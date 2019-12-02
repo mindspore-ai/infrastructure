@@ -20,6 +20,6 @@ install-helm
 
 echo "generating jenkins yaml..."
 helm template ${CURRENT_DIR}/jenkins -f ${CURRENT_DIR}/jenkins/values.yaml -f ${CURRENT_DIR}/jenkins/hw_override.yaml --name openeuler > jenkins.yaml
-echo "jenkins yaml generated with filename 'jenkins.yaml'."
+echo "jenkins yaml generated with filename 'jenkins-cluster.yaml'."
 
 

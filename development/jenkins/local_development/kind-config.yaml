@@ -6,7 +6,7 @@ nodes:
   - role: control-plane
   # and the two workers
   - role: worker
-    # The node port used for code server ingress controller.
+    # The node port used for jenkins web UI.
     extraPortMappings:
     - containerPort: 30080
       hostPort: 80

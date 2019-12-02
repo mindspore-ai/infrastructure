@@ -1,40 +1,43 @@
-# Resource for small specification slave pods
+# Resource for medium specification slave pods
 apiVersion: v1
 kind: Service
 metadata:
-  name: small-slaves-service
+  name: medium-slaves-service
   labels:
-    app: small-slaves
+    app: medium-slaves
 spec:
   ports:
     - port: 80
-      name: web
+      name: port-placeholder
   clusterIP: None
   selector:
-    app: small-slaves
+    app: medium-slaves
 
 ---
 kind: StatefulSet
 apiVersion: apps/v1beta1
 metadata:
-  name: small-slaves
+  name: medium-slaves
   namespace: default
   labels:
-    app: small-slaves
+    app: medium-slaves
 spec:
-  serviceName: small-slaves-service
+  serviceName: medium-slaves-service
   replicas: 2
   selector:
     matchLabels:
-      app: small-slaves
+      app: medium-slaves
   template:
     metadata:
       labels:
-        app: small-slaves
+        app: medium-slaves
     spec:
-      containers:
+      initContainers:
         - name: slave-init
           image: tommylike/jenkins-slave-tools:0.0.1
+          volumeMounts:
+            - mountPath: /home/jenkins/share-config
+              name: jenkins-share-config
           env:
             - name: JENKINS_NODE_NAME
               valueFrom:
@@ -49,45 +52,56 @@ spec:
             - name: JENKINS_URL
               value: http://mindspore-jenkins.default.svc.cluster.local:80
             - name: JENKINS_SHARE_FOLDER
-              value: /home/jenkins/share-folder
+              value: /home/jenkins/share-config
             - name: EXECUTOR_NUMBERS
-              value: 4
+              value: "4"
             - name: NODE_LABELS
-              value: x86;small
+              value: x86;k8s-medium
           args: ["$(JENKINS_URL)", "$(JENKINS_USER_NAME)", "$(JENKINS_USER_PASSWORD)", "$(JENKINS_NODE_NAME)", "$(EXECUTOR_NUMBERS)", "$(WORKING_DIR)", "$(NODE_LABELS)", "$(JENKINS_SHARE_FOLDER)"]
+      containers:
         - name: jenkins-slave
-          image: alpine:3.10
+          image: tommylike/ubuntu-slave:0.0.1
           imagePullPolicy: "IfNotPresent"
           volumeMounts:
             - mountPath: /home/jenkins/agent-working-dir
-              name: jenkins-workspace
-            - mountPath: /home/jenkins/share-folder
-              name: jenkins-share-folder
+              name: medium-workspace-pvc
+            - mountPath: /home/jenkins/share-config
+              name: jenkins-share-config
+            - mountPath: /home/jenkins/share-data
+              name: jenkins-share-data
           command:
             - /bin/sh
             - -c
             - |
-              sleep 10000;
+              export JENKINS_SECRET=`cat /home/jenkins/share-config/node_secret.id`;
+              exec jenkins-agent
           env:
-            - name: JENKINS_NODE_NAME
-              valueFrom:
-                fieldRef:
-                  fieldPath: metadata.name
-            - name: JENKINS_SECRET
-              value: 623648f4686a7a0cc32530f6ba09b731f0993c348bd429266f327131fde49b6a
             - name: JENKINS_TUNNEL
               value: mindspore-jenkins-agent:50000
             - name: JENKINS_AGENT_NAME
-              value: k8s-x86-gl02w
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
             - name: JENKINS_NAME
-              value: k8s-x86-gl02w
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
             - name: JENKINS_AGENT_WORKDIR
               value: /home/jenkins/agent-working-dir
             - name: JENKINS_URL
               value: http://mindspore-jenkins.default.svc.cluster.local:80
-
       volumes:
-        - name: jenkins-workspace
+        - name: jenkins-share-config
           emptyDir: {}
-        - name: jenkins-share-folder
-            emptyDir: {}
+        - name: jenkins-share-data
+          persistentVolumeClaim:
+            claimName: mindspore-jenkins-slave-share-pvc
+  volumeClaimTemplates:
+    - metadata:
+        name: medium-workspace-pvc
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        resources:
+          requests:
+            storage: 100Mi
+        storageClassName: "local-nfs"

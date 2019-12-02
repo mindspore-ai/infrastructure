@@ -8,10 +8,10 @@ export CLUSTER_CONTEXT="--name ${CLUSTER_NAME}"
 
 # clean up
 function cleanup {
-  echo "Uninstall code server services"
+  echo "Uninstall jenkins services"
   #kubectl delete -f ${CURRENT_ROOT}/code-server-development.yaml
   echo "Deleting nfs services"
-  helm deletenfs-server
+  helm delete nfs-server
   echo "Running kind: [kind delete cluster ${CLUSTER_CONTEXT}]"
   kind delete cluster ${CLUSTER_CONTEXT}
 
