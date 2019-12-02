@@ -18,7 +18,7 @@ master:
   # used to specify the service node port for master web UI
   nodePort: 30080
   # master image node and tag
-  image: "swr.cn-south-1.myhuaweicloud.com/freesky-edward/jenkins"
+  image: "jenkins/jenkins"
   tag: "lts"
   # request resource for master pod
   resources:
@@ -103,9 +103,9 @@ persistence:
   # Whether to enable persistent volume
   enabled: true
   # used to specify the PVC for jenkins master
-  size: 100Gi
+  size: 1Gi
   # used to specify the PVC SC for jenkins master
-  storageClass: ssd
+  storageClass: local-nfs
   accessMode: ReadWriteMany
 
 
