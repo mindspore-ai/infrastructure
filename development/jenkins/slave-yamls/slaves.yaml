@@ -33,22 +33,50 @@ spec:
         app: small-slaves
     spec:
       containers:
+        - name: slave-init
+          image: tommylike/jenkins-slave-tools:0.0.1
+          env:
+            - name: JENKINS_NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: JENKINS_USER_NAME
+              value: admin
+            - name: JENKINS_USER_PASSWORD
+              value: 11bbcf7dfa50b83cf1fe8773acfb527fc7
+            - name: JENKINS_AGENT_WORKDIR
+              value: /home/jenkins/agent-working-dir
+            - name: JENKINS_URL
+              value: http://mindspore-jenkins.default.svc.cluster.local:80
+            - name: JENKINS_SHARE_FOLDER
+              value: /home/jenkins/share-folder
+            - name: EXECUTOR_NUMBERS
+              value: 4
+            - name: NODE_LABELS
+              value: x86;small
+          args: ["$(JENKINS_URL)", "$(JENKINS_USER_NAME)", "$(JENKINS_USER_PASSWORD)", "$(JENKINS_NODE_NAME)", "$(EXECUTOR_NUMBERS)", "$(WORKING_DIR)", "$(NODE_LABELS)", "$(JENKINS_SHARE_FOLDER)"]
         - name: jenkins-slave
-          image: tommylike/ubuntu-slave:0.0.1
+          image: alpine:3.10
           imagePullPolicy: "IfNotPresent"
           volumeMounts:
             - mountPath: /home/jenkins/agent-working-dir
               name: jenkins-workspace
+            - mountPath: /home/jenkins/share-folder
+              name: jenkins-share-folder
           command:
             - /bin/sh
             - -c
             - |
-              sleep;
+              sleep 10000;
           env:
+            - name: JENKINS_NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
             - name: JENKINS_SECRET
               value: 623648f4686a7a0cc32530f6ba09b731f0993c348bd429266f327131fde49b6a
             - name: JENKINS_TUNNEL
-              value: openeuler-jenkins-agent:50000
+              value: mindspore-jenkins-agent:50000
             - name: JENKINS_AGENT_NAME
               value: k8s-x86-gl02w
             - name: JENKINS_NAME
@@ -56,8 +84,10 @@ spec:
             - name: JENKINS_AGENT_WORKDIR
               value: /home/jenkins/agent-working-dir
             - name: JENKINS_URL
-              value: http://openeuler-jenkins.default.svc.cluster.local:80
+              value: http://mindspore-jenkins.default.svc.cluster.local:80
 
       volumes:
         - name: jenkins-workspace
           emptyDir: {}
+        - name: jenkins-share-folder
+            emptyDir: {}
