@@ -1,0 +1,63 @@
+# Resource for small specification slave pods
+apiVersion: v1
+kind: Service
+metadata:
+  name: small-slaves-service
+  labels:
+    app: small-slaves
+spec:
+  ports:
+    - port: 80
+      name: web
+  clusterIP: None
+  selector:
+    app: small-slaves
+
+---
+kind: StatefulSet
+apiVersion: apps/v1beta1
+metadata:
+  name: small-slaves
+  namespace: default
+  labels:
+    app: small-slaves
+spec:
+  serviceName: small-slaves-service
+  replicas: 2
+  selector:
+    matchLabels:
+      app: small-slaves
+  template:
+    metadata:
+      labels:
+        app: small-slaves
+    spec:
+      containers:
+        - name: jenkins-slave
+          image: tommylike/ubuntu-slave:0.0.1
+          imagePullPolicy: "IfNotPresent"
+          volumeMounts:
+            - mountPath: /home/jenkins/agent-working-dir
+              name: jenkins-workspace
+          command:
+            - /bin/sh
+            - -c
+            - |
+              sleep;
+          env:
+            - name: JENKINS_SECRET
+              value: 623648f4686a7a0cc32530f6ba09b731f0993c348bd429266f327131fde49b6a
+            - name: JENKINS_TUNNEL
+              value: openeuler-jenkins-agent:50000
+            - name: JENKINS_AGENT_NAME
+              value: k8s-x86-gl02w
+            - name: JENKINS_NAME
+              value: k8s-x86-gl02w
+            - name: JENKINS_AGENT_WORKDIR
+              value: /home/jenkins/agent-working-dir
+            - name: JENKINS_URL
+              value: http://openeuler-jenkins.default.svc.cluster.local:80
+
+      volumes:
+        - name: jenkins-workspace
+          emptyDir: {}

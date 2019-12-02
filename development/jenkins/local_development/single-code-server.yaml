@@ -1,0 +1,111 @@
+# Ingress used to map url to different code server instances
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: code-server-entrance
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      proxy_set_header Accept-Encoding "";
+      sub_filter '<head>' '<head> <base href="/tommylike/">';
+spec:
+  rules:
+    - host: tommylike.me
+      http:
+        paths:
+          - path: /tommylike(/|$)(.*)
+            backend:
+              serviceName: code-server-instance-1
+              servicePort: 80
+# Service for code server instance 1
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: code-server-instance-1
+  labels:
+    app: code-server-instance-1
+spec:
+  selector:
+    app: code-server-instance-1
+  type: ClusterIP
+  ports:
+    - port: 80
+      name: web-ui
+      targetPort: 8080
+    - port: 8000
+      name: web-status
+      targetPort: 8000
+
+#Deployment for code server instance 1
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: code-server-instance-1
+  namespace: default
+  labels:
+    app: code-server-instance-1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: code-server-instance-1
+  template:
+    metadata:
+      labels:
+        app: code-server-instance-1
+    spec:
+      containers:
+        - name: code-server
+          image: codercom/code-server:v2
+          imagePullPolicy: "IfNotPresent"
+          automountServiceAccountToken: false
+          volumeMounts:
+            - mountPath: /home/coder/.local/share/code-server
+              name: code-srver-share-dir
+            - mountPath: /home/coder/project
+              name: code-server-project-dir
+          env:
+            - name: PASSWORD
+              value: "password"
+          securityContext:
+            privileged: true
+        - name: status-exporter
+          image: tommylike/code-server-exporter:0.0.1
+          imagePullPolicy: "IfNotPresent"
+          volumeMounts:
+            - mountPath: /home/coder/.local/share/code-server
+              name: code-server-share-dir
+          env:
+            - name: STAT_FILE
+              value: /home/coder/.local/share/code-server/heartbeat
+            - name: LISTEN_PORT
+              value: "8000"
+      volumes:
+        - name: code-server-share-dir
+          emptyDir: {}
+        - name: code-server-project-dir
+          persistentVolumeClaim:
+            claimName: code-server-project-dir
+
+
+#PVC for code server instance 1
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: code-server-project-dir
+  annotations:
+    volume.beta.kubernetes.io/storage-class: "local-nfs"
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 1000Mi
+  storageClassName: local-nfs
+
+
