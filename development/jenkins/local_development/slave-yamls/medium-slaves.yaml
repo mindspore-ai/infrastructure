@@ -1,37 +1,36 @@
-# Resource for small specification slave pods
+# Resource for medium specification slave pods
 apiVersion: v1
 kind: Service
 metadata:
-  name: small-slaves-service
-  namespace: jenkins
+  name: medium-slaves-service
   labels:
-    app: small-slaves
+    app: medium-slaves
 spec:
   ports:
     - port: 80
       name: port-placeholder
   clusterIP: None
   selector:
-    app: small-slaves
+    app: medium-slaves
 
 ---
 kind: StatefulSet
 apiVersion: apps/v1beta1
 metadata:
-  name: small-slaves
-  namespace: jenkins
+  name: medium-slaves
+  namespace: default
   labels:
-    app: small-slaves
+    app: medium-slaves
 spec:
-  serviceName: small-slaves-service
+  serviceName: medium-slaves-service
   replicas: 2
   selector:
     matchLabels:
-      app: small-slaves
+      app: medium-slaves
   template:
     metadata:
       labels:
-        app: small-slaves
+        app: medium-slaves
     spec:
       initContainers:
         - name: slave-init
@@ -57,7 +56,7 @@ spec:
             - name: EXECUTOR_NUMBERS
               value: "4"
             - name: NODE_LABELS
-              value: x86;k8s-small
+              value: x86;k8s-medium
           args: ["$(JENKINS_URL)", "$(JENKINS_USER_NAME)", "$(JENKINS_USER_PASSWORD)", "$(JENKINS_NODE_NAME)", "$(EXECUTOR_NUMBERS)", "$(WORKING_DIR)", "$(NODE_LABELS)", "$(JENKINS_SHARE_FOLDER)"]
       containers:
         - name: jenkins-slave
@@ -65,7 +64,7 @@ spec:
           imagePullPolicy: "IfNotPresent"
           volumeMounts:
             - mountPath: /home/jenkins/agent-working-dir
-              name: jenkins-workspace
+              name: medium-workspace-pvc
             - mountPath: /home/jenkins/share-config
               name: jenkins-share-config
             - mountPath: /home/jenkins/share-data
@@ -76,13 +75,12 @@ spec:
             - |
               export JENKINS_SECRET=`cat /home/jenkins/share-config/node_secret.id`;
               exec jenkins-agent
-          resources:
-            limits:
-              cpu: 1000m
-              memory: 2000Mi
+          limits:
+            cpu: 400m
+            memory: 400Mi
             requests:
-              cpu: 2000m
-              memory: 3000Mi
+              cpu: 500m
+              memory: 900Mi
           env:
             - name: JENKINS_TUNNEL
               value: mindspore-jenkins-agent:50000
@@ -111,5 +109,5 @@ spec:
         accessModes: [ "ReadWriteOnce" ]
         resources:
           requests:
-            storage: 500Gi
-        storageClassName: "ssd"
+            storage: 100Mi
+        storageClassName: "local-nfs"

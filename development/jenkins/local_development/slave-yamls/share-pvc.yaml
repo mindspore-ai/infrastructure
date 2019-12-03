@@ -2,12 +2,12 @@ kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
   name: mindspore-jenkins-slave-share-pvc
-  namespace: jenkins
+  namespace: default
 spec:
   volumeMode: Filesystem
   accessModes:
     - "ReadWriteMany"
   resources:
     requests:
-      storage: "4000Gi"
-  storageClassName: "ssd"
+      storage: "40Mi"
+  storageClassName: "local-nfs"

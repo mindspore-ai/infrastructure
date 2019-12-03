@@ -1,0 +1,598 @@
+---
+# Source: jenkins/templates/secret.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: mindspore-jenkins
+  namespace: jenkins
+  labels:
+    "app.kubernetes.io/name": 'jenkins'
+    "helm.sh/chart": "jenkins-1.7.4"
+    "app.kubernetes.io/managed-by": "Tiller"
+    "app.kubernetes.io/instance": "mindspore"
+    "app.kubernetes.io/component": "jenkins-master"
+type: Opaque
+data:
+  jenkins-admin-password: "QWRtaW5QYXNzd29yZA=="
+  jenkins-admin-user: "YWRtaW4="
+
+---
+# Source: jenkins/templates/config.yaml
+
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mindspore-jenkins
+  namespace: jenkins
+  labels:
+    "app.kubernetes.io/name": 'jenkins'
+    "helm.sh/chart": "jenkins-1.7.4"
+    "app.kubernetes.io/managed-by": "Tiller"
+    "app.kubernetes.io/instance": "mindspore"
+    "app.kubernetes.io/component": "jenkins-master"
+data:
+  config.xml: |-
+    <?xml version='1.0' encoding='UTF-8'?>
+    <hudson>
+      <disabledAdministrativeMonitors/>
+      <version>lts</version>
+      <numExecutors>0</numExecutors>
+      <mode>NORMAL</mode>
+      <useSecurity>true</useSecurity>
+      <authorizationStrategy class="hudson.security.FullControlOnceLoggedInAuthorizationStrategy">
+        <denyAnonymousReadAccess>true</denyAnonymousReadAccess>
+      </authorizationStrategy>
+      <securityRealm class="hudson.security.LegacySecurityRealm"/>
+      <disableRememberMe>false</disableRememberMe>
+      <projectNamingStrategy class="jenkins.model.ProjectNamingStrategy$DefaultProjectNamingStrategy"/>
+      <workspaceDir>${JENKINS_HOME}/workspace/${ITEM_FULLNAME}</workspaceDir>
+      <buildsDir>${ITEM_ROOTDIR}/builds</buildsDir>
+      <markupFormatter class="hudson.markup.EscapedMarkupFormatter"/>
+      <jdks/>
+      <viewsTabBar class="hudson.views.DefaultViewsTabBar"/>
+      <myViewsTabBar class="hudson.views.DefaultMyViewsTabBar"/>
+      <clouds>
+        <org.csanchez.jenkins.plugins.kubernetes.KubernetesCloud plugin="kubernetes@1.18.2">
+          <name>kubernetes-x86-cluster</name>
+          <templates>
+            <org.csanchez.jenkins.plugins.kubernetes.PodTemplate>
+              <inheritFrom></inheritFrom>
+              <name>k8s-x86</name>
+              <instanceCap>2147483647</instanceCap>
+              <idleMinutes>0</idleMinutes>
+              <label>mindspore-jenkins-slave-x86 </label>
+              <serviceAccount>default</serviceAccount>
+              <nodeSelector></nodeSelector>
+                <nodeUsageMode>EXCLUSIVE</nodeUsageMode>
+              <volumes>
+                <org.csanchez.jenkins.plugins.kubernetes.volumes.HostPathVolume>
+                  <hostPath>/jenkins_agent_dir</hostPath>
+                  <mountPath>/home/jenkins/agent-working-dir</mountPath>
+                </org.csanchez.jenkins.plugins.kubernetes.volumes.HostPathVolume>
+              </volumes>
+              <containers>
+                <org.csanchez.jenkins.plugins.kubernetes.ContainerTemplate>
+                  <name>jnlp</name>
+                  <image>swr.cn-south-1.myhuaweicloud.com/freesky-edward/jnlp-slave:3.27-1</image>
+                  <privileged>false</privileged>
+                  <alwaysPullImage>false</alwaysPullImage>
+                  <workingDir>/home/jenkins</workingDir>
+                  <command></command>
+                  <args>${computer.jnlpmac} ${computer.name}</args>
+                  <ttyEnabled>false</ttyEnabled>
+                  # Resources configuration is a little hacky. This was to prevent breaking
+                  # changes, and should be cleanned up in the future once everybody had
+                  # enough time to migrate.
+                  <resourceRequestCpu>2000m</resourceRequestCpu>
+                  <resourceRequestMemory>4096Mi</resourceRequestMemory>
+                  <envVars>
+                    <org.csanchez.jenkins.plugins.kubernetes.ContainerEnvVar>
+                      <key>JENKINS_URL</key>
+                      <value>http://mindspore-jenkins.jenkins.svc.cluster.local:80</value>
+                    </org.csanchez.jenkins.plugins.kubernetes.ContainerEnvVar>
+                  </envVars>
+                </org.csanchez.jenkins.plugins.kubernetes.ContainerTemplate>
+              </containers>
+              <envVars>
+                <org.csanchez.jenkins.plugins.kubernetes.PodEnvVar>
+                  <key>JENKINS_AGENT_WORKDIR</key>
+                  <value>/home/jenkins/agent-working-dir</value>
+                </org.csanchez.jenkins.plugins.kubernetes.PodEnvVar>
+              </envVars>
+              <annotations/>
+              <imagePullSecrets/>
+              <nodeProperties/>
+              <podRetention class="org.csanchez.jenkins.plugins.kubernetes.pod.retention.Default"/>
+            </org.csanchez.jenkins.plugins.kubernetes.PodTemplate></templates>
+          <serverUrl>https://kubernetes.default</serverUrl>
+          <skipTlsVerify>false</skipTlsVerify>
+          <namespace>jenkins</namespace>
+          <jenkinsUrl>http://mindspore-jenkins:80</jenkinsUrl>
+          <jenkinsTunnel>mindspore-jenkins-agent:50000</jenkinsTunnel>
+          <containerCap>10</containerCap>
+          <retentionTimeout>5</retentionTimeout>
+          <connectTimeout>0</connectTimeout>
+          <readTimeout>0</readTimeout>
+          <podRetention class="org.csanchez.jenkins.plugins.kubernetes.pod.retention.Never"/>
+        </org.csanchez.jenkins.plugins.kubernetes.KubernetesCloud>
+        <org.csanchez.jenkins.plugins.kubernetes.KubernetesCloud plugin="kubernetes@1.18.2">
+          <name>kubernetes-arm-cluster</name>
+          <templates>
+            <org.csanchez.jenkins.plugins.kubernetes.PodTemplate>
+              <inheritFrom></inheritFrom>
+              <name>k8s-arm</name>
+              <instanceCap>2147483647</instanceCap>
+              <idleMinutes>0</idleMinutes>
+              <label>mindspore-jenkins-slave-arm </label>
+              <serviceAccount>default</serviceAccount>
+              <nodeSelector></nodeSelector>
+                <nodeUsageMode>EXCLUSIVE</nodeUsageMode>
+              <volumes>
+                <org.csanchez.jenkins.plugins.kubernetes.volumes.HostPathVolume>
+                  <hostPath>/jenkins_agent_dir</hostPath>
+                  <mountPath>/home/jenkins/agent-working-dir</mountPath>
+                </org.csanchez.jenkins.plugins.kubernetes.volumes.HostPathVolume>
+              </volumes>
+              <containers>
+                <org.csanchez.jenkins.plugins.kubernetes.ContainerTemplate>
+                  <name>jnlp</name>
+                  <image>swr.cn-south-1.myhuaweicloud.com/freesky-edward/jnlp-slave:3.27-1</image>
+                  <privileged>false</privileged>
+                  <alwaysPullImage>false</alwaysPullImage>
+                  <workingDir>/home/jenkins</workingDir>
+                  <command></command>
+                  <args>${computer.jnlpmac} ${computer.name}</args>
+                  <ttyEnabled>false</ttyEnabled>
+                  # Resources configuration is a little hacky. This was to prevent breaking
+                  # changes, and should be cleanned up in the future once everybody had
+                  # enough time to migrate.
+                  <resourceRequestCpu>2000m</resourceRequestCpu>
+                  <resourceRequestMemory>4096Mi</resourceRequestMemory>
+                  <envVars>
+                    <org.csanchez.jenkins.plugins.kubernetes.ContainerEnvVar>
+                      <key>JENKINS_URL</key>
+                      <value>http://mindspore-jenkins.jenkins.svc.cluster.local:80</value>
+                    </org.csanchez.jenkins.plugins.kubernetes.ContainerEnvVar>
+                  </envVars>
+                </org.csanchez.jenkins.plugins.kubernetes.ContainerTemplate>
+              </containers>
+              <envVars>
+                <org.csanchez.jenkins.plugins.kubernetes.PodEnvVar>
+                  <key>JENKINS_AGENT_WORKDIR</key>
+                  <value>/home/jenkins/agent-working-dir</value>
+                </org.csanchez.jenkins.plugins.kubernetes.PodEnvVar>
+              </envVars>
+              <annotations/>
+              <imagePullSecrets/>
+              <nodeProperties/>
+              <podRetention class="org.csanchez.jenkins.plugins.kubernetes.pod.retention.Default"/>
+            </org.csanchez.jenkins.plugins.kubernetes.PodTemplate></templates>
+          <serverUrl>https://kubernetes.default</serverUrl>
+          <skipTlsVerify>false</skipTlsVerify>
+          <namespace>jenkins</namespace>
+          <jenkinsUrl>http://mindspore-jenkins:80</jenkinsUrl>
+          <jenkinsTunnel>mindspore-jenkins-agent:50000</jenkinsTunnel>
+          <containerCap>10</containerCap>
+          <retentionTimeout>5</retentionTimeout>
+          <connectTimeout>0</connectTimeout>
+          <readTimeout>0</readTimeout>
+          <podRetention class="org.csanchez.jenkins.plugins.kubernetes.pod.retention.Never"/>
+        </org.csanchez.jenkins.plugins.kubernetes.KubernetesCloud>
+      </clouds>
+      <quietPeriod>5</quietPeriod>
+      <scmCheckoutRetryCount>0</scmCheckoutRetryCount>
+      <views>
+        <hudson.model.AllView>
+          <owner class="hudson" reference="../../.."/>
+          <name>All</name>
+          <filterExecutors>false</filterExecutors>
+          <filterQueue>false</filterQueue>
+          <properties class="hudson.model.View$PropertyList"/>
+        </hudson.model.AllView>
+      </views>
+      <primaryView>All</primaryView>
+      <slaveAgentPort>50000</slaveAgentPort>
+      <disabledAgentProtocols>
+        <string>JNLP-connect</string>
+        <string>JNLP2-connect</string>
+      </disabledAgentProtocols>
+      <label></label>
+      <crumbIssuer class="hudson.security.csrf.DefaultCrumbIssuer">
+        <excludeClientIPFromCrumb>true</excludeClientIPFromCrumb>
+      </crumbIssuer>
+      <nodeProperties/>
+      <globalNodeProperties/>
+      <noUsageStatistics>true</noUsageStatistics>
+    </hudson>
+  jenkins.model.JenkinsLocationConfiguration.xml: |-
+    <?xml version='1.1' encoding='UTF-8'?>
+    <jenkins.model.JenkinsLocationConfiguration>
+      <adminAddress></adminAddress>
+      <jenkinsUrl>http://mindspore-jenkins:80</jenkinsUrl>
+    </jenkins.model.JenkinsLocationConfiguration>
+  jenkins.CLI.xml: |-
+    <?xml version='1.1' encoding='UTF-8'?>
+    <jenkins.CLI>
+      <enabled>false</enabled>
+    </jenkins.CLI>
+  apply_config.sh: |-
+    mkdir -p /usr/share/jenkins/ref/secrets/;
+    echo "false" > /usr/share/jenkins/ref/secrets/slave-to-master-security-kill-switch;
+    yes n | cp -i /var/jenkins_config/config.xml /var/jenkins_home;
+    yes n | cp -i /var/jenkins_config/jenkins.CLI.xml /var/jenkins_home;
+    yes n | cp -i /var/jenkins_config/jenkins.model.JenkinsLocationConfiguration.xml /var/jenkins_home;
+    # Install missing plugins
+    cp /var/jenkins_config/plugins.txt /var/jenkins_home;
+    rm -rf /usr/share/jenkins/ref/plugins/*.lock
+    /usr/local/bin/install-plugins.sh `echo $(cat /var/jenkins_home/plugins.txt)`;
+    # Copy plugins to shared volume
+    yes n | cp -i /usr/share/jenkins/ref/plugins/* /var/jenkins_plugins/;
+  plugins.txt: |-
+    kubernetes:1.18.2
+    workflow-job:2.33
+    workflow-aggregator:2.6
+    credentials-binding:1.19
+    git:3.11.0
+    gitee:1.1.3
+    ssh-slaves:1.31.0
+
+
+---
+# Source: jenkins/templates/home-pvc.yaml
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: mindspore-jenkins
+  namespace: jenkins
+  labels:
+    "app.kubernetes.io/name": 'jenkins'
+    "helm.sh/chart": "jenkins-1.7.4"
+    "app.kubernetes.io/managed-by": "Tiller"
+    "app.kubernetes.io/instance": "mindspore"
+    "app.kubernetes.io/component": "jenkins-master"
+spec:
+  volumeMode: Filesystem
+  accessModes:
+    - "ReadWriteMany"
+  resources:
+    requests:
+      storage: "4000Gi"
+  storageClassName: "sas"
+
+---
+# Source: jenkins/templates/service-account.yaml
+
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: mindspore-jenkins
+  namespace: jenkins
+  labels:
+    "app.kubernetes.io/name": 'jenkins'
+    "helm.sh/chart": "jenkins-1.7.4"
+    "app.kubernetes.io/managed-by": "Tiller"
+    "app.kubernetes.io/instance": "mindspore"
+    "app.kubernetes.io/component": "jenkins-master"
+
+
+---
+# Source: jenkins/templates/rbac.yaml
+# This role is used to allow Jenkins scheduling of agents via Kubernetes plugin.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: mindspore-jenkins-schedule-agents
+  namespace: jenkins
+  labels:
+    "app.kubernetes.io/name": 'jenkins'
+    "helm.sh/chart": "jenkins-1.7.4"
+    "app.kubernetes.io/managed-by": "Tiller"
+    "app.kubernetes.io/instance": "mindspore"
+    "app.kubernetes.io/component": "jenkins-master"
+rules:
+- apiGroups: [""]
+  resources: ["pods", "pods/exec", "pods/log"]
+  verbs: ["*"]
+
+---
+
+# We bind the role to the Jenkins service account. The role binding is created in the namespace
+# where the agents are supposed to run.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: mindspore-jenkins-schedule-agents
+  namespace: jenkins
+  labels:
+    "app.kubernetes.io/name": 'jenkins'
+    "helm.sh/chart": "jenkins-1.7.4"
+    "app.kubernetes.io/managed-by": "Tiller"
+    "app.kubernetes.io/instance": "mindspore"
+    "app.kubernetes.io/component": "jenkins-master"
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: mindspore-jenkins-schedule-agents
+subjects:
+- kind: ServiceAccount
+  name: mindspore-jenkins
+  namespace: jenkins
+
+---
+
+
+
+---
+# Source: jenkins/templates/jenkins-agent-svc.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: mindspore-jenkins-agent
+  namespace: jenkins
+  labels:
+    "app.kubernetes.io/name": 'jenkins'
+    "helm.sh/chart": "jenkins-1.7.4"
+    "app.kubernetes.io/managed-by": "Tiller"
+    "app.kubernetes.io/instance": "mindspore"
+    "app.kubernetes.io/component": "jenkins-master"
+spec:
+  ports:
+    - port: 50000
+      targetPort: 50000
+      
+      name: slavelistener
+  selector:
+    "app.kubernetes.io/component": "jenkins-master"
+    "app.kubernetes.io/instance": "mindspore"
+  type: ClusterIP
+
+---
+# Source: jenkins/templates/jenkins-master-svc.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: mindspore-jenkins
+  namespace: jenkins
+  labels:
+    "app.kubernetes.io/name": 'jenkins'
+    "helm.sh/chart": "jenkins-1.7.4"
+    "app.kubernetes.io/managed-by": "Tiller"
+    "app.kubernetes.io/instance": "mindspore"
+    "app.kubernetes.io/component": "jenkins-master"
+    "kubernetes.io/elb.class": union
+    "kubernetes.io/elb.id": "b0158483-ae46-4cea-8763-d48d1bde3e83"
+    "kubernetes.io/elb.lb-algorithm": ROUND_ROBIN
+spec:
+  ports:
+    - port: 80
+      name: http
+      targetPort: 8080
+
+  selector:
+    "app.kubernetes.io/component": "jenkins-master"
+    "app.kubernetes.io/instance": "mindspore"
+  type: LoadBalancer
+  
+  loadBalancerSourceRanges:
+    - 0.0.0.0/0
+    
+  
+  loadBalancerIP: 117.78.60.175
+  
+  
+
+---
+# Source: jenkins/templates/jenkins-master-deployment.yaml
+
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: mindspore-jenkins
+  namespace: jenkins
+  labels:
+    "app.kubernetes.io/name": 'jenkins'
+    "helm.sh/chart": "jenkins-1.7.4"
+    "app.kubernetes.io/managed-by": "Tiller"
+    "app.kubernetes.io/instance": "mindspore"
+    "app.kubernetes.io/component": "jenkins-master"
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      "app.kubernetes.io/component": "jenkins-master"
+      "app.kubernetes.io/instance": "mindspore"
+  template:
+    metadata:
+      labels:
+        "app.kubernetes.io/name": 'jenkins'
+        "helm.sh/chart": "jenkins-1.7.4"
+        "app.kubernetes.io/managed-by": "Tiller"
+        "app.kubernetes.io/instance": "mindspore"
+        "app.kubernetes.io/component": "jenkins-master"
+      annotations:
+        checksum/config: 9082d5fc978a4463dfc767a49f21b1ebe45d1767849c41939a18e1baab59f923
+    spec:
+      nodeSelector:
+        master_node: "true"
+        
+      securityContext:
+        runAsUser: 0
+      serviceAccountName: "mindspore-jenkins"
+      initContainers:
+        - name: "copy-default-config"
+          image: "swr.cn-north-1.myhuaweicloud.com/hwstaff_h00223369/jenkins/jenkins:lts"
+          imagePullPolicy: "Always"
+          command: [ "sh", "/var/jenkins_config/apply_config.sh" ]
+          env:
+            - name: ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mindspore-jenkins
+                  key: jenkins-admin-password
+            - name: ADMIN_USER
+              valueFrom:
+                secretKeyRef:
+                  name: mindspore-jenkins
+                  key: jenkins-admin-user
+          resources:
+            limits:
+              cpu: 15000m
+              memory: 55000Mi
+            requests:
+              cpu: 15000m
+              memory: 55000Mi
+            
+          volumeMounts:
+            - mountPath: /tmp
+              name: tmp
+            - mountPath: /var/jenkins_home
+              name: jenkins-home
+            - mountPath: /var/jenkins_config
+              name: jenkins-config
+            - mountPath: /usr/share/jenkins/ref/secrets/
+              name: secrets-dir
+            - mountPath: /usr/share/jenkins/ref/plugins
+              name: plugins
+            - mountPath: /var/jenkins_plugins
+              name: plugin-dir
+      containers:
+        - name: jenkins
+          image: "swr.cn-north-1.myhuaweicloud.com/hwstaff_h00223369/jenkins/jenkins:lts"
+          imagePullPolicy: "Always"
+          args: [ "--argumentsRealm.passwd.$(ADMIN_USER)=$(ADMIN_PASSWORD)",  "--argumentsRealm.roles.$(ADMIN_USER)=admin"]
+          env:
+            - name: JAVA_OPTS
+              value: ""
+            - name: JENKINS_OPTS
+              value: ""
+            - name: JENKINS_SLAVE_AGENT_PORT
+              value: "50000"
+            - name: ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mindspore-jenkins
+                  key: jenkins-admin-password
+            - name: ADMIN_USER
+              valueFrom:
+                secretKeyRef:
+                  name: mindspore-jenkins
+                  key: jenkins-admin-user
+          ports:
+            - containerPort: 8080
+              name: http
+            - containerPort: 50000
+              name: slavelistener
+          livenessProbe:
+            httpGet:
+              path: "/login"
+              port: http
+            initialDelaySeconds: 90
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 5
+          readinessProbe:
+            httpGet:
+              path: "/login"
+              port: http
+            initialDelaySeconds: 60
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+
+          resources:
+            limits:
+              cpu: 15000m
+              memory: 55000Mi
+            requests:
+              cpu: 15000m
+              memory: 55000Mi
+            
+          volumeMounts:
+            - mountPath: /tmp
+              name: tmp
+            - mountPath: /var/jenkins_home
+              name: jenkins-home
+              readOnly: false
+            - mountPath: /var/jenkins_config
+              name: jenkins-config
+              readOnly: true
+            - mountPath: /usr/share/jenkins/ref/secrets/
+              name: secrets-dir
+              readOnly: false
+            - mountPath: /usr/share/jenkins/ref/plugins/
+              name: plugin-dir
+              readOnly: false
+
+      volumes:
+      - name: plugins
+        emptyDir: {}
+      - name: tmp
+        emptyDir: {}
+      - name: jenkins-config
+        configMap:
+          name: mindspore-jenkins
+      - name: secrets-dir
+        emptyDir: {}
+      - name: plugin-dir
+        emptyDir: {}
+      - name: jenkins-home
+        persistentVolumeClaim:
+          claimName: mindspore-jenkins
+---
+# Source: jenkins/templates/deprecation.yaml
+
+
+---
+# Source: jenkins/templates/jcasc-config.yaml
+
+
+---
+# Source: jenkins/templates/jenkins-backup-cronjob.yaml
+
+
+---
+# Source: jenkins/templates/jenkins-backup-rbac.yaml
+
+
+---
+# Source: jenkins/templates/jenkins-master-alerting-rules.yaml
+
+
+---
+# Source: jenkins/templates/jenkins-master-backendconfig.yaml
+
+
+---
+# Source: jenkins/templates/jenkins-master-ingress.yaml
+
+
+---
+# Source: jenkins/templates/jenkins-master-networkpolicy.yaml
+
+
+---
+# Source: jenkins/templates/jenkins-master-route.yaml
+
+
+---
+# Source: jenkins/templates/jenkins-master-servicemonitor.yaml
+
+
+---
+# Source: jenkins/templates/jobs.yaml
+
+---
+# Source: jenkins/templates/service-account-agent.yaml
+
+
+---
+# Source: jenkins/templates/tests/jenkins-test.yaml
+
+
+---
+# Source: jenkins/templates/tests/test-config.yaml
+
+

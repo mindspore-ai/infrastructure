@@ -19,7 +19,7 @@ function install-helm {
 install-helm
 
 echo "generating jenkins yaml..."
-helm template ${CURRENT_DIR}/jenkins -f ${CURRENT_DIR}/jenkins/values.yaml -f ${CURRENT_DIR}/jenkins/hw_override.yaml --name openeuler > jenkins.yaml
+helm template ${CURRENT_DIR}/jenkins -f ${CURRENT_DIR}/jenkins/values.yaml -f ${CURRENT_DIR}/jenkins/hw_override.yaml --name mindspore --namespace jenkins > ../../production/jenkins/jenkins-cluster.yaml
 echo "jenkins yaml generated with filename 'jenkins-cluster.yaml'."
 
 

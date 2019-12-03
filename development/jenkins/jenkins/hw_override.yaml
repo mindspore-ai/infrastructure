@@ -8,26 +8,28 @@ master:
   # test pod will be created to test the readness of master web UI if enabled.
   testEnabled: false
   # used to specify the Elb ID which used for master service
-  huaweielbID: e1bb61d2-6101-419f-97d8-c76b1020a0c1
+  huaweielbID: b0158483-ae46-4cea-8763-d48d1bde3e83
   # used to specify the service type of master service
   serviceType: LoadBalancer
   # EIP for node load balancer
-  loadBalancerIP: 114.116.250.98
+  loadBalancerIP: 117.78.60.175
   # used to specify the service port for master web UI
   servicePort: 80
   # used to specify the service node port for master web UI
   nodePort: 8000
   # master image node and tag
-  image: "swr.cn-south-1.myhuaweicloud.com/freesky-edward/jenkins"
+  image: "swr.cn-north-1.myhuaweicloud.com/hwstaff_h00223369/jenkins/jenkins"
   tag: "lts"
+  nodeSelector:
+    master_node: "true"
   # request resource for master pod
   resources:
     requests:
-      cpu: "8000m"
-      memory: "8192Mi"
+      cpu: "15000m"
+      memory: "55000Mi"
     limits:
-      cpu: "8000m"
-      memory: "16384Mi"
+      cpu: "15000m"
+      memory: "55000Mi"
   # installed plugins
   installPlugins:
     - kubernetes:1.18.2
@@ -38,6 +40,8 @@ master:
     - gitee:1.1.3
     - ssh-slaves:1.31.0
 
+
+## NOTE: Configuration below for agents are not used for Mindspore jenkins cluster.
 agent:
   # Whether enable agents
   enabled: true
@@ -103,9 +107,9 @@ persistence:
   # Whether to enable persistent volume
   enabled: true
   # used to specify the PVC for jenkins master
-  size: 100Gi
+  size: 4000Gi
   # used to specify the PVC SC for jenkins master
-  storageClass: ssd
+  storageClass: sas
   accessMode: ReadWriteMany
 
 

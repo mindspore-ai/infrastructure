@@ -1,41 +1,41 @@
-# Resource for small specification slave pods
+# Resource for medium specification slave pods
 apiVersion: v1
 kind: Service
 metadata:
-  name: small-slaves-service
+  name: medium-slaves-service
   namespace: jenkins
   labels:
-    app: small-slaves
+    app: medium-slaves
 spec:
   ports:
     - port: 80
       name: port-placeholder
   clusterIP: None
   selector:
-    app: small-slaves
+    app: medium-slaves
 
 ---
 kind: StatefulSet
 apiVersion: apps/v1beta1
 metadata:
-  name: small-slaves
+  name: medium-slaves
   namespace: jenkins
   labels:
-    app: small-slaves
+    app: medium-slaves
 spec:
-  serviceName: small-slaves-service
-  replicas: 2
+  serviceName: medium-slaves-service
+  replicas: 9
   selector:
     matchLabels:
-      app: small-slaves
+      app: medium-slaves
   template:
     metadata:
       labels:
-        app: small-slaves
+        app: medium-slaves
     spec:
       initContainers:
         - name: slave-init
-          image: tommylike/jenkins-slave-tools:0.0.1
+          image: swr.cn-north-1.myhuaweicloud.com/hwstaff_h00223369/jenkins-slave-tools:0.0.1
           volumeMounts:
             - mountPath: /home/jenkins/share-config
               name: jenkins-share-config
@@ -47,25 +47,25 @@ spec:
             - name: JENKINS_USER_NAME
               value: admin
             - name: JENKINS_USER_PASSWORD
-              value: 11bbcf7dfa50b83cf1fe8773acfb527fc7
+              value: 11d0c70ee84399e316a245073446bd66c8
             - name: JENKINS_AGENT_WORKDIR
               value: /home/jenkins/agent-working-dir
             - name: JENKINS_URL
-              value: http://mindspore-jenkins.default.svc.cluster.local:80
+              value: http://mindspore-jenkins.jenkins.svc.cluster.local:80
             - name: JENKINS_SHARE_FOLDER
               value: /home/jenkins/share-config
             - name: EXECUTOR_NUMBERS
-              value: "4"
+              value: "1"
             - name: NODE_LABELS
-              value: x86;k8s-small
-          args: ["$(JENKINS_URL)", "$(JENKINS_USER_NAME)", "$(JENKINS_USER_PASSWORD)", "$(JENKINS_NODE_NAME)", "$(EXECUTOR_NUMBERS)", "$(WORKING_DIR)", "$(NODE_LABELS)", "$(JENKINS_SHARE_FOLDER)"]
+              value: x86;k8s-medium
+          args: ["$(JENKINS_URL)", "$(JENKINS_USER_NAME)", "$(JENKINS_USER_PASSWORD)", "$(JENKINS_NODE_NAME)", "$(EXECUTOR_NUMBERS)", "$(JENKINS_AGENT_WORKDIR)", "$(NODE_LABELS)", "$(JENKINS_SHARE_FOLDER)"]
       containers:
         - name: jenkins-slave
-          image: tommylike/ubuntu-slave:0.0.1
+          image: swr.cn-north-1.myhuaweicloud.com/hwstaff_h00223369/ubuntu-slave:0.0.1
           imagePullPolicy: "IfNotPresent"
           volumeMounts:
             - mountPath: /home/jenkins/agent-working-dir
-              name: jenkins-workspace
+              name: medium-workspace-pvc
             - mountPath: /home/jenkins/share-config
               name: jenkins-share-config
             - mountPath: /home/jenkins/share-data
@@ -77,12 +77,12 @@ spec:
               export JENKINS_SECRET=`cat /home/jenkins/share-config/node_secret.id`;
               exec jenkins-agent
           resources:
-            limits:
-              cpu: 1000m
-              memory: 2000Mi
             requests:
-              cpu: 2000m
-              memory: 3000Mi
+              cpu: 4000m
+              memory: 8000Mi
+            limits:
+              cpu: 5000m
+              memory: 9000Mi
           env:
             - name: JENKINS_TUNNEL
               value: mindspore-jenkins-agent:50000
@@ -97,13 +97,14 @@ spec:
             - name: JENKINS_AGENT_WORKDIR
               value: /home/jenkins/agent-working-dir
             - name: JENKINS_URL
-              value: http://mindspore-jenkins.default.svc.cluster.local:80
+              value: http://mindspore-jenkins.jenkins.svc.cluster.local:80
       volumes:
         - name: jenkins-share-config
           emptyDir: {}
         - name: jenkins-share-data
           persistentVolumeClaim:
-            claimName: mindspore-jenkins-slave-share-pvc
+            # NOTE: this persistenvolumeclaim is imported on CCE web console, not created by command.
+            claimName: cce-efs-import-k3paa03e-auh7
   volumeClaimTemplates:
     - metadata:
         name: medium-workspace-pvc
@@ -111,5 +112,5 @@ spec:
         accessModes: [ "ReadWriteOnce" ]
         resources:
           requests:
-            storage: 500Gi
-        storageClassName: "ssd"
+            storage: 200Gi
+        storageClassName: "sas"
