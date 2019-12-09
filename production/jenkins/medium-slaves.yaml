@@ -105,6 +105,8 @@ spec:
           persistentVolumeClaim:
             # NOTE: this persistenvolumeclaim is imported on CCE web console, not created by command.
             claimName: cce-efs-import-k3paa03e-auh7
+  updateStrategy:
+    type: RollingUpdate
   volumeClaimTemplates:
     - metadata:
         name: medium-workspace-pvc
