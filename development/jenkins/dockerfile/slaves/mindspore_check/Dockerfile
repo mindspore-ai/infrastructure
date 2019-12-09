@@ -4,6 +4,7 @@ MAINTAINER tommylike <tommylikehu@gmail.com>
 # Install jdk8 and bunch of build tools
 USER root
 ENV USER root
+ENV TZ Asia/Shanghai
 
 
 ENV PATH /usr/local/bin:$PATH
@@ -18,7 +19,8 @@ RUN apt update \
     && apt install -y vim \
     && apt install -y xz-utils \
     && apt install -y net-tools \
-    && apt install -y openssh-client
+    && apt install -y openssh-client \
+    && apt install -y tzdata
 
 # Install compile tools
 RUN apt install -y gcc g++ make
@@ -83,6 +85,9 @@ RUN cd /tmp \
     && rm -rf /usr/local/cloc \
     && mv /tmp/cloc-1.84 /usr/local/cloc \
     && rm -f /tmp/cloc-1.84.tar.gz
+
+RUN echo "dash dash/sh boolean false" | debconf-set-selections
+RUN DEBIAN_FRONTEND=noninteractive dpkg-reconfigure dash
 
 # Setup java path
 ENV JAVA_HOME /usr/lib/jvm/java-8-openjdk-amd64/jre
