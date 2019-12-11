@@ -11,7 +11,7 @@ resources into kubernetes cluster.
 
 # Command to generate the final yaml
 ```$xslt
-helm template ./jenkins --namespace jenkins-system -f jenkins/values.yaml -f jenkins/hw_override.yaml --name openeuler
+helm template ./jenkins --namespace jenkins-system -f jenkins/values.yaml -f jenkins/hw_override.yaml --name mindspore
 ```
 
 # Node Notes

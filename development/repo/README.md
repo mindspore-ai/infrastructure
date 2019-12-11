@@ -27,8 +27,8 @@ Request Body:
 {
     "projects": [
         {
-            "localpath": "openeuler/extras",
-            "sync_url": "root@password:/home/xsmq/iso/mount_iso/Packages"
+            "localpath": "euleros/euler_v2_x86_64",
+            "http_url": "http://117.78.1.88:82/euleros/Packages/"
         }
     ]
 }
