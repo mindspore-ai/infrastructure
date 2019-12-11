@@ -41,7 +41,7 @@ data:
           volumes:
             - name: repo-data-volume
               persistentVolumeClaim:
-                claimName: cce-efs-import-k4100bio-vczq
+                claimName: cce-efs-import-k410ji5h-hinm
   default.conf: |
     server {
         listen 443 ssl;
@@ -220,7 +220,7 @@ spec:
             name: mindspore-configmap
         - name: repo-data-volume
           persistentVolumeClaim:
-            claimName: cce-efs-import-k4100bio-vczq
+            claimName: cce-efs-import-k410ji5h-hinm
 
 ---
 # Source: repo-chart/templates/service.yaml

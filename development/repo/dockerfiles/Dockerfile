@@ -8,7 +8,6 @@ RUN yum -y install createrepo && \
     yum -y install epel-release && \
     yum -y install curl && \
     yum -y install wget && \
-    yum -y install ssh && \
     yum -y install rsync && \
     yum -y install python36 && \
     pip3 install pytz
