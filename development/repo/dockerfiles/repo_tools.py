@@ -28,15 +28,15 @@ def prepare_repo(arg_instance):
 #    "projects": [
 #        {
 #            "localpath": "xxxx",
-#            "sync_url": ""
+#            "http_url": ""
 #       },
 #        {
 #            "localpath": "xxxx",
-#            "sync_url": ""
+#            "http_url": ""
 #        }
 #    ]
 # }
-# 'update_repo' will download every rpm packages (overwrite if it exists) specified in 'sync_url' root folder via wget tool and the rpm will be arranged in the format of
+# 'update_repo' will download every rpm packages (overwrite if it exists) specified in 'http_url' root folder via wget tool and the rpm will be arranged in the format of
 # .
 # ├── packages
 # |      └────── AAA.rpm
@@ -49,10 +49,10 @@ def update_repo(arg_instance, working_dir):
         print("unacceptable json content when trying to update repo {0}".format(arg_instance.repo_json))
         sys.exit(1)
     for project in repo["projects"]:
-        if "localpath" not in project or "sync_url" not in project:
+        if "localpath" not in project or "http_url" not in project:
             print("project {0} format unacceptable, skipping".format(project))
             continue
-        handle_single_repo_update(project, working_dir)        
+        handle_single_repo_update(project, working_dir)
 
 def handle_single_repo_update(project, working_dir):
     #check and create the base repo folder
@@ -63,10 +63,10 @@ def handle_single_repo_update(project, working_dir):
     package_folder= os.path.join(base_repo_folder, "packages")
     if not os.path.isdir(package_folder):
         os.mkdir(package_folder)
-    print("starting to sync rpms from {0} into folder {1}".format(project['sync_url'], project['localpath']))
-    ret = subprocess.run(["cd {0} && rsync -avz {1} .".format(package_folder, project['sync_url'])], shell=True)
+    print("starting to sync rpms from {0} into folder {1}".format(project['http_url'], project['localpath']))
+    ret = subprocess.run(["cd {0} && wget -N -r -nd -np -k -L -p -A '*.rpm' --tries=5 {1}".format(package_folder, project['http_url'])], shell=True)
     if ret.returncode != 0:
-        print("failed to download rpms from http url {0}, stdout {1}".format(project["sync_url"], ret.stdout))
+        print("failed to download rpms from http url {0}, stdout {1}".format(project["http_url"], ret.stdout))
         sys.exit(1)
     #create or update repo
     print("starting to sync repodata folder {0}".format(os.path.join(package_folder, 'repodata')))
@@ -80,7 +80,7 @@ def handle_single_repo_update(project, working_dir):
     #Add timestamp file
     subprocess.run(["echo {0} > {1}".format(datetime.datetime.now(pytz.timezone('Hongkong')), os.path.join(package_folder, 'release_time.txt'))], shell=True)
 
-if __name__ == "__main__":    
+if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='repo action collection.')
     parser.add_argument('action', type=str, metavar='ACTION', help='specify the action to perform, now only "prepare" or "update" are supported')
     parser.add_argument('--key-file', type=str, nargs='?', help='key file used in nginx for tls')
@@ -99,5 +99,5 @@ if __name__ == "__main__":
         update_repo(args, working_dir)
     else:
         print("unsupported actions {0}, please specify 'prepare' or 'update'.".format(args.action))
-        sys.exit(1)    
+        sys.exit(1)
     sys.exit(0)
