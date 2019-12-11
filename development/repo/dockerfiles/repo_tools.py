@@ -15,11 +15,11 @@ def prepare_repo(arg_instance):
     if not os.path.isdir(local_folder):
         os.mkdir(local_folder)
     print("starting to download key file {0}".format(arg_instance.key_file))
-    ret = subprocess.run(["curl -o {0} \"{1}\"".format(os.path.join(local_folder, "privkey.pem"), arg_instance.key_file)], shell=True)
+    ret = subprocess.run(["curl -o {0} '{1}'".format(os.path.join(local_folder, "privkey.pem"), arg_instance.key_file)], shell=True)
     if ret.returncode != 0:
         print("failed to get key file for nginx service: {0}", ret.stdout)
     print("starting to download cert file {0}".format(arg_instance.cert_file))
-    ret = subprocess.run(["curl -o {0} \"{1}\"".format(os.path.join(local_folder, "fullchain.pem"), arg_instance.cert_file)], shell=True)
+    ret = subprocess.run(["curl -o {0} '{1}'".format(os.path.join(local_folder, "fullchain.pem"), arg_instance.cert_file)], shell=True)
     if ret.returncode != 0:
         print("failed to get cert file for nginx service: {0}", ret.stdout)
 
@@ -28,15 +28,15 @@ def prepare_repo(arg_instance):
 #    "projects": [
 #        {
 #            "localpath": "xxxx",
-#            "http_url": ""
+#            "sync_url": ""
 #       },
 #        {
 #            "localpath": "xxxx",
-#            "http_url": ""
+#            "sync_url": ""
 #        }
 #    ]
 # }
-# 'update_repo' will download every rpm packages (overwrite if it exists) specified in 'http_url' root folder via wget tool and the rpm will be arranged in the format of
+# 'update_repo' will download every rpm packages (overwrite if it exists) specified in 'sync_url' root folder via wget tool and the rpm will be arranged in the format of
 # .
 # ├── packages
 # |      └────── AAA.rpm
@@ -49,7 +49,7 @@ def update_repo(arg_instance, working_dir):
         print("unacceptable json content when trying to update repo {0}".format(arg_instance.repo_json))
         sys.exit(1)
     for project in repo["projects"]:
-        if "localpath" not in project or "http_url" not in project:
+        if "localpath" not in project or "sync_url" not in project:
             print("project {0} format unacceptable, skipping".format(project))
             continue
         handle_single_repo_update(project, working_dir)        
@@ -63,10 +63,10 @@ def handle_single_repo_update(project, working_dir):
     package_folder= os.path.join(base_repo_folder, "packages")
     if not os.path.isdir(package_folder):
         os.mkdir(package_folder)
-    print("starting to sync rpms from {0} into folder {1}".format(project['http_url'], project['localpath']))
-    ret = subprocess.run(["cd {0} && wget -N -r -nd -np -k -L -p -A '*.rpm' --tries=5 {1}".format(package_folder, project['http_url'])], shell=True)                                     
+    print("starting to sync rpms from {0} into folder {1}".format(project['sync_url'], project['localpath']))
+    ret = subprocess.run(["cd {0} && rsync -avz {1} .".format(package_folder, project['sync_url'])], shell=True)
     if ret.returncode != 0:
-        print("failed to download rpms from http url {0}, stdout {1}".format(project["http_url"], ret.stdout))
+        print("failed to download rpms from http url {0}, stdout {1}".format(project["sync_url"], ret.stdout))
         sys.exit(1)
     #create or update repo
     print("starting to sync repodata folder {0}".format(os.path.join(package_folder, 'repodata')))

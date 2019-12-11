@@ -28,7 +28,7 @@ data:
         spec:
           containers:
             - name: update-repo
-              image: swr.cn-north-1.myhuaweicloud.com/hwstaff_h00223369/repo-tools:0.0.1
+              image: swr.cn-north-1.myhuaweicloud.com/hwstaff_h00223369/repo-tools:0.0.3
               # NOTE: PROJECT_VARIABLE is used to be replaced with actual project list, don't update this only at this place.
               args: ["--repo-json", "PROJECT_VARIABLE", "update"]
               volumeMounts:
@@ -41,7 +41,7 @@ data:
           volumes:
             - name: repo-data-volume
               persistentVolumeClaim:
-                claimName: mindspore-data-volume
+                claimName: cce-efs-import-k4100bio-vczq
   default.conf: |
     server {
         listen 443 ssl;
@@ -103,19 +103,19 @@ data:
 ---
 # Source: repo-chart/templates/deployment.yaml
 # Persistent volume claim for deployment
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: mindspore-data-volume
-  namespace: repo
-spec:
-  accessModes:
-    - ReadWriteMany
-  resources:
-    requests:
-      storage: 100Gi
-  storageClassName: sas
+#---
+#apiVersion: v1
+#kind: PersistentVolumeClaim
+#metadata:
+#  name: mindspore-data-volume
+#  namespace: repo
+#spec:
+#  accessModes:
+#    - ReadWriteMany
+#  resources:
+#    requests:
+#      storage: 100Gi
+#  storageClassName: sas
 
 # ServiceAccount for deployment
 ---
@@ -171,7 +171,7 @@ spec:
       serviceAccount: mindspore-listener
       initContainers:
         - name: repo-prepare-tool
-          image: swr.cn-north-1.myhuaweicloud.com/hwstaff_h00223369/repo-tools:0.0.1
+          image: swr.cn-north-1.myhuaweicloud.com/hwstaff_h00223369/repo-tools:0.0.3
           env:
             # key and cert file used for nginx tls
             - name: KEY_FILE
@@ -198,7 +198,7 @@ spec:
             - mountPath: /repo/mindspore
               name: repo-data-volume
         - name: repo-update-listener
-          image: swr.cn-north-1.myhuaweicloud.com/hwstaff_h00223369/repo-listener:0.0.1
+          image: swr.cn-north-1.myhuaweicloud.com/hwstaff_h00223369/repo-listener:0.0.2
           env:
               # base auth for repo listener
             - name: BASIC_AUTH_USERNAME
@@ -220,7 +220,7 @@ spec:
             name: mindspore-configmap
         - name: repo-data-volume
           persistentVolumeClaim:
-            claimName: mindspore-data-volume
+            claimName: cce-efs-import-k4100bio-vczq
 
 ---
 # Source: repo-chart/templates/service.yaml

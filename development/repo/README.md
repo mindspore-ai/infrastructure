@@ -28,7 +28,7 @@ Request Body:
     "projects": [
         {
             "localpath": "openeuler/extras",
-            "http_url": "http://119.3.219.20:82/openEuler:/Extras/standard_aarch64/aarch64/"
+            "sync_url": "root@password:/home/xsmq/iso/mount_iso/Packages"
         }
     ]
 }
