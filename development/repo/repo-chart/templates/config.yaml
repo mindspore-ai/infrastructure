@@ -1,0 +1,36 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-configmap
+  namespace: {{ .Release.Namespace }}
+data:
+  update-repo-job.yaml: |
+    apiVersion: batch/v1
+    kind: Job
+    metadata:
+      name: update-repo-job
+      namespace: {{ .Release.Namespace }}
+    spec:
+      template:
+        spec:
+          containers:
+            - name: update-repo
+              image: {{ .Values.deployment.initImage }}
+              # NOTE: PROJECT_VARIABLE is used to be replaced with actual project list, don't update this only at this place.
+              args: ["--repo-json", "PROJECT_VARIABLE", "update"]
+              volumeMounts:
+                - mountPath: /repo/openeuler
+                  name: repo-data-volume
+              env:
+                - name: WORKING_DIR
+                  value: /repo/openeuler/repository
+          restartPolicy: Never
+          volumes:
+            - name: repo-data-volume
+              persistentVolumeClaim:
+                claimName: {{ .Release.Name }}-data-volume
+
+  {{- (.Files.Glob .Values.deployment.defaultConfig).AsConfig | nindent 2 }}
+  {{- (.Files.Glob .Values.deployment.nginxConfig).AsConfig | nindent 2 }}
+

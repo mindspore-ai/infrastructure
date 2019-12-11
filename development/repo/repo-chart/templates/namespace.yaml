@@ -1,0 +1,7 @@
+# Namespace for repo server
+apiVersion: v1
+kind: Namespace
+metadata:
+  labels:
+    name: {{ .Release.Namespace }}
+  name: {{ .Release.Namespace }}
