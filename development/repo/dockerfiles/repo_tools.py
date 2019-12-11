@@ -15,11 +15,11 @@ def prepare_repo(arg_instance):
     if not os.path.isdir(local_folder):
         os.mkdir(local_folder)
     print("starting to download key file {0}".format(arg_instance.key_file))
-    ret = subprocess.run(["curl -o {0} {1}".format(os.path.join(local_folder, "privkey.pem"), arg_instance.key_file)], shell=True)
+    ret = subprocess.run(["curl -o {0} \"{1}\"".format(os.path.join(local_folder, "privkey.pem"), arg_instance.key_file)], shell=True)
     if ret.returncode != 0:
         print("failed to get key file for nginx service: {0}", ret.stdout)
     print("starting to download cert file {0}".format(arg_instance.cert_file))
-    ret = subprocess.run(["curl -o {0} {1}".format(os.path.join(local_folder, "fullchain.pem"), arg_instance.cert_file)], shell=True)
+    ret = subprocess.run(["curl -o {0} \"{1}\"".format(os.path.join(local_folder, "fullchain.pem"), arg_instance.cert_file)], shell=True)
     if ret.returncode != 0:
         print("failed to get cert file for nginx service: {0}", ret.stdout)
 
