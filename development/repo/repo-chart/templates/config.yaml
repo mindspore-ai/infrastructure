@@ -20,11 +20,11 @@ data:
               # NOTE: PROJECT_VARIABLE is used to be replaced with actual project list, don't update this only at this place.
               args: ["--repo-json", "PROJECT_VARIABLE", "update"]
               volumeMounts:
-                - mountPath: /repo/openeuler
+                - mountPath: /repo/mindspore
                   name: repo-data-volume
               env:
                 - name: WORKING_DIR
-                  value: /repo/openeuler/repository
+                  value: /repo/mindspore/repository
           restartPolicy: Never
           volumes:
             - name: repo-data-volume

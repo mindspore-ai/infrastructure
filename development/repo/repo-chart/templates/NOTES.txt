@@ -1,1 +1,1 @@
-## Notes for openeuler repo helm chart
+## Notes for mindspore repo helm chart
