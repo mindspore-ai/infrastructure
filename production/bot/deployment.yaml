@@ -1,0 +1,41 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: botinfo
+  namespace: bot
+  labels:
+    app: botinfo
+  annotations:
+    flux.weave.works/automated: "true"
+    flux.weave.works/tag.nginxinfod: semver:~1.0
+spec:
+  strategy:
+    rollingUpdate:
+      maxUnavailable: 0
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      app: botinfo
+  template:
+    metadata:
+      annotations:
+        prometheus.io/scrape: "true"
+      labels:
+        app: botinfo
+    spec:
+      containers:
+      - name: botinfod
+        image: swr.cn-south-1.myhuaweicloud.com/openeuler/bot:v1.0.201912091501353950
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8888
+          name: http
+          protocol: TCP
+        volumeMounts:
+        - mountPath: /bot/
+          name: configmap-volume
+      volumes:
+      - name: configmap-volume
+        configMap:
+          name: bot-configmap

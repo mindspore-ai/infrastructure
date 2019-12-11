@@ -1,0 +1,24 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: bot-configmap
+  namespace: bot
+data:
+  config.yaml: |
+    giteeToken: "48edae38475262f35aa7ffc6418b1983"
+    webhookSecret: "123456789"
+    databaseType: "mysql"
+    databaseHost: "10.0.0.172"
+    databasePort: 3306
+    databaseName: "cibot"
+    databaseUserName: "root"
+    databasePassword: "mindspore@1234"
+    watchProjectFiles: []
+    watchProjectFileDuration: 60
+    botName: mindspore_ci
+    communityName: MindSpore
+    claLink: https://mindspore.org/en/cla.html
+    commandLink: https://gitee.com/mindspore/community/blob/master/en/command.md
+    contactEmail: contact@mindspore.org
+
