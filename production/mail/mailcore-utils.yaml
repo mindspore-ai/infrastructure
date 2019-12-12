@@ -50,7 +50,7 @@ spec:
           env:
             # the mailman core API used to handling creating list and replace templates
             - name: MAILMAN_CORE_ENDPOINT
-              value: http://mailman-core-0.mail-suit-service.default.svc.cluster.local:8001/3.1
+              value: http://mailman-core-0.mail-suit-service.mail.svc.cluster.local:8001/3.1
             # the credential for mailman core API
             - name: MAILMAN_CORE_USER
               value: restadmin
