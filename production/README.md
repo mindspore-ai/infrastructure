@@ -22,4 +22,9 @@ https://storage.huaweicloud.com/obs/?agencyId=867bf353519742aab5037d1ba0af1d4e&r
 curl -o mindspore.key <file_from_remote> 
 kubectl create configmap dkim-config --from-file=mindspore.key --namespace mail
 ``` 
-
+2. the **configmap**: `mail/mailcert` is created manually via command:
+```
+curl -o server.crt <file_from_remote> 
+curl -o server.key <file_from_remote>
+kubectl create configmap mailcert --from-file=server.crt --from-file=server.key --namespace mail
+```

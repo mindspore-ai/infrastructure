@@ -58,13 +58,13 @@ spec:
       containers:
         - name: mailman-web
           # We modified the mail-web image to add static folder.
-          image: swr.cn-north-1.myhuaweicloud.com/hwstaff_h00223369/mail-web:v1.0.0
+          image: swr.cn-north-1.myhuaweicloud.com/hwstaff_h00223369/mail-web:v1.0.1
           imagePullPolicy: "IfNotPresent"
           volumeMounts:
             - mountPath: /opt/mailman-web-config
               name: mailman-web-configmap-volume
             - mountPath: /etc/nginx/ssl
-              name: mailman-secret-volume
+              name: mailman-cert-volume
             - mountPath: /opt/mailman-web-data
               name: mailman-web-volume
           env:
@@ -104,6 +104,6 @@ spec:
         - name: mailman-web-configmap-volume
           configMap:
             name: mailman-web-configmap
-        - name: mailman-secret-volume
-          secret:
-            secretName: mailcertsecret
+        - name: mailman-cert-volume
+          configMap:
+            name: mailcert
