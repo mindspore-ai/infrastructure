@@ -26,6 +26,6 @@ spec:
   - ReadWriteMany
   resources:
     requests:
-      storage: 1000Gi
+      storage: 500Gi
   storageClassName: nfs-rw
   volumeMode: Filesystem
