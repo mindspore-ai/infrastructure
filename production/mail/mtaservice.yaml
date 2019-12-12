@@ -69,7 +69,8 @@ spec:
             - mountPath: /opt/mailman/
               name: mailman-core-data
             - mountPath: /etc/exim4/dkim
-              name: mta-dkim-secret
+              name: mta-dkim-configmap
+              subPath: mindspore.key
           # NOTE: since we added new configuration files we need reload exim4 and start up
           command:
             - /bin/sh
@@ -86,6 +87,6 @@ spec:
         - name: mailman-core-data
           persistentVolumeClaim:
             claimName: config-vol
-        - name: mta-dkim-secret
-          secret:
-            secretName: dkimsecret
+        - name: mta-dkim-configmap
+          configMap:
+            name: dkim-config

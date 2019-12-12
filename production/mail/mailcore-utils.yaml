@@ -4,7 +4,7 @@ kind: Deployment
 apiVersion: apps/v1
 metadata:
   name: mailman-core-utils
-  namespace: default
+  namespace: mail
   labels:
     component: mail-core-utils
     app: mail-suit-service

@@ -12,4 +12,9 @@ The yamls in this folder used to generate the production cluster, please be care
 ## Bot system
 
 ## Mail system
+1. the **configmap**: `mail/dkim-config` is created manually via command:
+```
+curl -o mindspore.key <file_from_remote> 
+kubectl create configmap dkim-config --from-file=mindspore.key --namespace mail
+``` 
 

@@ -29,8 +29,7 @@ data:
     DKIM_CANON = relaxed
     DKIM_SELECTOR = 20190905
     DKIM_DOMAIN = mindspore.cn
-    #TODO: replace this with correct item
-    DKIM_FILE = /etc/exim4/dkim/openeuler.org-private.pem
+    DKIM_FILE = /etc/exim4/dkim/mindspore.key
     DKIM_PRIVATE_KEY=${if exists{DKIM_FILE}{DKIM_FILE}{0}}
 
   55_mm3_transport: |

@@ -28,16 +28,16 @@ repo_image_push:
 	docker push ${REPO_UPDATE_LISTENER}
 
 mail_image_build:
-	docker build -t ${MAIL_WEB} -f development/mail/dockerfile/web/Dockerfile development/mail/dockerfile/web/
-	docker build -t ${MAIL_EXIM} -f development/mail/dockerfile/exim4/Dockerfile development/mail/dockerfile/exim4/
-	docker build -t ${MAIL_CORE} -f development/mail/dockerfile/core/Dockerfile development/mail/dockerfile/core/
+	#docker build -t ${MAIL_WEB} -f development/mail/dockerfile/web/Dockerfile development/mail/dockerfile/web/
+	#docker build -t ${MAIL_EXIM} -f development/mail/dockerfile/exim4/Dockerfile development/mail/dockerfile/exim4/
+	#docker build -t ${MAIL_CORE} -f development/mail/dockerfile/core/Dockerfile development/mail/dockerfile/core/
 	docker build -t ${MAIL_GIT_UTIL} -f development/mail/dockerfile/core_utils/Dockerfile.git_tool development/mail/dockerfile/core_utils/
 	docker build -t ${MAIL_CORE_UTIL} -f development/mail/dockerfile/core_utils/Dockerfile development/mail/dockerfile/core_utils/
 
 mail_image_push:
-	docker push ${MAIL_WEB}
-	docker push ${MAIL_EXIM}
-	docker push ${MAIL_CORE}
+	#docker push ${MAIL_WEB}
+	#docker push ${MAIL_EXIM}
+	#docker push ${MAIL_CORE}
 	docker push ${MAIL_GIT_UTIL}
 	docker push ${MAIL_CORE_UTIL}
 

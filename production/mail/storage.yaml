@@ -11,7 +11,7 @@ spec:
   resources:
     requests:
       storage: 100Gi
-  storageClassName: ssd
+  storageClassName: sas
   volumeMode: Filesystem
 
 ## define the config volume for both mail-core & exim4
