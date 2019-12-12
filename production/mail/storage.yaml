@@ -1,0 +1,31 @@
+## define the postgros volume 
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: db-data-vol
+  namespace: mail
+spec:
+  accessModes:
+  - ReadWriteMany
+  resources:
+    requests:
+      storage: 100Gi
+  storageClassName: ssd
+  volumeMode: Filesystem
+
+## define the config volume for both mail-core & exim4
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: config-vol
+  namespace: mail
+spec:
+  accessModes:
+  - ReadWriteMany
+  resources:
+    requests:
+      storage: 1000Gi
+  storageClassName: nfs-rw
+  volumeMode: Filesystem

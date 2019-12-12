@@ -1,0 +1,13 @@
+# Headless Service for mailman suit service
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mail-suit-service
+  namespace: mail
+  labels:
+    app: mail-suit-service
+spec:
+  selector:
+    app: mail-suit-service
+  clusterIP: None

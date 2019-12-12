@@ -1,0 +1,78 @@
+# Deployment for mail core utils service
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: mailman-core-utils
+  namespace: default
+  labels:
+    component: mail-core-utils
+    app: mail-suit-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: mail-core-utils
+      app: mail-suit-service
+  template:
+    metadata:
+      labels:
+        component: mail-core-utils
+        app: mail-suit-service
+    spec:
+      # init container used to clone the repo and move it into the dir that core-utils will use.
+      initContainers:
+        - name: mail-git-tools
+          # Please ensure the image exists
+          image: openeuler/git-tools:0.0.1
+          imagePullPolicy: "IfNotPresent"
+          volumeMounts:
+            - mountPath: /opt/mailman-utils/data_source
+              name: mailman-core-utils
+          env:
+            # the repo which contains the templates folder
+            - name: TEMPLATE_REPO
+              value: https://gitee.com/openeuler/infrastructure.git
+          command:
+            - /bin/sh
+            - -c
+            - |
+              cd /opt/mailman-utils/data_source;
+              git clone ${TEMPLATE_REPO}
+      containers:
+        - name: mailman-core-utils
+          # Please ensure the image exists
+          image: openeuler/mailman-core-utils:0.0.1
+          imagePullPolicy: "IfNotPresent"
+          volumeMounts:
+            - mountPath: /opt/mailman-utils/data_source
+              name: mailman-core-utils
+          env:
+            # the mailman core API used to handling creating list and replace templates
+            - name: MAILMAN_CORE_ENDPOINT
+              value: http://mailman-core-0.mail-suit-service.default.svc.cluster.local:8001/3.1
+            # the credential for mailman core API
+            - name: MAILMAN_CORE_USER
+              value: restadmin
+            - name: MAILMAN_CORE_PASSWORD
+              value: restpass
+            # default domain name that will be created when starts up
+            - name: DEFAULT_DOMAIN_NAME
+              value: openeuler.org
+            # default mail lists that will created when starts up, if not specified, container will scan all of the list file in templates folder.
+            - name: DEFAULT_MAIL_LISTS
+              value: community,announce,council,dev,infra,marketing,user-committee
+            # the template server address, this is default to self IP address
+            - name: TEMPLATE_SERVER_ADDRESS
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+          command:
+            - /bin/sh
+            - -c
+            - |
+              cp -r /opt/mailman-utils/data_source/infrastructure/mail/templates  .;
+              exec docker-entrypoint.sh python -u mailman-core-utils.py
+      volumes:
+        - name: mailman-core-utils
+          emptyDir: {}

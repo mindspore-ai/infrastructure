@@ -1,0 +1,125 @@
+# configmap for mail exim4 service, these three files are directly read from exim config folder
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mailman-exim4-configmap
+  namespace: mail
+data:
+  25_mm3_macros: |
+    # Place this file at
+    # /etc/exim4/conf.d/main/25_mm3_macros
+
+    domainlist mm3_domains=openeuler.org
+    MM3_LMTP_HOST=mailman-core-0.mail-suit-service.mail.svc.cluster.local
+    MM3_LMTP_PORT=8024
+    # According to the configuration of: https://mailman.readthedocs.io/en/release-3.0/src/mailman/docs/MTA.html
+    # We need updating this, for the purpose of delivering emails to the mailman
+    MM3_HOME=/opt/mailman/var
+
+    ################################################################
+    # The configuration below is boilerplate:
+    # you should not need to change it.
+
+    # The path to the list receipt (used as the required file when
+    # matching list addresses)
+    MM3_LISTCHK=MM3_HOME/lists/${local_part}.${domain}
+  
+  00_local_macros: |
+    DKIM_CANON = relaxed
+    DKIM_SELECTOR = 20190905
+    DKIM_DOMAIN = openeuler.org
+    DKIM_FILE = /etc/exim4/dkim/openeuler.org-private.pem
+    DKIM_PRIVATE_KEY=${if exists{DKIM_FILE}{DKIM_FILE}{0}}
+
+  55_mm3_transport: |
+    # Place this file at
+    # /etc/exim4/conf.d/transport/55_mm3_transport
+
+    mailman3_transport:
+      debug_print = "Email for mailman"
+      driver = smtp
+      protocol = lmtp
+      allow_localhost
+      hosts = MM3_LMTP_HOST
+      port = MM3_LMTP_PORT
+      rcpt_include_affixes = true
+
+  455_mm3_router: |
+    # Place this file at
+    # /etc/exim4/conf.d/router/455_mm3_router
+
+    mailman3_router:
+      driver = accept
+      domains = +mm3_domains
+      require_files = MM3_LISTCHK
+      local_part_suffix_optional
+      local_part_suffix = -admin : \
+         -bounces   : -bounces+* : \
+         -confirm   : -confirm+* : \
+         -join      : -leave     : \
+         -owner     : -request   : \
+         -subscribe : -unsubscribe
+      transport = mailman3_transport
+
+  update-exim4-conf.conf: |
+    dc_eximconfig_configtype='internet'
+    dc_other_hostnames='openeuler.org;'
+    dc_local_interfaces=''
+    dc_readhost=''
+    # NOTE: wildchart is used here, but it's not safe at all.
+    dc_relay_domains='*'
+    dc_minimaldns='false'
+    # NOTE: wildchart is used here, but it's not safe at all.
+    dc_relay_nets='*'
+    dc_smarthost=''
+    CFILEMODE='644'
+    dc_use_split_config='true'
+    dc_hide_mailname=''
+    dc_mailname_in_oh='true'
+    dc_localdelivery='mail_spool'
+
+# configmap for mail web service
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mailman-web-configmap
+  namespace: mail
+data:
+  settings_local.py: |
+    import os
+    import socket
+    import ipaddress
+
+    DEBUG = True
+
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+    #NOTE: this is the MTA host, we need to update it.
+    EMAIL_HOST = 'mailman-exim4-service.mail.svc.cluster.local'
+    EMAIL_PORT = 25
+    
+    mailman_ip_address = socket.gethostbyname(os.environ.get('MAILMAN_HOST_IP')).split('.')
+    mailman_ip_cidr = "{0}.{1}.0.0/16".format(mailman_ip_address[0], mailman_ip_address[1])
+    MAILMAN_ARCHIVER_FROM = [str(ip) for ip in ipaddress.IPv4Network(mailman_ip_cidr)]
+
+    SERVICE_IP = socket.gethostbyname("mailweb.openeuler.org") 
+
+    ALLOWED_HOSTS = [
+        "localhost",  # Archiving API from Mailman, keep it.
+        # Add here all production URLs you may have.
+        "mailman-database-0.mail-suit-service.mail.svc.cluster.local",
+        "mailman-core-0.mail-suit-service.mail.svc.cluster.local",
+        "mailman-web-0.mail-suit-service.mail.svc.cluster.local",
+        "mailman-web-service.mail.svc.cluster.local",
+        #NOTE: This is the public ip address of the served host
+        "openeuler.org",
+        "mailweb.openeuler.org",
+        "mail.openeuler.org",
+        "mailman-web",
+        SERVICE_IP,
+        os.environ.get('SERVE_FROM_DOMAIN'),
+        os.environ.get('DJANGO_ALLOWED_HOSTS'),
+    ]
+
+    COMPRESS_CSS_HASHING_METHOD = 'content'

@@ -1,0 +1,29 @@
+Email Address Registration Confirmation
+
+Hello, this is the GNU Mailman server at $domain.
+
+We have received a registration request for the email address
+
+    $user_email
+
+Before you can start using GNU Mailman at this site, you must first confirm that this is your email address.  You can do this by replying to this message, keeping the Subject header intact.
+
+If you do not wish to register this email address, simply disregard this message.  If you think you are being maliciously subscribed to the list, or have any other questions, you may contact
+
+    $owner_email
+
+邮件列表注册确认邮件。
+
+你好！这是$domain邮件列表的自动回复邮件，请阅读完毕。
+
+我们已经收到了如下邮件地址发送的注册请求：
+
+    $user_email
+
+如果你确认如上地址是你的邮件地址，请回复该邮件，不要修改邮件标题和邮件内容，直接回复，之后你就可以使用该邮件列表了。
+
+如果你不想订阅该邮件列表，请忽略该邮件。
+
+如果你被恶意订阅了该邮件列表，或者你有关于该邮件列表的其他问题需要咨询，请发送邮件到给
+
+    $owner_email

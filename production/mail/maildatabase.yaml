@@ -1,0 +1,42 @@
+# StatefulSet for postgres database service
+---
+kind: StatefulSet
+apiVersion: apps/v1beta1
+metadata:
+  name: mailman-database
+  namespace: mail
+  labels:
+    app: mail-suit-service
+spec:
+  serviceName: mail-suit-service
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mail-suit-service
+  template:
+    metadata:
+      labels:
+        app: mail-suit-service
+    spec:
+      containers:
+        - name: mailman-database
+          image: postgres:9.6-alpine
+          imagePullPolicy: "IfNotPresent"
+          volumeMounts:
+            - mountPath: /var/lib/postgresql/data
+              name: mailman-database-volume
+              subPath: postgres
+          env:
+            - name: POSTGRES_DB
+              value: mailmandb
+            - name: POSTGRES_USER
+              value: mailman
+            - name: POSTGRES_PASSWORD
+              value: mailmanpass
+            - name: PGDATA
+              value: /var/lib/postgresql/data/postgres
+      #NOTE: Empty dir can't be used in a production dir. Please upgrade it before using.
+      volumes:
+        - name: mailman-database-volume
+          persistentVolumeClaim:
+            claimName: db-data-vol
