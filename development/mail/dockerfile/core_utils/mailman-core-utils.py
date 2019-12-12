@@ -1,6 +1,7 @@
 import requests
 import os
 import signal
+from urllib.error import HTTPError
 from mailmanclient import Client
 from http.server import SimpleHTTPRequestHandler, HTTPServer
 
@@ -77,11 +78,15 @@ def prepare_list():
                     MAILMAN_CORE_USER,
                     MAILMAN_CORE_PASSWORD)
 
-    # Create default domain if not exists
-    default_domain = client.get_domain(DEFAULT_DOMAIN_NAME)
-    if default_domain is None:
-        default_domain = client.create_domain(DEFAULT_DOMAIN_NAME)
-
+    try:
+        # Create default domain if not exists
+        default_domain = client.get_domain(DEFAULT_DOMAIN_NAME)
+    except HTTPError as err:
+        if err.code == 404:
+            default_domain = client.create_domain(DEFAULT_DOMAIN_NAME)
+        else:
+            print("unable to find domain {0}".format(err))
+            exit(1)
     # Create default mail lists
     existing_lists = [el.list_name for el in client.lists]
     for l in lists:
