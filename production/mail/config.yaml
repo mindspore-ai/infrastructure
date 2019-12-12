@@ -114,6 +114,8 @@ data:
         "mailman-web-service.mail.svc.cluster.local",
         #NOTE: This is the public ip address of the served host
         "mindspore.cn",
+        #NOTE: this can be removed if domain name finally get used.
+        "49.4.27.171",
         "mailweb.mindspore.cn",
         "mail.mindspore.cn",
         "mailman-web",

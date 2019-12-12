@@ -84,9 +84,9 @@ spec:
             - name: MAILMAN_HOST_IP
               value: mailman-core-0.mail-suit-service.mail.svc.cluster.local
             - name: MAILMAN_ADMIN_USER
-              value: openeuler
+              value: mindspore
             - name: MAILMAN_ADMIN_EMAIL
-              value: freesky.edward@gmail.com
+              value: tommylikehu@gmail.com
             #NOTE: this is the domain name that mailman web will serve
             - name: SERVE_FROM_DOMAIN
               value: mailweb.openeuler.org
