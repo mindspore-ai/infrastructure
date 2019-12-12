@@ -73,15 +73,9 @@ spec:
             - name: DATABASE_URL
               value: postgres://mailman:mailmanpass@mailman-database-0.mail-suit-service.mail.svc.cluster.local/mailmandb
             - name: HYPERKITTY_API_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: mailsecret
-                  key: HYPERKITTY_API_KEY
+              value: mindspore_api_key
             - name: SECRET_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: mailsecret
-                  key: SECRET_KEY
+              value: mindspore_secret_key
             - name: UWSGI_STATIC_MAP
             # NOTE: This static folder has been added into docker image located at /opt/mailman-web/static
               value: /static=/opt/mailman-web-data/static
