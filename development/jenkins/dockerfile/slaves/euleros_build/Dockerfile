@@ -12,10 +12,10 @@ ENV PYTHON_ROOT_PATH /usr/local/python/python373
 RUN repo_path=/etc/yum.repos.d/euleros.repo \
     && echo "[base]" > ${repo_path} \
     && echo "name=EulerOS-2.0SP5 base" >> ${repo_path} \
-    && echo "baseurl=http://117.78.1.88:82/mindspore_euleros/repo/EulerOS-V2.0SP5-x86_64-dvd-20190709/" >> ${repo_path} \
+    && echo "baseurl=https://dev-repo.mindspore.cn/repository/mindspore_euleros/repo/EulerOS-V2.0SP5-x86_64-dvd-20190709/" >> ${repo_path} \
     && echo "enabled=1" >> ${repo_path} \
     && echo "gpgcheck=1" >> ${repo_path} \
-    && echo "gpgkey=http://117.78.1.88:82/mindspore_euleros/repo/EulerOS-V2.0SP5-x86_64-dvd-20190709/RPM-GPG-KEY-EulerOS" >> ${repo_path}
+    && echo "gpgkey=https://dev-repo.mindspore.cn/repository/mindspore_euleros/repo/EulerOS-V2.0SP5-x86_64-dvd-20190709/RPM-GPG-KEY-EulerOS" >> ${repo_path}
 
 # Install base tools
 RUN rpm --rebuilddb \

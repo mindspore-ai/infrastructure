@@ -35,6 +35,12 @@ Request Body:
 ```
 then a k8s job will be created to fetch all rpm files into repo data volume.
 
+# TODO
+Support fully clone a folder and subfolder in repo tool image, for instance
+```$xslt
+wget -N -r -np -nH -k -L -p -A '*' -R "index.html*" --tries=5  http://117.78.1.88:82/mindspore_euleros/
+```
+
 # Generate yaml Command
 ```$xslt
 helm template repo-chart  -f repo-chart/values.yaml --namespace repo --name mindspore  > deployment.yaml
