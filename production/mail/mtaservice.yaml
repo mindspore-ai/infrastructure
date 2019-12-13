@@ -77,8 +77,9 @@ spec:
             - /bin/sh
             - -c
             - |
-              #Enable this when the permission issue get fixed.
-              #echo "log_file_path = /opt/mailman/exim_log/%s.%M" >> /etc/exim4/conf.d/main/01_exim4-config_listmacrosdefs;
+              mkdir -p /opt/mailman/exim_log;
+              chown Debian-exim:Debian-exim -R /opt/mailman/exim_log;
+              echo "log_file_path = /opt/mailman/exim_log/%s.%M" >> /etc/exim4/conf.d/main/01_exim4-config_listmacrosdefs;
               sudo update-exim4.conf;
               exec tini -- exim -bd -v;
       #NOTE: Empty dir can't be used in a production dir. Please upgrade it before using.

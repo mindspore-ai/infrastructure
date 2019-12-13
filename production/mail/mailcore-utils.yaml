@@ -38,7 +38,7 @@ spec:
             - -c
             - |
               cd /opt/mailman-utils/data_source;
-              git clone ${TEMPLATE_REPO}
+              git clone ${TEMPLATE_REPO} templates
       containers:
         - name: mailman-core-utils
           # Please ensure the image exists
@@ -73,7 +73,7 @@ spec:
             - /bin/sh
             - -c
             - |
-              cp -r /opt/mailman-utils/data_source/mail_templates  .;
+              cp -r /opt/mailman-utils/data_source/templates  .;
               exec docker-entrypoint.sh python -u mailman-core-utils.py
       volumes:
         - name: mailman-core-utils
