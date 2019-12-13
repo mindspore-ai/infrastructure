@@ -108,6 +108,15 @@ RUN cd /tmp \
     && rm -rf /tmp/ccache-3.7.6 \
     && rm -f /tmp/ccache-3.7.6.tar.gz
 
+ARG VERSION=3.35
+ARG user=jenkins
+ARG group=jenkins
+ARG uid=1000
+ARG gid=1000
+
+RUN groupadd -g ${gid} ${group}
+RUN useradd -c "Jenkins user" -d /home/${user} -u ${uid} -g ${gid} -m ${user}
+
 # Create user of mindspore_ci
 RUN groupadd mindspore_ci \
     && useradd -d /home/mindspore_ci -g mindspore_ci mindspore_ci \
@@ -158,15 +167,6 @@ RUN repo_path=/etc/yum.repos.d/euleros.repo \
 RUN rpm --rebuilddb \
     && yum install -y java-1.8.0 \
     && yum install wget
-
-ARG VERSION=3.35
-ARG user=jenkins
-ARG group=jenkins
-ARG uid=1000
-ARG gid=1000
-
-RUN groupadd -g ${gid} ${group}
-RUN useradd -c "Jenkins user" -d /home/${user} -u ${uid} -g ${gid} -m ${user}
 
 ARG AGENT_WORKDIR=/home/${user}/agent
 
