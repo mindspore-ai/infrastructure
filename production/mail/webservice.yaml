@@ -15,17 +15,14 @@ spec:
   ports:
   - port: 8000
     name: website-port-uwsgi-http
-    nodePort: 30059
     targetPort: 8000
     protocol: TCP  
   - port: 80
     name: website-port-http
-    nodePort: 30061
     targetPort: 80
     protocol: TCP
   - port: 443
     name: website-port-https
-    nodePort: 30062
     targetPort: 443
     protocol: TCP
   selector:
@@ -86,7 +83,7 @@ spec:
             - name: MAILMAN_ADMIN_USER
               value: mindspore
             - name: MAILMAN_ADMIN_EMAIL
-              value: tommylikehu@gmail.com
+              value: tommylike@qq.com
             #NOTE: this is the domain name that mailman web will serve
             - name: SERVE_FROM_DOMAIN
               value: mailweb.mindspore.cn

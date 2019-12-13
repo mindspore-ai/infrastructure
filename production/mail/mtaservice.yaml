@@ -14,7 +14,6 @@ spec:
   ports:
   - port: 25
     name: exim4-port
-    nodePort: 30063
     targetPort: 25
     protocol: TCP
   selector:
@@ -44,6 +43,8 @@ spec:
         app: mail-suit-service
         component: mail-exim4-service
     spec:
+      nodeSelector:
+        mail_exim4: "true"
       containers:
         - name: mailman-exim4
           #NOTE: This image is directly built from our dockerfile located in exim4 folder
@@ -76,7 +77,8 @@ spec:
             - /bin/sh
             - -c
             - |
-              echo "log_file_path = /opt/mailman/exim_log/%s.%M" >> /etc/exim4/conf.d/main/01_exim4-config_listmacrosdefs;
+              #Enable this when the permission issue get fixed.
+              #echo "log_file_path = /opt/mailman/exim_log/%s.%M" >> /etc/exim4/conf.d/main/01_exim4-config_listmacrosdefs;
               sudo update-exim4.conf;
               exec tini -- exim -bd -v;
       #NOTE: Empty dir can't be used in a production dir. Please upgrade it before using.
