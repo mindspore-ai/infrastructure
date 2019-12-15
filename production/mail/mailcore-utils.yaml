@@ -64,7 +64,7 @@ spec:
               value: community,dev,infra
             # the template server address, this is default to self IP address
             - name: TEMPLATE_FOLDER_PATH
-              value: mail_templates
+              value: templates
             - name: TEMPLATE_SERVER_ADDRESS
               valueFrom:
                 fieldRef:

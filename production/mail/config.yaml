@@ -68,10 +68,10 @@ data:
     dc_local_interfaces=''
     dc_readhost=''
     # NOTE: wildchart is used here, but it's not safe at all.
-    dc_relay_domains='*'
+    dc_relay_domains=''
     dc_minimaldns='false'
     # NOTE: wildchart is used here, but it's not safe at all.
-    dc_relay_nets='*'
+    dc_relay_nets='172.17.0.0/16'
     dc_smarthost=''
     CFILEMODE='644'
     dc_use_split_config='true'
