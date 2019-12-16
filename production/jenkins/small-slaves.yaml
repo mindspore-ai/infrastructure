@@ -24,7 +24,7 @@ metadata:
     app: small-slaves
 spec:
   serviceName: small-slaves-service
-  replicas: 20
+  replicas: 22
   selector:
     matchLabels:
       app: small-slaves

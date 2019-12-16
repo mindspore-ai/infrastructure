@@ -24,7 +24,7 @@ metadata:
     app: medium-slaves
 spec:
   serviceName: medium-slaves-service
-  replicas: 20
+  replicas: 22
   selector:
     matchLabels:
       app: medium-slaves
