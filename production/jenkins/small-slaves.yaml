@@ -47,7 +47,7 @@ spec:
             - name: JENKINS_USER_NAME
               value: admin
             - name: JENKINS_USER_PASSWORD
-              value: 11d0c70ee84399e316a245073446bd66c8
+              value: 11644f18a4601e09a02313bf1a5d8920fe
             - name: JENKINS_AGENT_WORKDIR
               value: /home/jenkins/agent-working-dir
             - name: JENKINS_URL
