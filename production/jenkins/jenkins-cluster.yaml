@@ -9,7 +9,7 @@ metadata:
     "app.kubernetes.io/name": 'jenkins'
     "helm.sh/chart": "jenkins-1.7.4"
     "app.kubernetes.io/managed-by": "Tiller"
-    "app.kubernetes.io/instance": "mindspore"
+    "app.kubernetes.io/instance": "jenkins"
     "app.kubernetes.io/component": "jenkins-master"
 type: Opaque
 data:
@@ -29,7 +29,7 @@ metadata:
     "app.kubernetes.io/name": 'jenkins'
     "helm.sh/chart": "jenkins-1.7.4"
     "app.kubernetes.io/managed-by": "Tiller"
-    "app.kubernetes.io/instance": "mindspore"
+    "app.kubernetes.io/instance": "jenkins"
     "app.kubernetes.io/component": "jenkins-master"
 data:
   config.xml: |-
@@ -249,7 +249,7 @@ metadata:
     "app.kubernetes.io/name": 'jenkins'
     "helm.sh/chart": "jenkins-1.7.4"
     "app.kubernetes.io/managed-by": "Tiller"
-    "app.kubernetes.io/instance": "mindspore"
+    "app.kubernetes.io/instance": "jenkins"
     "app.kubernetes.io/component": "jenkins-master"
 spec:
   volumeMode: Filesystem
@@ -272,7 +272,7 @@ metadata:
     "app.kubernetes.io/name": 'jenkins'
     "helm.sh/chart": "jenkins-1.7.4"
     "app.kubernetes.io/managed-by": "Tiller"
-    "app.kubernetes.io/instance": "mindspore"
+    "app.kubernetes.io/instance": "jenkins"
     "app.kubernetes.io/component": "jenkins-master"
 
 
@@ -288,7 +288,7 @@ metadata:
     "app.kubernetes.io/name": 'jenkins'
     "helm.sh/chart": "jenkins-1.7.4"
     "app.kubernetes.io/managed-by": "Tiller"
-    "app.kubernetes.io/instance": "mindspore"
+    "app.kubernetes.io/instance": "jenkins"
     "app.kubernetes.io/component": "jenkins-master"
 rules:
 - apiGroups: [""]
@@ -308,7 +308,7 @@ metadata:
     "app.kubernetes.io/name": 'jenkins'
     "helm.sh/chart": "jenkins-1.7.4"
     "app.kubernetes.io/managed-by": "Tiller"
-    "app.kubernetes.io/instance": "mindspore"
+    "app.kubernetes.io/instance": "jenkins"
     "app.kubernetes.io/component": "jenkins-master"
 roleRef:
   apiGroup: rbac.authorization.k8s.io
@@ -334,7 +334,7 @@ metadata:
     "app.kubernetes.io/name": 'jenkins'
     "helm.sh/chart": "jenkins-1.7.4"
     "app.kubernetes.io/managed-by": "Tiller"
-    "app.kubernetes.io/instance": "mindspore"
+    "app.kubernetes.io/instance": "jenkins"
     "app.kubernetes.io/component": "jenkins-master"
 spec:
   ports:
@@ -344,7 +344,7 @@ spec:
       name: slavelistener
   selector:
     "app.kubernetes.io/component": "jenkins-master"
-    "app.kubernetes.io/instance": "mindspore"
+    "app.kubernetes.io/instance": "jenkins"
   type: ClusterIP
 
 ---
@@ -358,7 +358,7 @@ metadata:
     "app.kubernetes.io/name": 'jenkins'
     "helm.sh/chart": "jenkins-1.7.4"
     "app.kubernetes.io/managed-by": "Tiller"
-    "app.kubernetes.io/instance": "mindspore"
+    "app.kubernetes.io/instance": "jenkins"
     "app.kubernetes.io/component": "jenkins-master"
     "kubernetes.io/elb.class": union
     "kubernetes.io/elb.id": "b0158483-ae46-4cea-8763-d48d1bde3e83"
@@ -371,7 +371,7 @@ spec:
 
   selector:
     "app.kubernetes.io/component": "jenkins-master"
-    "app.kubernetes.io/instance": "mindspore"
+    "app.kubernetes.io/instance": "jenkins"
   type: LoadBalancer
   
   loadBalancerSourceRanges:
@@ -394,7 +394,7 @@ metadata:
     "app.kubernetes.io/name": 'jenkins'
     "helm.sh/chart": "jenkins-1.7.4"
     "app.kubernetes.io/managed-by": "Tiller"
-    "app.kubernetes.io/instance": "mindspore"
+    "app.kubernetes.io/instance": "jenkins"
     "app.kubernetes.io/component": "jenkins-master"
 spec:
   replicas: 1
@@ -403,14 +403,14 @@ spec:
   selector:
     matchLabels:
       "app.kubernetes.io/component": "jenkins-master"
-      "app.kubernetes.io/instance": "mindspore"
+      "app.kubernetes.io/instance": "jenkins"
   template:
     metadata:
       labels:
         "app.kubernetes.io/name": 'jenkins'
         "helm.sh/chart": "jenkins-1.7.4"
         "app.kubernetes.io/managed-by": "Tiller"
-        "app.kubernetes.io/instance": "mindspore"
+        "app.kubernetes.io/instance": "jenkins"
         "app.kubernetes.io/component": "jenkins-master"
       annotations:
         checksum/config: 9082d5fc978a4463dfc767a49f21b1ebe45d1767849c41939a18e1baab59f923
