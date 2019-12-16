@@ -442,8 +442,8 @@ spec:
               cpu: 15000m
               memory: 55000Mi
             requests:
-              cpu: 15000m
-              memory: 55000Mi
+              cpu: 8000m
+              memory: 16000Mi
             
           volumeMounts:
             - mountPath: /tmp
@@ -507,8 +507,8 @@ spec:
               cpu: 15000m
               memory: 55000Mi
             requests:
-              cpu: 15000m
-              memory: 55000Mi
+              cpu: 8000m
+              memory: 16000Mi
             
           volumeMounts:
             - mountPath: /tmp
