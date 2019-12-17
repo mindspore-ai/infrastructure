@@ -9,7 +9,8 @@ metadata:
     kubernetes.io/elb.id: a3e79c26-493b-4170-b48a-fa3d49c79b30
     kubernetes.io/elb.lb-algorithm: ROUND_ROBIN
 spec:
-  externalTrafficPolicy: Cluster
+  #We need set this into 'Local' since we need get the client IP for relay excluding.
+  externalTrafficPolicy: Local
   loadBalancerIP: 49.4.78.4
   ports:
   - port: 25

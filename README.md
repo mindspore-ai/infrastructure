@@ -5,8 +5,14 @@ This project contains all necessary dockerfile and yaml files that used provisio
 ├── development #contains all developing files (helm charts, init scripts, dockerfile)
 └── production #contains the final yaml file that will be used in our production environment.   
 ```
-All of the components are deployed via [ArgoCDP](https://argoproj.github.io/argo-cd/), 
+All of the components are deployed via [ArgoCD](https://argoproj.github.io/argo-cd/), 
 please visit: https://dev-deploy.mindspore.cn/login for more detail.
+
+NOTE: The argocd will use the pod name as default admin password, in order to keep it simple, we patched
+the password secret via command:
+```$xslt
+kubectl patch secret -n argocd argocd-secret  -p '{"stringData": { "admin.password": "'$(htpasswd -bnBC 10 "" realpassword | tr -d ':\n')'"}}'
+```
 
 # Components
 
