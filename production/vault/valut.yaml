@@ -81,15 +81,16 @@ spec:
               name: vaultport
               protocol: TCP
           volumeMounts:
-            - name: vault-config
-              mountPath: /valut/config/config.hcl
-              subPath: config.hcl
             - name: vault-file
               mountPath: /valut/file
+          env:
+            - name: VAULT_LOCAL_CONFIG
+              valueFrom:
+                configMapKeyRef:
+                  name: vault-config-map
+                  key: config.hcl
       volumes:
         - name: vault-file
           persistentVolumeClaim:
             claimName: vault-file-backend
-        - name: vault-config
-          configMap:
-            name: vault-config-map
+
