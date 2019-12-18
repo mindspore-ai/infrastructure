@@ -1,0 +1,73 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: valut-data
+  namespace: valut
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 100Gi
+  storageClassName: sas
+  volumeMode: Filesystem
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: vault
+  labels:
+    app: vault
+  namespace: valut
+  annotations:
+    kubernetes.io/elb.class: union
+    kubernetes.io/elb.id: d7ff3b09-a34c-413f-a8c3-9eff8ed25b27
+    kubernetes.io/elb.lb-algorithm: ROUND_ROBIN
+spec:
+  externalTrafficPolicy: Cluster
+  loadBalancerIP: 117.78.48.76
+  ports:
+    - name: vault
+      port: 80
+      targetPort: 8200
+      protocol: TCP
+  selector:
+    app: vault
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    app: vault
+  name: vault
+  namespace: valut
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: vault
+    spec:
+      containers:
+        - image: vault:1.3.0
+          name: vault
+          command:
+            - vault
+          args:
+            - server
+            - -dev
+            - -dev-listen-address=0.0.0.0:8200
+          ports:
+            - containerPort: 8200
+              name: vaultport
+              protocol: TCP
+          volumeMounts:
+            - name: root-home
+              mountPath: /root
+          env:
+            - name: VAULT_ADDR
+              value: http://localhost:8200
+      volumes:
+        - name: root-home
+          persistentVolumeClaim:
+            claimName: valut-data
