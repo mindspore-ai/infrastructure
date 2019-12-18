@@ -81,16 +81,12 @@ spec:
               name: vaultport
               protocol: TCP
           volumeMounts:
-            - name: root-home
-              mountPath: /root
             - name: vault-config
               mountPath: /valut/config/config.hcl
               subPath: config.hcl
             - name: vault-file
               mountPath: /valut/file
       volumes:
-        - name: root-home
-          emptyDir: {}
         - name: vault-file
           persistentVolumeClaim:
             claimName: vault-file-backend
