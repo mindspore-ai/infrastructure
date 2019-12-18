@@ -24,11 +24,6 @@ data:
     storage "file" {
       path = "/vault/file"
     }
-
-    listener "tcp" {
-      address     = "127.0.0.1:8200"
-      tls_disable = 1
-    }
 ---
 apiVersion: v1
 kind: Service
@@ -79,7 +74,7 @@ spec:
               protocol: TCP
           volumeMounts:
             - name: vault-file
-              mountPath: /valut/file
+              mountPath: /vault/file
           env:
             - name: VAULT_LOCAL_CONFIG
               valueFrom:
