@@ -22,7 +22,7 @@ data:
   config.hcl: |
 
     storage "file" {
-      path = "/root/file"
+      path = "/vault/file"
     }
 
     listener "tcp" {
