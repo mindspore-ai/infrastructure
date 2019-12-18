@@ -26,8 +26,6 @@ spec:
             - mountPath: /opt/mailman/
               name: mailman-core-volume
           env:
-            - name: DATABASE_URL
-              value: postgres://mailman:mailmanpass@mailman-database-0.mail-suit-service.mail.svc.cluster.local/mailmandb
             - name: DATABASE_TYPE
               value: postgres
             - name: DATABASE_CLASS
@@ -37,6 +35,16 @@ spec:
                 secretKeyRef:
                   name: mailman-secrets
                   key: hyperkitty_api_key
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: mailman-secrets
+                  key: postgres_user
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mailman-secrets
+                  key: postgres_password
             - name: HYPERKITTY_URL
             # NOTE: Please update the HYPERKITTY_URL
               value: http://mailman-web-service.mail.svc.cluster.local:8000/hyperkitty
@@ -48,6 +56,7 @@ spec:
             - /bin/sh
             - -c
             - |
+              export DATABASE_URL=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@mailman-database-0.mail-suit-service.mail.svc.cluster.local/mailmandb
               sed -i "s/charset: us-ascii/charset: utf-8/g" /usr/lib/python3.6/site-packages/mailman/config/schema.cfg;
               exec docker-entrypoint.sh master --force
       #NOTE: Empty dir can't be used in a production dir. Please upgrade it before using.
