@@ -33,7 +33,10 @@ spec:
             - name: DATABASE_CLASS
               value: mailman.database.postgresql.PostgreSQLDatabase
             - name: HYPERKITTY_API_KEY
-              value: mindspore_api_key
+              valueFrom:
+                secretKeyRef:
+                  name: mailman-secrets
+                  key: hyperkitty_api_key
             - name: HYPERKITTY_URL
             # NOTE: Please update the HYPERKITTY_URL
               value: http://mailman-web-service.mail.svc.cluster.local:8000/hyperkitty

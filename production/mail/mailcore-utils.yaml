@@ -53,9 +53,15 @@ spec:
               value: http://mailman-core-0.mail-suit-service.mail.svc.cluster.local:8001/3.1
             # the credential for mailman core API
             - name: MAILMAN_CORE_USER
-              value: restadmin
+              valueFrom:
+                secretKeyRef:
+                  name: mailman-secrets
+                  key: mailman_core_user
             - name: MAILMAN_CORE_PASSWORD
-              value: restpass
+              valueFrom:
+                secretKeyRef:
+                  name: mailman-secrets
+                  key: mailman_core_password
             # default domain name that will be created when starts up
             - name: DEFAULT_DOMAIN_NAME
               value: mindspore.cn

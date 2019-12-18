@@ -30,9 +30,15 @@ spec:
             - name: POSTGRES_DB
               value: mailmandb
             - name: POSTGRES_USER
-              value: mailman
+              valueFrom:
+                secretKeyRef:
+                  name: mailman-secrets
+                  key: postgres_user
             - name: POSTGRES_PASSWORD
-              value: mailmanpass
+              valueFrom:
+                secretKeyRef:
+                  name: mailman-secrets
+                  key: postgres_password
             - name: PGDATA
               value: /var/lib/postgresql/data/postgres
       #NOTE: Empty dir can't be used in a production dir. Please upgrade it before using.
