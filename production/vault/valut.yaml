@@ -74,7 +74,7 @@ spec:
         app: vault
     spec:
       containers:
-        - image: vault:1.3.0
+        - image: swr.cn-north-1.myhuaweicloud.com/hwstaff_h00223369/vault:1.3.0
           name: vault
           ports:
             - containerPort: 8200
