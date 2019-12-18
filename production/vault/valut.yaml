@@ -29,11 +29,6 @@ data:
       address     = "127.0.0.1:8200"
       tls_disable = 1
     }
-
-    telemetry {
-      statsite_address = "127.0.0.1:8125"
-      disable_hostname = true
-    }
 ---
 apiVersion: v1
 kind: Service
@@ -76,6 +71,8 @@ spec:
       containers:
         - image: swr.cn-north-1.myhuaweicloud.com/hwstaff_h00223369/vault:1.3.0
           name: vault
+          securityContext:
+            privileged: true
           ports:
             - containerPort: 8200
               name: vaultport
