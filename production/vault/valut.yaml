@@ -19,7 +19,7 @@ metadata:
   name: vault-config-map
   namespace: vault
 data:
-  config.json: |
+  config.hcl: |
 
     storage "file" {
       path = "/root/file"
@@ -84,7 +84,8 @@ spec:
             - name: root-home
               mountPath: /root
             - name: vault-config
-              mountPath: /valut/config
+              mountPath: /valut/config/config.hcl
+              subPath: config.hcl
             - name: vault-file
               mountPath: /valut/file
       volumes:
