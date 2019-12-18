@@ -11,6 +11,7 @@ spec:
       storage: 100Gi
   storageClassName: sas
   volumeMode: Filesystem
+
 ---
 apiVersion: v1
 kind: Service
@@ -26,6 +27,7 @@ metadata:
 spec:
   externalTrafficPolicy: Cluster
   loadBalancerIP: 117.78.48.76
+  type: LoadBalancer
   ports:
     - name: vault
       port: 80
@@ -33,6 +35,7 @@ spec:
       protocol: TCP
   selector:
     app: vault
+
 ---
 apiVersion: extensions/v1beta1
 kind: Deployment
