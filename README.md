@@ -22,7 +22,11 @@ kubectl patch secret -n argocd argocd-secret  -p '{"stringData": { "admin.passwo
 ```
 
 ## BASIC: Vault Server
-Vault server used to hold all sensitive secrets that used in the infrastructure.
+Vault server used to hold all sensitive secrets that used in the infrastructure. In order to enable tls support, the
+certificate secrets ``vault-secret`` is required.
+```$xslt
+kubectl create secret generic vault-secret --from-file=./server.key  --from-file=./server.crt -n vault
+```
 
 **Website**: http://dev-secrets.mindspore.cn.
 
