@@ -5,7 +5,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  namespace: default
+  namespace: prow
   name: plugins
 data:
   plugins.yaml: ""
@@ -13,12 +13,12 @@ data:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  namespace: default
+  namespace: prow
   name: config
 data:
   config.yaml: |
-    prowjob_namespace: default
-    pod_namespace: test-pods
+    prowjob_namespace: prow
+    pod_namespace: prow-pods
     periodics:
     - interval: 10m
       agent: kubernetes
@@ -119,7 +119,7 @@ spec:
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  namespace: default
+  namespace: prow
   name: hook
   labels:
     app: hook
@@ -139,7 +139,7 @@ spec:
       terminationGracePeriodSeconds: 180
       containers:
         - name: hook
-          image: gcr.io/k8s-prow/hook:v20190625-9f02db3fe
+          image: tommylike/hook:v20190625-9f02db3fe
           imagePullPolicy: Always
           args:
             - --dry-run=false
@@ -190,7 +190,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  namespace: default
+  namespace: prow
   name: hook
 spec:
   selector:
@@ -202,7 +202,7 @@ spec:
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  namespace: default
+  namespace: prow
   name: plank
   labels:
     app: plank
@@ -218,7 +218,7 @@ spec:
       serviceAccountName: "plank"
       containers:
         - name: plank
-          image: gcr.io/k8s-prow/plank:v20190625-9f02db3fe
+          image: tommylike/plank:v20190625-9f02db3fe
           args:
             - --dry-run=false
             - --config-path=/etc/config/config.yaml
@@ -240,7 +240,7 @@ spec:
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  namespace: default
+  namespace: prow
   name: sinker
   labels:
     app: sinker
@@ -254,7 +254,7 @@ spec:
       serviceAccountName: "sinker"
       containers:
         - name: sinker
-          image: gcr.io/k8s-prow/sinker:v20190625-9f02db3fe
+          image: tommylike/sinker:v20190625-9f02db3fe
           args:
             - --config-path=/etc/config/config.yaml
           volumeMounts:
@@ -269,7 +269,7 @@ spec:
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  namespace: default
+  namespace: prow
   name: deck
   labels:
     app: deck
@@ -289,7 +289,7 @@ spec:
       terminationGracePeriodSeconds: 30
       containers:
         - name: deck
-          image: gcr.io/k8s-prow/deck:v20190625-9f02db3fe
+          image: tommylike/deck:v20190625-9f02db3fe
           args:
             - --config-path=/etc/config/config.yaml
             - --tide-url=http://tide/
@@ -322,7 +322,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  namespace: default
+  namespace: prow
   name: deck
 spec:
   selector:
@@ -335,7 +335,7 @@ spec:
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  namespace: default
+  namespace: prow
   name: horologium
   labels:
     app: horologium
@@ -352,7 +352,7 @@ spec:
       terminationGracePeriodSeconds: 30
       containers:
         - name: horologium
-          image: gcr.io/k8s-prow/horologium:v20190625-9f02db3fe
+          image: tommylike/horologium:v20190625-9f02db3fe
           args:
             - --config-path=/etc/config/config.yaml
           volumeMounts:
@@ -367,7 +367,7 @@ spec:
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  namespace: default
+  namespace: prow
   name: tide
   labels:
     app: tide
@@ -383,7 +383,7 @@ spec:
       serviceAccountName: "tide"
       containers:
         - name: tide
-          image: gcr.io/k8s-prow/tide:v20190625-9f02db3fe
+          image: tommylike/tide:v20190625-9f02db3fe
           args:
             - --dry-run=false
             - --config-path=/etc/config/config.yaml
@@ -408,7 +408,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  namespace: default
+  namespace: prow
   name: tide
 spec:
   selector:
@@ -421,7 +421,7 @@ spec:
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  namespace: default
+  namespace: prow
   name: ing
 spec:
   rules:
@@ -440,7 +440,7 @@ apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
   name: statusreconciler
-  namespace: default
+  namespace: prow
   labels:
     app: statusreconciler
 spec:
@@ -454,7 +454,7 @@ spec:
       terminationGracePeriodSeconds: 180
       containers:
         - name: statusreconciler
-          image: gcr.io/k8s-prow/status-reconciler:v20190625-9f02db3fe
+          image: tommylike/status-reconciler:v20190625-9f02db3fe
           args:
             - --dry-run=false
             - --continue-on-error=true
@@ -490,13 +490,13 @@ metadata:
 kind: ServiceAccount
 apiVersion: v1
 metadata:
-  namespace: default
+  namespace: prow
   name: "deck"
 ---
 kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1beta1
 metadata:
-  namespace: default
+  namespace: prow
   name: "deck"
 roleRef:
   apiGroup: rbac.authorization.k8s.io
@@ -509,7 +509,7 @@ subjects:
 kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1beta1
 metadata:
-  namespace: test-pods
+  namespace: prow-pods
   name: "deck"
 roleRef:
   apiGroup: rbac.authorization.k8s.io
@@ -518,12 +518,12 @@ roleRef:
 subjects:
   - kind: ServiceAccount
     name: "deck"
-    namespace: default
+    namespace: prow
 ---
 kind: Role
 apiVersion: rbac.authorization.k8s.io/v1beta1
 metadata:
-  namespace: default
+  namespace: prow
   name: "deck"
 rules:
   - apiGroups:
@@ -541,7 +541,7 @@ rules:
 kind: Role
 apiVersion: rbac.authorization.k8s.io/v1beta1
 metadata:
-  namespace: test-pods
+  namespace: prow-pods
   name: "deck"
 rules:
   - apiGroups:
@@ -554,13 +554,13 @@ rules:
 kind: ServiceAccount
 apiVersion: v1
 metadata:
-  namespace: default
+  namespace: prow
   name: "horologium"
 ---
 kind: Role
 apiVersion: rbac.authorization.k8s.io/v1beta1
 metadata:
-  namespace: default
+  namespace: prow
   name: "horologium"
 rules:
   - apiGroups:
@@ -574,7 +574,7 @@ rules:
 kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1beta1
 metadata:
-  namespace: default
+  namespace: prow
   name: "horologium"
 roleRef:
   apiGroup: rbac.authorization.k8s.io
@@ -587,13 +587,13 @@ subjects:
 kind: ServiceAccount
 apiVersion: v1
 metadata:
-  namespace: default
+  namespace: prow
   name: "plank"
 ---
 kind: Role
 apiVersion: rbac.authorization.k8s.io/v1beta1
 metadata:
-  namespace: default
+  namespace: prow
   name: "plank"
 rules:
   - apiGroups:
@@ -609,7 +609,7 @@ rules:
 kind: Role
 apiVersion: rbac.authorization.k8s.io/v1beta1
 metadata:
-  namespace: test-pods
+  namespace: prow-pods
   name: "plank"
 rules:
   - apiGroups:
@@ -624,7 +624,7 @@ rules:
 kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1beta1
 metadata:
-  namespace: default
+  namespace: prow
   name: "plank"
 roleRef:
   apiGroup: rbac.authorization.k8s.io
@@ -637,7 +637,7 @@ subjects:
 kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1beta1
 metadata:
-  namespace: test-pods
+  namespace: prow-pods
   name: "plank"
 roleRef:
   apiGroup: rbac.authorization.k8s.io
@@ -646,18 +646,18 @@ roleRef:
 subjects:
   - kind: ServiceAccount
     name: "plank"
-    namespace: default
+    namespace: prow
 ---
 kind: ServiceAccount
 apiVersion: v1
 metadata:
-  namespace: default
+  namespace: prow
   name: "sinker"
 ---
 kind: Role
 apiVersion: rbac.authorization.k8s.io/v1beta1
 metadata:
-  namespace: default
+  namespace: prow
   name: "sinker"
 rules:
   - apiGroups:
@@ -671,7 +671,7 @@ rules:
 kind: Role
 apiVersion: rbac.authorization.k8s.io/v1beta1
 metadata:
-  namespace: test-pods
+  namespace: prow-pods
   name: "sinker"
 rules:
   - apiGroups:
@@ -685,7 +685,7 @@ rules:
 kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1beta1
 metadata:
-  namespace: default
+  namespace: prow
   name: "sinker"
 roleRef:
   apiGroup: rbac.authorization.k8s.io
@@ -698,7 +698,7 @@ subjects:
 kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1beta1
 metadata:
-  namespace: test-pods
+  namespace: prow-pods
   name: "sinker"
 roleRef:
   apiGroup: rbac.authorization.k8s.io
@@ -707,18 +707,18 @@ roleRef:
 subjects:
   - kind: ServiceAccount
     name: "sinker"
-    namespace: default
+    namespace: prow
 ---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  namespace: default
+  namespace: prow
   name: "hook"
 ---
 kind: Role
 apiVersion: rbac.authorization.k8s.io/v1beta1
 metadata:
-  namespace: default
+  namespace: prow
   name: "hook"
 rules:
   - apiGroups:
@@ -740,7 +740,7 @@ rules:
 kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1beta1
 metadata:
-  namespace: default
+  namespace: prow
   name: "hook"
 roleRef:
   apiGroup: rbac.authorization.k8s.io
@@ -753,13 +753,13 @@ subjects:
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  namespace: default
+  namespace: prow
   name: "tide"
 ---
 kind: Role
 apiVersion: rbac.authorization.k8s.io/v1beta1
 metadata:
-  namespace: default
+  namespace: prow
   name: "tide"
 rules:
   - apiGroups:
@@ -773,7 +773,7 @@ rules:
 kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1beta1
 metadata:
-  namespace: default
+  namespace: prow
   name: "tide"
 roleRef:
   apiGroup: rbac.authorization.k8s.io
@@ -786,13 +786,13 @@ subjects:
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  namespace: default
+  namespace: prow
   name: "statusreconciler"
 ---
 kind: Role
 apiVersion: rbac.authorization.k8s.io/v1beta1
 metadata:
-  namespace: default
+  namespace: prow
   name: "statusreconciler"
 rules:
   - apiGroups:
@@ -805,7 +805,7 @@ rules:
 kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1beta1
 metadata:
-  namespace: default
+  namespace: prow
   name: "statusreconciler"
 roleRef:
   apiGroup: rbac.authorization.k8s.io
