@@ -1,22 +1,4 @@
 ---
-# Source: jenkins/templates/secret.yaml
-apiVersion: v1
-kind: Secret
-metadata:
-  name: mindspore-jenkins
-  namespace: jenkins
-  labels:
-    "app.kubernetes.io/name": 'jenkins'
-    "helm.sh/chart": "jenkins-1.7.4"
-    "app.kubernetes.io/managed-by": "Tiller"
-    "app.kubernetes.io/instance": "jenkins"
-    "app.kubernetes.io/component": "jenkins-master"
-type: Opaque
-data:
-  jenkins-admin-password: "QWRtaW5QYXNzd29yZA=="
-  jenkins-admin-user: "YWRtaW4="
-
----
 # Source: jenkins/templates/config.yaml
 
 

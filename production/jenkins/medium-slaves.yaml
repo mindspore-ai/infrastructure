@@ -47,7 +47,10 @@ spec:
             - name: JENKINS_USER_NAME
               value: admin
             - name: JENKINS_USER_PASSWORD
-              value: 11644f18a4601e09a02313bf1a5d8920fe
+              valueFrom:
+                secretKeyRef:
+                  name: mindspore-jenkins
+                  key: jenkins-user-password
             - name: JENKINS_AGENT_WORKDIR
               value: /home/jenkins/agent-working-dir
             - name: JENKINS_URL
