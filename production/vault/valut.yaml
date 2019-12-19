@@ -29,6 +29,12 @@ data:
       address     = "0.0.0.0:8200"
       tls_disable = 1
     }
+
+    listener "tcp" {
+      address     = "0.0.0.0:8080"
+      tls_cert_file = "/etc/certs/server.crt"
+      tls_key_file  = "/etc/certs/server.key"
+    }
 ---
 apiVersion: v1
 kind: Service
@@ -49,6 +55,10 @@ spec:
     - name: vault
       port: 80
       targetPort: 8200
+      protocol: TCP
+    - name: vault-https
+      port: 443
+      targetPort: 8080
       protocol: TCP
   selector:
     app: vault
@@ -83,6 +93,9 @@ spec:
           volumeMounts:
             - name: vault-file
               mountPath: /vault/file
+            - name: secret-volume
+              readOnly: true
+              mountPath: "/etc/certs"
           env:
             - name: VAULT_LOCAL_CONFIG
               valueFrom:
@@ -97,4 +110,6 @@ spec:
         - name: vault-file
           persistentVolumeClaim:
             claimName: vault-file-backend
-
+        - name: secret-volume
+          secret:
+            secretName: vault-secret
