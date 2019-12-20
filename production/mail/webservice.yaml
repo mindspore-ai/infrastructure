@@ -64,6 +64,9 @@ spec:
               name: mailman-cert-volume
             - mountPath: /opt/mailman-web-data
               name: mailman-web-volume
+            - mountPath: /usr/lib/python3.6/site-packages/postorius/templates/postorius/lists/summary.html
+              name: mailman-webpage-hack-volume
+              subPath: summary.html
           env:
             - name: DATABASE_TYPE
               value: postgres
@@ -113,3 +116,6 @@ spec:
         - name: mailman-cert-volume
           configMap:
             name: mailcert
+        - name: mailman-webpage-hack-volume
+          configMap:
+            name: mailman-webpage-hack

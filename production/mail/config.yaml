@@ -125,3 +125,115 @@ data:
     ]
 
     COMPRESS_CSS_HASHING_METHOD = 'content'
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mailman-webpage-hack
+  namespace: mail
+data:
+  summary.html: |
+    {% extends "postorius/base.html" %}
+    {% load i18n %}
+    {% load bootstrap_tags %}
+    {% load nav_helpers %}
+
+    {% block head_title %}
+    {% trans 'Info' %} | {{ list.fqdn_listname }} - {{ block.super }}
+    {% endblock %}
+
+    {% block content %}
+
+    {% list_nav 'list_summary' 'Summary' %}
+
+    <p>{{ list.settings.description }}</p>
+    {% if list.settings.info %}
+    <p><pre style="white-space: pre-wrap; word-break: normal; border: none; background: none;">{{ list.settings.info }}</pre></p>
+    {% endif %}
+    <p>{% trans 'To contact the list owners, use the following email address:' %} <em>{{ list.settings.owner_address }}</em></p>
+
+    {# Archives #}
+    {% if hyperkitty_enabled %}
+    {% if not public_archive and not user.is_authenticated %}
+    <p>
+        {% trans 'You have to login to visit the archives of this list.' %}
+    </p>
+    {% else %}
+    {% url 'hk_list_overview' list.fqdn_listname as hyperkitty_list_url %}
+    <p>
+        {% blocktrans %}
+        To see the prior postings to this list, visit
+        <a href="{{ hyperkitty_list_url }}">the archives</a>.
+        {% endblocktrans %}
+    </p>
+    {% endif %}
+    {% endif %}
+
+    <hr />
+
+    {# Subscription #}
+    {% if user.is_authenticated %}
+    {% if user_subscribed %}
+    <h2>{% trans 'Subscription / Unsubscription' %}</h2>
+    <p>
+        {% trans 'You are subscribed to this list with the following address:' %} <em>{{ subscribed_address }}</em>
+    </p>
+    {% url 'user_list_options' list.list_id as user_list_options_url %}
+    <p>
+        {% blocktrans %}
+        You can manage your subscription on <a href="{{ user_list_options_url }}">your list options page</a>
+        {% endblocktrans %}
+    </p>
+    <p>
+    <form method="post" action="{% url 'list_unsubscribe' list.list_id %}">
+        {% csrf_token %}
+        <input type="hidden" name="email" value="{{ subscribed_address }}" />
+        <button type="submit" class="btn btn-danger">{% trans 'Unsubscribe' %}</button>
+    </form>
+    </p>
+    {% elif user_request_pending %}
+    <h4>{% trans "You have a subscription request pending. If you don't hear back soon, please contact the list owners." %}</h4>
+    {% else %}
+    <h2>{% trans 'Subscribe to this list' %}</h2>
+    <p>
+        {% blocktrans with address=list.settings.join_address %}
+        To subscribe you can send an email with 'subscribe' in the subject to
+        <a href="mailto:{{ address }}?subject=Subscribe">{{ address }}</a>
+        or use the form below:
+        {% endblocktrans %}
+    </p>
+    <form action="{% url 'list_subscribe' list.list_id %}" method="post" class="form-horizontal">
+        {% bootstrap_form_horizontal subscribe_form 2 8 'Subscribe' %}
+    </form>
+    {% endif %}
+    {% else %}
+    <hr />
+    <div>
+        <p>
+            {% blocktrans %}
+            You can also subscribe without creating an account.
+            If you wish to do so, please use the form below.
+            {% endblocktrans%}
+        </p>
+        <form action="{% url 'list_anonymous_subscribe' list.list_id %}"
+              method="post" class="form-horizontal">
+            {% bootstrap_form_horizontal anonymous_subscription_form 2 8 'Subscribe' %}
+        </form>
+    </div>
+    {% endif %}
+
+    {# List metrics #}
+    {% if user.is_authenticated %}
+    {% if user.is_list_owner or user.is_superuser %}
+    <hr />
+    <h3>{% trans 'List metrics' %}</h3>
+    <dl class="dl-horizontal">
+        <dt>{% trans 'Created at' %}</dt><dd>{{ list.settings.created_at }}</dd>
+        <dt>{% trans 'Last post at' %}</dt><dd>{{ list.settings.last_post_at }}</dd>
+        <dt>{% trans 'Digest last sent at' %}</dt><dd>{{ list.settings.digest_last_sent_at }}</dd>
+        <dt>{% trans 'Volume' %}</dt><dd>{{ list.settings.volume }}</dd>
+    </dl>
+    {% endif %}
+    {% endif %}
+    {% endblock %}

@@ -28,94 +28,6 @@ data:
         - image: alpine
           command: ["/bin/date"]
 ---
-apiVersion: apiextensions.k8s.io/v1beta1
-kind: CustomResourceDefinition
-metadata:
-  name: prowjobs.prow.k8s.io
-spec:
-  group: prow.k8s.io
-  version: v1
-  names:
-    kind: ProwJob
-    singular: prowjob
-    plural: prowjobs
-  scope: Namespaced
-  validation:
-    openAPIV3Schema:
-      properties:
-        spec:
-          properties:
-            max_concurrency:
-              type: integer
-              minimum: 0
-            type:
-              type: string
-              enum:
-                - "presubmit"
-                - "postsubmit"
-                - "periodic"
-                - "batch"
-        status:
-          properties:
-            state:
-              type: string
-              enum:
-                - "triggered"
-                - "pending"
-                - "success"
-                - "failure"
-                - "aborted"
-                - "error"
-          anyOf:
-            - not:
-                properties:
-                  state:
-                    type: string
-                    enum:
-                      - "success"
-                      - "failure"
-                      - "error"
-                      - "aborted"
-            - required:
-                - completionTime
-  additionalPrinterColumns:
-    - name: Job
-      type: string
-      description: The name of the job being run.
-      JSONPath: .spec.job
-    - name: BuildId
-      type: string
-      description: The ID of the job being run.
-      JSONPath: .status.build_id
-    - name: Type
-      type: string
-      description: The type of job being run.
-      JSONPath: .spec.type
-    - name: Org
-      type: string
-      description: The org for which the job is running.
-      JSONPath: .spec.refs.org
-    - name: Repo
-      type: string
-      description: The repo for which the job is running.
-      JSONPath: .spec.refs.repo
-    - name: Pulls
-      type: string
-      description: The pulls for which the job is running.
-      JSONPath: ".spec.refs.pulls[*].number"
-    - name: StartTime
-      type: date
-      description: When the job started running.
-      JSONPath: .status.startTime
-    - name: CompletionTime
-      type: date
-      description: When the job finished running.
-      JSONPath: .status.completionTime
-    - name: State
-      description: The state of the job.
-      type: string
-      JSONPath: .status.state
----
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
@@ -199,6 +111,7 @@ spec:
     - port: 8888
   type: NodePort
 ---
+
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
@@ -237,6 +150,7 @@ spec:
           configMap:
             name: config
 ---
+
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
@@ -265,6 +179,7 @@ spec:
         - name: config
           configMap:
             name: config
+
 ---
 apiVersion: extensions/v1beta1
 kind: Deployment
@@ -318,6 +233,7 @@ spec:
         - name: config
           configMap:
             name: config
+
 ---
 apiVersion: v1
 kind: Service
@@ -331,6 +247,7 @@ spec:
     - port: 80
       targetPort: 8080
   type: NodePort
+
 ---
 apiVersion: extensions/v1beta1
 kind: Deployment
@@ -363,6 +280,7 @@ spec:
         - name: config
           configMap:
             name: config
+
 ---
 apiVersion: extensions/v1beta1
 kind: Deployment
@@ -417,24 +335,25 @@ spec:
     - port: 80
       targetPort: 8888
   type: NodePort
----
-apiVersion: extensions/v1beta1
-kind: Ingress
-metadata:
-  namespace: prow
-  name: ing
-spec:
-  rules:
-    - http:
-        paths:
-          - path: /* # Correct for GKE, need / on many other distros
-            backend:
-              serviceName: deck
-              servicePort: 80
-          - path: /hook
-            backend:
-              serviceName: hook
-              servicePort: 8888
+# We need create this manually before actually appending this into yaml file.
+#---
+#apiVersion: extensions/v1beta1
+#kind: Ingress
+#metadata:
+#  namespace: prow
+#  name: ing
+#spec:
+#  rules:
+#    - http:
+#        paths:
+#          - path: /* # Correct for GKE, need / on many other distros
+#            backend:
+#              serviceName: deck
+#              servicePort: 80
+#          - path: /hook
+#            backend:
+#              serviceName: hook
+#              servicePort: 8888
 ---
 apiVersion: extensions/v1beta1
 kind: Deployment
@@ -481,11 +400,6 @@ spec:
         - name: plugins
           configMap:
             name: plugins
----
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: test-pods
 ---
 kind: ServiceAccount
 apiVersion: v1
