@@ -104,6 +104,8 @@ def prepare_list():
             f for f in os.listdir(
                 os.path.join(os.getcwd(), TEMPLATE_FOLDER_PATH))]
         for d in existing_folders:
+            if not os.path.isdir(os.path.join(os.getcwd(), TEMPLATE_FOLDER_PATH, d)):
+                continue
             # check the list file exists
             local_file = get_template_file(d, l)
             if os.path.exists(local_file):
@@ -115,8 +117,6 @@ def prepare_list():
                     convert_name_to_substitution(d): get_templates_url(d, "base")
                 }
             else:
-                print("could not found template file for list {0}, path {1}, "
-                      "skipping".format(l, local_file))
                 continue
             patch_uri = "{0}/lists/{1}.{2}/uris".format(
                 MAILMAN_CORE_ENDPOINT,
