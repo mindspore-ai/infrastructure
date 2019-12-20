@@ -11,7 +11,7 @@ MAIL_WEB=swr.cn-north-1.myhuaweicloud.com/hwstaff_h00223369/mail-web:v1.0.1
 MAIL_EXIM=swr.cn-north-1.myhuaweicloud.com/hwstaff_h00223369/mail-exim4:v0.1.0
 MAIL_CORE=swr.cn-north-1.myhuaweicloud.com/hwstaff_h00223369/mail-core:v0.1.0
 MAIL_GIT_UTIL=swr.cn-north-1.myhuaweicloud.com/hwstaff_h00223369/git-tools:0.0.1
-MAIL_CORE_UTIL=swr.cn-north-1.myhuaweicloud.com/hwstaff_h00223369/mailman-core-utils:0.0.2
+MAIL_CORE_UTIL=swr.cn-north-1.myhuaweicloud.com/hwstaff_h00223369/mailman-core-utils:0.0.3
 MAIL_DATABASE=swr.cn-north-1.myhuaweicloud.com/hwstaff_h00223369/postgres:9.6-alpine
 
 jenkins_image_build:
