@@ -32,7 +32,7 @@ spec:
           env:
             # the repo which contains the templates folder
             - name: TEMPLATE_REPO
-              value: https://github.com/TommyLike/mail_templates.git
+              value: https://github.com/mindspore-ai/mail_templates.git
           command:
             - /bin/sh
             - -c

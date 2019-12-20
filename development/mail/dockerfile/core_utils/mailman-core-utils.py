@@ -70,7 +70,7 @@ def prepare_list():
         for _, _, f in os.walk(os.path.join(os.getcwd(),
                                             TEMPLATE_FOLDER_PATH)):
             for file in f:
-                if file.endswith(".txt"):
+                if file.endswith(".txt") and not file.endswith("base.txt"):
                     local_file.append(os.path.splitext(file)[0])
         lists = list(set(local_file))
 
@@ -110,18 +110,23 @@ def prepare_list():
                 patch_content = {
                     convert_name_to_substitution(d): get_templates_url(d, l)
                 }
-                patch_uri = "{0}/lists/{1}.{2}/uris".format(
-                    MAILMAN_CORE_ENDPOINT,
-                    l,
-                    DEFAULT_DOMAIN_NAME)
-                response = requests.patch(
-                    patch_uri, patch_content,
-                    auth=(MAILMAN_CORE_USER, MAILMAN_CORE_PASSWORD))
-                print("patching list {0} with template file {1}, result {2} {3}"
-                      "".format(l, local_file, response.status_code, response.text))
+            elif os.path.exists(get_base_template_file(d)):
+                patch_content = {
+                    convert_name_to_substitution(d): get_templates_url(d, "base")
+                }
             else:
                 print("could not found template file for list {0}, path {1}, "
                       "skipping".format(l, local_file))
+                continue
+            patch_uri = "{0}/lists/{1}.{2}/uris".format(
+                MAILMAN_CORE_ENDPOINT,
+                l,
+                DEFAULT_DOMAIN_NAME)
+            response = requests.patch(
+                patch_uri, patch_content,
+                auth=(MAILMAN_CORE_USER, MAILMAN_CORE_PASSWORD))
+            print("patching list {0} with template file {1}, result {2} {3}"
+                  "".format(l, local_file, response.status_code, response.text))
 
 
 def convert_name_to_substitution(dir_name):
@@ -139,6 +144,11 @@ def get_template_file(folder_name, list_name):
     return os.path.join(os.getcwd(),
                         TEMPLATE_FOLDER_PATH,
                         folder_name, "{0}.txt".format(list_name))
+
+def get_base_template_file(folder_name):
+    return os.path.join(os.getcwd(),
+                        TEMPLATE_FOLDER_PATH,
+                        folder_name, "base.txt")
 
 
 def httpd_signal_handler(signum, frame):
