@@ -81,7 +81,6 @@ spec:
               mkdir -p /opt/mailman/exim_log;
               chown Debian-exim:Debian-exim -R /opt/mailman/exim_log;
               echo "log_file_path = /opt/mailman/exim_log/%s.%M" >> /etc/exim4/conf.d/main/01_exim4-config_listmacrosdefs;
-              echo "log_selector = -host_lookup_failed -smtp_connection -smtp_protocol_error +dkim_verbose" >> /etc/exim4/conf.d/main/01_exim4-config_listmacrosdefs;
               sudo update-exim4.conf;
               exec tini -- exim -bd -v;
       #NOTE: Empty dir can't be used in a production dir. Please upgrade it before using.

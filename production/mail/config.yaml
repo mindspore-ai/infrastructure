@@ -31,6 +31,7 @@ data:
     DKIM_DOMAIN = mindspore.cn
     DKIM_FILE = /etc/exim4/dkim/mindspore.key
     DKIM_PRIVATE_KEY=${if exists{DKIM_FILE}{DKIM_FILE}{0}}
+    MAIN_LOG_SELECTOR = -host_lookup_failed -smtp_connection -smtp_protocol_error
 
   55_mm3_transport: |
     # Place this file at
