@@ -373,7 +373,7 @@ metadata:
   namespace: prow
 spec:
   rules:
-    - host: prow.mindspore.cn
+    - host: dev-prow.mindspore.cn
       http:
         paths:
           - backend:
