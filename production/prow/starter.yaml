@@ -356,6 +356,40 @@ spec:
 #              servicePort: 8888
 ---
 apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  annotations:
+    kubernetes.io/elb.autocreate: '{"type":"public","bandwidth_name":"cce-bandwidth-1577260579032","bandwidth_chargemode":"bandwidth","bandwidth_size":5,"bandwidth_sharetype":"PER","eip_type":"5_bgp"}'
+    kubernetes.io/elb.eip-id: ba5aaa37-9c12-4923-b2d3-03bfc87fd899
+    kubernetes.io/elb.id: efd54ca0-2d25-42b3-838d-2ac267289db7
+    kubernetes.io/elb.ip: 117.78.19.234
+    kubernetes.io/elb.port: "80"
+    kubernetes.io/elb.subnet-id: a7c8fc31-50cc-4c64-b9cd-d2f54c973230
+    kubernetes.io/ingress.class: cce
+  labels:
+    isExternal: "true"
+    zone: data
+  name: prow
+  namespace: prow
+spec:
+  rules:
+    - host: prow.mindspore.cn
+      http:
+        paths:
+          - backend:
+              serviceName: deck
+              servicePort: 80
+            path: /*
+            property:
+              ingress.beta.kubernetes.io/url-match-mode: STARTS_WITH
+          - backend:
+              serviceName: hook
+              servicePort: 8888
+            path: /hook
+            property:
+              ingress.beta.kubernetes.io/url-match-mode: STARTS_WITH
+---
+apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
   name: statusreconciler
