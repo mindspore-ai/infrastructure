@@ -9,6 +9,11 @@ metadata:
   name: plugins
 data:
   plugins.yaml: |
+    approve:
+      - repos:
+        - mindspore-ai/infrastructure
+        review_acts_as_lgtm: true
+        require_self_approval: false
     welcome:
       - repos:
           - mindspore-ai/infrastructure
@@ -17,12 +22,9 @@ data:
       mindspore-ai/infrastructure:
         - approve  # Allow OWNERS to /approve
         - assign  # Allow /assign and /cc
-        - cat # /meow replies with cat pictures
-        - dog # /bark replies with dog pictures
         - help  # Support /help and /good-first-issue
         - hold  # Support /hold to delay merge
         - lgtm  # Allow /lgtm
-        - verify-owners # Validates OWNERS file changes in PRs.
         - wip  # Auto-hold PRs with WIP in title
         - welcome # Let prow tell a /joke
 
