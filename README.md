@@ -82,7 +82,6 @@ It's a simple repo deployment that served with nginx, now it's only for developi
 It's mindspore's official website, please visit https://wwww.mindspore.cn
 
 ## CI Bot System
-It's very similar to k8s' [prow](https://github.com/kubernetes/test-infra) system, but this component is designed to handle
-gitee requests.
+It's based on kubernetess' [prow](https://github.com/kubernetes/test-infra) system, but some features are trimmed.
 
 
