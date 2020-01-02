@@ -46,6 +46,18 @@ data:
         containers:
         - image: alpine
           command: ["/bin/date"]
+    tide:
+      target_url: https://dev-prow.mindspore.cn/tide.html
+      queries:
+      - repos:
+        - mindspore-ai/infrastructure
+        labels:
+        - lgtm
+        - approved
+        missingLabels:
+        - do-not-merge
+        - do-not-merge/hold
+        - do-not-merge/work-in-progress
 ---
 apiVersion: extensions/v1beta1
 kind: Deployment
