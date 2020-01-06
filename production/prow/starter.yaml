@@ -47,6 +47,7 @@ data:
         - image: alpine
           command: ["/bin/date"]
     tide:
+      sync_period: 30s
       target_url: https://dev-prow.mindspore.cn/tide.html
       queries:
       - repos:
