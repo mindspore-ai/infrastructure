@@ -68,6 +68,8 @@ spec:
               name: medium-workspace-pvc
             - mountPath: /home/jenkins/share-config
               name: jenkins-share-config
+            - mountPath: /home/jenkins/share-data
+              name: jenkins-share-data
           command:
             - /bin/sh
             - -c
@@ -99,6 +101,10 @@ spec:
       volumes:
         - name: jenkins-share-config
           emptyDir: {}
+        - name: jenkins-share-data
+          persistentVolumeClaim:
+            # NOTE: this persistenvolumeclaim is imported on CCE web console, not created by command.
+            claimName: cce-efs-import-armslave-001
   updateStrategy:
     type: RollingUpdate
   volumeClaimTemplates:
