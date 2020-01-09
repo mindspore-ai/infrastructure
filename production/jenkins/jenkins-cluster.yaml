@@ -350,6 +350,8 @@ spec:
     - port: 80
       name: http
       targetPort: 8080
+    - port: 50000
+      targetPort: 50000
 
   selector:
     "app.kubernetes.io/component": "jenkins-master"
