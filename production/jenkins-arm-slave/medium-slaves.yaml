@@ -24,7 +24,7 @@ metadata:
     app: arm-medium-slaves
 spec:
   serviceName: arm-medium-slaves-service
-  replicas: 2
+  replicas: 3
   selector:
     matchLabels:
       app: arm-medium-slaves

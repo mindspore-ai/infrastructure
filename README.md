@@ -84,4 +84,9 @@ It's mindspore's official website, please visit https://wwww.mindspore.cn
 ## CI Bot System
 It's based on kubernetess' [prow](https://github.com/kubernetes/test-infra) system, but some features are trimmed.
 
+# Clusters
+Now all mindspore components are deployed into two HuaweiCloud k8s clusters[CCE]. They are:
 
+1. CCE on cn-north-1 which are all x86 based nodes
+
+2. CCE ib cn-north-4 which are all arm based nodes
