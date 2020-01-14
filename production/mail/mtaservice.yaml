@@ -80,11 +80,7 @@ spec:
               name: mta-dkim-configmap
               subPath: mindspore.key
             - name: secret-cert-volume
-              mountPath: /etc/exim4/exim.crt
-              subPath: server.crt
-            - name: secret-cert-volume
-              mountPath: /etc/exim4/exim.key
-              subPath: server.key
+              mountPath: /etc/exim4
           env:
             - name: EXIM4_CREDENTIAL
               valueFrom:
@@ -121,3 +117,8 @@ spec:
         - name: secret-cert-volume
           secret:
             secretName: mailman-cert-secrets
+            items:
+              - key: server_crt
+                path: exim.crt
+              - key: server_crt
+                path: exim.key
