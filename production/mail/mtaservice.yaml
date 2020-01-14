@@ -55,6 +55,12 @@ spec:
             - mountPath: /etc/exim4/conf.d/main/25_mm3_macros
               name: mailman-exim4-configmap-volume
               subPath: 25_mm3_macros
+            - mountPath: /etc/exim4/conf.d/main/01_exim4-config_listmacrosdefs
+              name: mailman-exim4-configmap-volume
+              subPath: 01_exim4-config_listmacrosdefs
+            - mountPath: /etc/exim4/conf.d/auth/30_exim4-config_examples
+              name: mailman-exim4-configmap-volume
+              subPath: 30_exim4-config_examples
             - mountPath: /etc/exim4/conf.d/main/00_local_macros
               name: mailman-exim4-configmap-volume
               subPath: 00_local_macros
@@ -73,14 +79,32 @@ spec:
             - mountPath: /etc/exim4/dkim
               name: mta-dkim-configmap
               subPath: mindspore.key
+            - name: secret-cert-volume
+              mountPath: /etc/exim4/exim.crt
+              subPath: server.crt
+            - name: secret-cert-volume
+              mountPath: /etc/exim4/exim.key
+              subPath: server.key
+          env:
+            - name: EXIM4_CREDENTIAL
+              valueFrom:
+                secretKeyRef:
+                  name: mailman-secrets
+                  key: exim4_credential
           # NOTE: since we added new configuration files we need reload exim4 and start up
+          # 1. save and update password file mode
+          # 2. update the log folder permission
+          # 3. reconfigure exim4
+          # 4. start the service
           command:
             - /bin/sh
             - -c
             - |
+              echo ${EXIM4_CREDENTIAL} > /etc/exim4/passwd
+              sudo chown root:Debian-exim /etc/exim4/passwd
+              sudo chmod 640 /etc/exim4/passwd
               mkdir -p /opt/mailman/exim_log;
               chown Debian-exim:Debian-exim -R /opt/mailman/exim_log;
-              echo "log_file_path = /opt/mailman/exim_log/%s.%M" >> /etc/exim4/conf.d/main/01_exim4-config_listmacrosdefs;
               sudo update-exim4.conf;
               exec tini -- exim -bd -v;
       #NOTE: Empty dir can't be used in a production dir. Please upgrade it before using.
@@ -94,3 +118,6 @@ spec:
         - name: mta-dkim-configmap
           configMap:
             name: dkim-config
+        - name: secret-cert-volume
+          secret:
+            secretName: mailman-cert-secrets

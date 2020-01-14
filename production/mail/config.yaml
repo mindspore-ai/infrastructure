@@ -31,7 +31,9 @@ data:
     DKIM_DOMAIN = mindspore.cn
     DKIM_FILE = /etc/exim4/dkim/mindspore.key
     DKIM_PRIVATE_KEY=${if exists{DKIM_FILE}{DKIM_FILE}{0}}
-    MAIN_LOG_SELECTOR = -host_lookup_failed -smtp_connection -smtp_protocol_error
+    MAIN_LOG_SELECTOR = +subject +deliver_time +received_sender +return_path_on_delivery +sender_on_delivery +unknown_in_list +smtp_protocol_error +smtp_syntax_error +tls_certificate_verified +tls_peerdn
+    MAIN_TLS_ENABLE = yes
+    AUTH_SERVER_ALLOW_NOTLS_PASSWORDS = true
 
   55_mm3_transport: |
     # Place this file at
@@ -62,6 +64,147 @@ data:
          -owner     : -request   : \
          -subscribe : -unsubscribe
       transport = mailman3_transport
+
+  01_exim4-config_listmacrosdefs: |
+    # Place this file at
+    # /etc/exim4/conf.d/main/01_exim4-config_listmacrosdefs
+    log_file_path = /opt/mailman/exim_log/%s.%M
+    exim_path = /usr/sbin/exim4
+
+    # Macro defining the main configuration directory.
+    # We do not use absolute paths.
+    .ifndef CONFDIR
+    CONFDIR = /etc/exim4
+    .endif
+
+    # debconf-driven macro definitions get inserted after this line
+    UPEX4CmacrosUPEX4C = 1
+
+    # Create domain and host lists for relay control
+    # '@' refers to 'the name of the local host'
+
+    # List of domains considered local for exim. Domains not listed here
+    # need to be deliverable remotely.
+    domainlist local_domains = MAIN_LOCAL_DOMAINS
+
+    # List of recipient domains to relay _to_. Use this list if you're -
+    # for example - fallback MX or mail gateway for domains.
+    domainlist relay_to_domains = MAIN_RELAY_TO_DOMAINS
+
+    # List of sender networks (IP addresses) to _unconditionally_ relay
+    # _for_. If you intend to be SMTP AUTH server, you do not need to enter
+    # anything here.
+    hostlist relay_from_hosts = MAIN_RELAY_NETS
+
+
+    # Decide which domain to use to add to all unqualified addresses.
+    # If MAIN_PRIMARY_HOSTNAME_AS_QUALIFY_DOMAIN is defined, the primary
+    # hostname is used. If not, but MAIN_QUALIFY_DOMAIN is set, the value
+    # of MAIN_QUALIFY_DOMAIN is used. If both macros are not defined,
+    # the first line of /etc/mailname is used.
+    .ifndef MAIN_PRIMARY_HOSTNAME_AS_QUALIFY_DOMAIN
+    .ifndef MAIN_QUALIFY_DOMAIN
+    qualify_domain = ETC_MAILNAME
+    .else
+    qualify_domain = MAIN_QUALIFY_DOMAIN
+    .endif
+    .endif
+
+    # listen on all all interfaces?
+    .ifdef MAIN_LOCAL_INTERFACES
+    local_interfaces = MAIN_LOCAL_INTERFACES
+    .endif
+
+    .ifndef LOCAL_DELIVERY
+    # The default transport, set in /etc/exim4/update-exim4.conf.conf,
+    # defaulting to mail_spool. See CONFDIR/conf.d/transport/ for possibilities
+    LOCAL_DELIVERY=mail_spool
+    .endif
+
+    # The gecos field in /etc/passwd holds not only the name. see passwd(5).
+    gecos_pattern = ^([^,:]*)
+    gecos_name = $1
+
+    .ifndef CHECK_RCPT_LOCAL_LOCALPARTS
+    CHECK_RCPT_LOCAL_LOCALPARTS = ^[.] : ^.*[@%!/|`#&?]
+    .endif
+
+    .ifndef CHECK_RCPT_REMOTE_LOCALPARTS
+    CHECK_RCPT_REMOTE_LOCALPARTS = ^[./|] : ^.*[@%!`#&?] : ^.*/\\.\\./
+    .endif
+
+  30_exim4-config_examples: |
+    # Place this file at
+    # /etc/exim4/conf.d/auth/30_exim4-config_examples
+
+    plain_server:
+      driver = plaintext
+      public_name = PLAIN
+      server_condition = "${if crypteq{$auth3}{${extract{1}{:}{${lookup{$auth2}lsearch{CONFDIR/passwd}{$value}{*:*}}}}}{1}{0}}"
+      server_set_id = $auth2
+      server_prompts = :
+      .ifndef AUTH_SERVER_ALLOW_NOTLS_PASSWORDS
+      server_advertise_condition = ${if eq{$tls_in_cipher}{}{}{*}}
+      .endif
+
+    login_server:
+      driver = plaintext
+      public_name = LOGIN
+      server_prompts = "Username:: : Password::"
+      server_condition = "${if crypteq{$auth2}{${extract{1}{:}{${lookup{$auth1}lsearch{CONFDIR/passwd}{$value}{*:*}}}}}{1}{0}}"
+      server_set_id = $auth1
+      .ifndef AUTH_SERVER_ALLOW_NOTLS_PASSWORDS
+      server_advertise_condition = ${if eq{$tls_in_cipher}{}{}{*}}
+      .endif
+
+    cram_md5:
+      driver = cram_md5
+      public_name = CRAM-MD5
+      client_name = ${extract{1}{:}{${lookup{$host}nwildlsearch{CONFDIR/passwd.client}{$value}fail}}}
+      client_secret = ${extract{2}{:}{${lookup{$host}nwildlsearch{CONFDIR/passwd.client}{$value}fail}}}
+
+    # this returns the matching line from passwd.client and doubles all ^
+    PASSWDLINE=${sg{\
+                    ${lookup{$host}nwildlsearch{CONFDIR/passwd.client}{$value}fail}\
+    	        }\
+    	        {\\N[\\^]\\N}\
+    	        {^^}\
+    	    }
+
+    plain:
+      driver = plaintext
+      public_name = PLAIN
+    .ifndef AUTH_CLIENT_ALLOW_NOTLS_PASSWORDS
+      client_send = "<; ${if !eq{$tls_out_cipher}{}\
+                        {^${extract{1}{:}{PASSWDLINE}}\
+    		     ^${sg{PASSWDLINE}{\\N([^:]+:)(.*)\\N}{\\$2}}\
+    		   }fail}"
+    .else
+      client_send = "<; ^${extract{1}{:}{PASSWDLINE}}\
+    		    ^${sg{PASSWDLINE}{\\N([^:]+:)(.*)\\N}{\\$2}}"
+    .endif
+
+    login:
+      driver = plaintext
+      public_name = LOGIN
+    .ifndef AUTH_CLIENT_ALLOW_NOTLS_PASSWORDS
+      # Return empty string if not non-TLS AND looking up $host in passwd-file
+      # yields a non-empty string; fail otherwise.
+      client_send = "<; ${if and{\
+                              {!eq{$tls_out_cipher}{}}\
+                              {!eq{PASSWDLINE}{}}\
+                             }\
+                          {}fail}\
+                     ; ${extract{1}{::}{PASSWDLINE}}\
+    		 ; ${sg{PASSWDLINE}{\\N([^:]+:)(.*)\\N}{\\$2}}"
+    .else
+      # Return empty string if looking up $host in passwd-file yields a
+      # non-empty string; fail otherwise.
+      client_send = "<; ${if !eq{PASSWDLINE}{}\
+                          {}fail}\
+                     ; ${extract{1}{::}{PASSWDLINE}}\
+    		 ; ${sg{PASSWDLINE}{\\N([^:]+:)(.*)\\N}{\\$2}}"
+    .endif
 
   update-exim4-conf.conf: |
     dc_eximconfig_configtype='internet'
