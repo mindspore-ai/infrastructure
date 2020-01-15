@@ -52,6 +52,9 @@ spec:
           image: swr.cn-north-1.myhuaweicloud.com/hwstaff_h00223369/mail-exim4:v0.1.0
           imagePullPolicy: "IfNotPresent"
           volumeMounts:
+            - mountPath: /etc/exim4/conf.d/acl/30_exim4-config_check_mail
+              name: mailman-exim4-configmap-volume
+              subPath: 30_exim4-config_check_mail
             - mountPath: /etc/exim4/conf.d/main/25_mm3_macros
               name: mailman-exim4-configmap-volume
               subPath: 25_mm3_macros
@@ -76,22 +79,33 @@ spec:
               # This file path also used in command option that used as a exim4 log path
             - mountPath: /opt/mailman/
               name: mailman-core-data
-            - mountPath: /etc/exim4/dkim
-              name: mta-dkim-configmap
-              subPath: mindspore.key
-            - name: secret-cert-volume
-              mountPath: /etc/exim4
           env:
             - name: EXIM4_CREDENTIAL
               valueFrom:
                 secretKeyRef:
                   name: mailman-secrets
                   key: exim4_credential
+            - name: EXIM4_TLS_CERT
+              valueFrom:
+                secretKeyRef:
+                  name: mailman-cert-secrets
+                  key: server_crt
+            - name: EXIM4_TLS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: mailman-cert-secrets
+                  key: server_key
+            - name: DKIM_KEY
+                valueFrom:
+                  secretKeyRef:
+                    name: mailman-secrets
+                    key: dkim_key
           # NOTE: since we added new configuration files we need reload exim4 and start up
           # 1. save and update password file mode
           # 2. update the log folder permission
-          # 3. reconfigure exim4
-          # 4. start the service
+          # 3. save and update dkim key
+          # 4. reconfigure exim4
+          # 5. start the service
           command:
             - /bin/sh
             - -c
@@ -99,6 +113,15 @@ spec:
               echo ${EXIM4_CREDENTIAL} > /etc/exim4/passwd
               sudo chown root:Debian-exim /etc/exim4/passwd
               sudo chmod 640 /etc/exim4/passwd
+              echo ${EXIM4_TLS_CERT} > /etc/exim4/exim.crt
+              sudo chown root:Debian-exim /etc/exim4/exim.crt
+              sudo chmod 640 /etc/exim4/exim.crt
+              echo ${EXIM4_TLS_KEY} > /etc/exim4/exim.key
+              sudo chown root:Debian-exim /etc/exim4/exim.key
+              sudo chmod 640 /etc/exim4/exim.key
+              echo ${DKIM_KEY} > /etc/exim4/dkim/mindspore.key
+              sudo chown root:Debian-exim /etc/exim4/dkim/mindspore.key
+              sudo chmod 640 /etc/exim4/dkim/mindspore.key
               mkdir -p /opt/mailman/exim_log;
               chown Debian-exim:Debian-exim -R /opt/mailman/exim_log;
               sudo update-exim4.conf;
@@ -114,11 +137,4 @@ spec:
         - name: mta-dkim-configmap
           configMap:
             name: dkim-config
-        - name: secret-cert-volume
-          secret:
-            secretName: mailman-cert-secrets
-            items:
-              - key: server_crt
-                path: exim.crt
-              - key: server_crt
-                path: exim.key
+

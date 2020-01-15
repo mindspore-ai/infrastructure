@@ -96,6 +96,16 @@ spec:
                 secretKeyRef:
                   name: mailman-secrets
                   key: mailman_admin_email
+            - name: EMAIL_HOST_USER
+              valueFrom:
+                secretKeyRef:
+                  name: mailman-secrets
+                  key: exim4_credential_username
+            - name: EMAIL_HOST_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mailman-secrets
+                  key: exim4_credential_password
             #NOTE: this is the domain name that mailman web will serve
             - name: SERVE_FROM_DOMAIN
               value: mailweb.mindspore.cn

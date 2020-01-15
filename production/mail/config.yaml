@@ -6,6 +6,22 @@ metadata:
   name: mailman-exim4-configmap
   namespace: mail
 data:
+  30_exim4-config_check_mail: |
+    # Place this file at
+    # /etc/exim4/conf.d/acl/30_exim4-config_check_mail
+    acl_check_mail:
+      .ifdef CHECK_MAIL_HELO_ISSUED
+      deny
+        message = no HELO given before MAIL command
+        condition = ${if def:sender_helo_name {no}{yes}}
+      .endif
+
+      require
+          authenticated = *
+          message = auth required
+
+      accept
+
   25_mm3_macros: |
     # Place this file at
     # /etc/exim4/conf.d/main/25_mm3_macros
@@ -31,7 +47,7 @@ data:
     DKIM_DOMAIN = mindspore.cn
     DKIM_FILE = /etc/exim4/dkim/mindspore.key
     DKIM_PRIVATE_KEY=${if exists{DKIM_FILE}{DKIM_FILE}{0}}
-    MAIN_LOG_SELECTOR = +subject +deliver_time +received_sender +return_path_on_delivery +sender_on_delivery +unknown_in_list +smtp_protocol_error +smtp_syntax_error +tls_certificate_verified +tls_peerdn
+    MAIN_LOG_SELECTOR = +subject +deliver_time +received_sender +return_path_on_delivery +sender_on_delivery +unknown_in_list +smtp_protocol_error +smtp_syntax_error +tls_certificate_verified +tls_peerdn -host_lookup_failed
     MAIN_TLS_ENABLE = yes
     AUTH_SERVER_ALLOW_NOTLS_PASSWORDS = true
 
@@ -241,6 +257,8 @@ data:
     EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
     #NOTE: this is the MTA host, we need to update it.
     EMAIL_HOST = 'mailman-exim4-service.mail.svc.cluster.local'
+    EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
+    EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
     EMAIL_PORT = 25
     
     mailman_ip_address = socket.gethostbyname(os.environ.get('MAILMAN_HOST_IP')).split('.')

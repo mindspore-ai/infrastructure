@@ -50,6 +50,16 @@ spec:
               value: http://mailman-web-service.mail.svc.cluster.local:8000/hyperkitty
             - name: SMTP_HOST
               value: mailman-exim4-service.mail.svc.cluster.local
+            - name: EMAIL_HOST_USER
+              valueFrom:
+                secretKeyRef:
+                  name: mailman-secrets
+                  key: exim4_credential_username
+            - name: EMAIL_HOST_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mailman-secrets
+                  key: exim4_credential_password
           # Sed command is used here to force change default charsets to UTF-8
           # related issue: https://gitlab.com/mailman/postorius/issues/325
           command:
