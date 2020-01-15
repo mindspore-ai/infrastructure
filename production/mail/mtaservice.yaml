@@ -79,52 +79,32 @@ spec:
               # This file path also used in command option that used as a exim4 log path
             - mountPath: /opt/mailman/
               name: mailman-core-data
-          env:
-            - name: EXIM4_CREDENTIAL
-              valueFrom:
-                secretKeyRef:
-                  name: mailman-secrets
-                  key: exim4_credential
-            - name: EXIM4_TLS_CERT
-              valueFrom:
-                secretKeyRef:
-                  name: mailman-cert-secrets
-                  key: server_crt
-            - name: EXIM4_TLS_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: mailman-cert-secrets
-                  key: server_key
-            - name: DKIM_KEY
-                valueFrom:
-                  secretKeyRef:
-                    name: mailman-secrets
-                    key: dkim_key
+            - name: mailman-secrets
+              mountPath: /etc/exim4/passwd
+              subPath: exim4_credential
+            - name: mailman-cert-secrets
+              mountPath: /etc/exim4/exim.crt
+              subPath: server_crt
+            - name: mailman-cert-secrets
+              mountPath: /etc/exim4/exim.key
+              subPath: server_key
+            - name: mailman-secrets
+              mountPath: /etc/exim4/dkim/mindspore.key
+              subPath: dkim_key
           # NOTE: since we added new configuration files we need reload exim4 and start up
-          # 1. save and update password file mode
+          # 1. update password  and key file mode
           # 2. update the log folder permission
-          # 3. save and update dkim key
-          # 4. reconfigure exim4
-          # 5. start the service
+          # 3. reconfigure exim4
+          # 4. start the service
           command:
             - /bin/sh
             - -c
             - |
-              echo ${EXIM4_CREDENTIAL} > /etc/exim4/passwd
-              sudo chown root:Debian-exim /etc/exim4/passwd
-              sudo chmod 640 /etc/exim4/passwd
-              echo ${EXIM4_TLS_CERT} > /etc/exim4/exim.crt
-              sudo chown root:Debian-exim /etc/exim4/exim.crt
-              sudo chmod 640 /etc/exim4/exim.crt
-              echo ${EXIM4_TLS_KEY} > /etc/exim4/exim.key
-              sudo chown root:Debian-exim /etc/exim4/exim.key
-              sudo chmod 640 /etc/exim4/exim.key
-              echo ${DKIM_KEY} > /etc/exim4/dkim/mindspore.key
-              sudo chown root:Debian-exim /etc/exim4/dkim/mindspore.key
-              sudo chmod 640 /etc/exim4/dkim/mindspore.key
-              mkdir -p /opt/mailman/exim_log;
-              chown Debian-exim:Debian-exim -R /opt/mailman/exim_log;
-              sudo update-exim4.conf;
+              sudo chown root:Debian-exim /etc/exim4/passwd /etc/exim4/exim.crt /etc/exim4/exim.key /etc/exim4/dkim/mindspore.key
+              sudo chmod 640 /etc/exim4/passwd /etc/exim4/exim.crt /etc/exim4/exim.key /etc/exim4/dkim/mindspore.key
+              mkdir -p /opt/mailman/exim_log
+              chown Debian-exim:Debian-exim -R /opt/mailman/exim_log
+              sudo update-exim4.conf
               exec tini -- exim -bd -v;
       #NOTE: Empty dir can't be used in a production dir. Please upgrade it before using.
       volumes:
@@ -137,4 +117,10 @@ spec:
         - name: mta-dkim-configmap
           configMap:
             name: dkim-config
+        - name: mailman-secrets
+          secret:
+            secretName: mailman-secrets
+        - name: mailman-cert-secrets
+          secret:
+            secretName: mailman-cert-secrets
 
