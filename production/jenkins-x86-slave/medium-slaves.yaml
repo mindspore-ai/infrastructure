@@ -2,36 +2,36 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: medium-slaves-service
+  name: x86-medium-slaves-service
   namespace: jenkins
   labels:
-    app: medium-slaves
+    app: x86-medium-slaves
 spec:
   ports:
     - port: 80
       name: port-placeholder
   clusterIP: None
   selector:
-    app: medium-slaves
+    app: x86-medium-slaves
 
 ---
 kind: StatefulSet
 apiVersion: apps/v1beta1
 metadata:
-  name: medium-slaves
+  name: x86-medium-slaves
   namespace: jenkins
   labels:
-    app: medium-slaves
+    app: x86-medium-slaves
 spec:
-  serviceName: medium-slaves-service
-  replicas: 0
+  serviceName: x86-medium-slaves-service
+  replicas: 3
   selector:
     matchLabels:
-      app: medium-slaves
+      app: x86-medium-slaves
   template:
     metadata:
       labels:
-        app: medium-slaves
+        app: x86-medium-slaves
     spec:
       initContainers:
         - name: slave-init
@@ -47,20 +47,17 @@ spec:
             - name: JENKINS_USER_NAME
               value: admin
             - name: JENKINS_USER_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: mindspore-jenkins
-                  key: jenkins-user-password
+              value: 11644f18a4601e09a02313bf1a5d8920fe
             - name: JENKINS_AGENT_WORKDIR
               value: /home/jenkins/agent-working-dir
             - name: JENKINS_URL
-              value: http://mindspore-jenkins.jenkins.svc.cluster.local:80
+              value: http://build.mindspore.cn
             - name: JENKINS_SHARE_FOLDER
               value: /home/jenkins/share-config
             - name: EXECUTOR_NUMBERS
               value: "1"
             - name: NODE_LABELS
-              value: x86;k8s-medium
+              value: x86 k8s-medium
           args: ["$(JENKINS_URL)", "$(JENKINS_USER_NAME)", "$(JENKINS_USER_PASSWORD)", "$(JENKINS_NODE_NAME)", "$(EXECUTOR_NUMBERS)", "$(JENKINS_AGENT_WORKDIR)", "$(NODE_LABELS)", "$(JENKINS_SHARE_FOLDER)"]
       containers:
         - name: jenkins-slave
@@ -88,7 +85,7 @@ spec:
               memory: 9000Mi
           env:
             - name: JENKINS_TUNNEL
-              value: mindspore-jenkins-agent:50000
+              value: build.mindspore.cn:50000
             - name: JENKINS_AGENT_NAME
               valueFrom:
                 fieldRef:
@@ -100,7 +97,7 @@ spec:
             - name: JENKINS_AGENT_WORKDIR
               value: /home/jenkins/agent-working-dir
             - name: JENKINS_URL
-              value: http://mindspore-jenkins.jenkins.svc.cluster.local:80
+              value: http://build.mindspore.cn
       volumes:
         - name: jenkins-share-config
           emptyDir: {}

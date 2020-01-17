@@ -52,9 +52,6 @@ spec:
           image: swr.cn-north-1.myhuaweicloud.com/hwstaff_h00223369/mail-exim4:v0.1.0
           imagePullPolicy: "IfNotPresent"
           volumeMounts:
-            - mountPath: /etc/exim4/conf.d/acl/30_exim4-config_check_mail
-              name: mailman-exim4-configmap-volume
-              subPath: 30_exim4-config_check_mail
             - mountPath: /etc/exim4/conf.d/main/25_mm3_macros
               name: mailman-exim4-configmap-volume
               subPath: 25_mm3_macros

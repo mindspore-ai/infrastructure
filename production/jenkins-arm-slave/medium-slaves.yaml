@@ -57,7 +57,7 @@ spec:
             - name: EXECUTOR_NUMBERS
               value: "1"
             - name: NODE_LABELS
-              value: arm;k8s-medium
+              value: arm k8s-medium
           args: ["$(JENKINS_URL)", "$(JENKINS_USER_NAME)", "$(JENKINS_USER_PASSWORD)", "$(JENKINS_NODE_NAME)", "$(EXECUTOR_NUMBERS)", "$(JENKINS_AGENT_WORKDIR)", "$(NODE_LABELS)", "$(JENKINS_SHARE_FOLDER)"]
       containers:
         - name: jenkins-slave
