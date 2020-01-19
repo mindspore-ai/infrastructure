@@ -61,8 +61,8 @@ spec:
           args: ["$(JENKINS_URL)", "$(JENKINS_USER_NAME)", "$(JENKINS_USER_PASSWORD)", "$(JENKINS_NODE_NAME)", "$(EXECUTOR_NUMBERS)", "$(JENKINS_AGENT_WORKDIR)", "$(NODE_LABELS)", "$(JENKINS_SHARE_FOLDER)"]
       containers:
         - name: jenkins-slave
-          image: swr.cn-north-4.myhuaweicloud.com/hwstaff_h00223369/centos_slave_arm:0.0.1
-          imagePullPolicy: "IfNotPresent"
+          image: swr.cn-north-1.myhuaweicloud.com/hwstaff_h00223369/euleros_davinci:0.0.2
+          imagePullPolicy: "Always"
           volumeMounts:
             - mountPath: /home/jenkins/agent-working-dir
               name: medium-workspace-pvc
