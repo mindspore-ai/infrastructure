@@ -1,0 +1,187 @@
+def giteeComments = "| Check Name | Build Result | Build Details |\n| --- | --- | --- |\n"
+pipeline {
+    agent { node {label 'k8s-small'}}
+    environment {
+        GITEE_TOKEN = credentials('gitee_token_id')
+    }
+    stages {
+        stage('source code clone') {
+            steps {
+                checkout([$class: 'GitSCM',
+                    branches: [[name: "FETCH_HEAD"]],
+                    doGenerateSubmoduleConfigurations: false,
+                    extensions: [[$class: 'LocalBranch'], [$class: 'RelativeTargetDirectory', relativeTargetDir: "${env.BUILD_ID}/mindspore"]],
+                    userRemoteConfigs: [[refspec: "+refs/pull/${env.giteePullRequestIid}/MERGE:refs/pull/${env.giteePullRequestIid}/MERGE",
+                    url: "https://tommylike:${env.GITEE_TOKEN}@gitee.com/mindspore/mindspore"]]
+                ])
+                sh '''cd ${WORKSPACE}/${BUILD_ID}
+                      git clone https://tommylike:$GITEE_TOKEN@gitee.com/mindspore/graphengine.git
+                      rm -rf ${WORKSPACE}/${BUILD_ID}/mindspore/graphengine
+                      mv ${WORKSPACE}/${BUILD_ID}/graphengine ${WORKSPACE}/${BUILD_ID}/mindspore/graphengine
+                      cd ${WORKSPACE}/${BUILD_ID}
+                      tar cf mindspore.tar mindspore
+                      rm -rf mindspore
+                      mkdir -pv /home/jenkins/share-data/code
+                      rm -rf /home/jenkins/share-data/code/${BUILD_ID}
+                      mv ${WORKSPACE}/${BUILD_ID} /home/jenkins/share-data/code
+                   '''
+            }
+        }
+        stage('static-check') {
+            steps {
+            	script {
+                    def jobsString = "MindSpore_Gate_Cpplint,MindSpore_Gate_Cppcheck,MindSpore_Gate_Pylint,MindSpore_Gate_Shellcheck"
+                    ArrayList jobsList = jobsString.split('\\,')
+                    def parallelJobs2Run = [:]
+                    def parallelJobResults = [:]
+                    jobsList.each { job ->
+                        echo "Going to parallel for job ${job}"
+                        parallelJobs2Run["${job}"] = { ->
+                            echo "Calling job ${job}"
+                            jobResults=build job: "${job}",
+                            parameters: [
+                                string(name: 'GATE_BUILD_ID', value: env.BUILD_ID),
+                                    ],
+                            propagate: false,
+                            wait: true
+                            parallelJobResults["${job}"] = jobResults
+                        }
+                    };
+
+                    parallel parallelJobs2Run
+                    parallelJobResults.each { name, result ->
+                        echo "Details for job ${name}"
+                        echo "RESULT: ${result.result}"
+                        echo "URL: ${result.absoluteUrl}"
+                        echo "NUMBER: ${result.number}"
+                    }
+
+
+                    def JobSuccess = true
+                    parallelJobResults.each {name, result ->
+                        echo result.result
+                        if (result.result == "SUCCESS") {
+                            resultIcon = ":white_check_mark: "
+                        } else {
+                            JobSuccess = false
+                            resultIcon = ":x:"
+                        }
+                        giteeComments += "|  ${name} | ${resultIcon}**${result.result}** |  [#${result.number}](${result.absoluteUrl}/console) |\n"
+                    }
+
+                    if (!JobSuccess){
+                    	error "Static check failed"
+                    }
+                }
+            }
+        }
+        stage('build and llt') {
+            steps {
+            	script {
+                    def jobsString = "MindSpore_Gate_Compile_Davinci_ARM_EulerOS,MindSpore_Gate_Compile_GPU_X86_Ubuntu_Cuda9,MindSpore_Gate_LLT"
+                    ArrayList jobsList = jobsString.split('\\,')
+                    def parallelJobs2Run = [:]
+                    def parallelJobResults = [:]
+                    jobsList.each { job ->
+                        echo "Going to parallel for job ${job}"
+                        parallelJobs2Run["${job}"] = { ->
+                            echo "Calling job ${job}"
+                            jobResults=build job: "${job}",
+                            parameters: [
+                                string(name: 'GATE_BUILD_ID', value: env.BUILD_ID),
+                                    ],
+                            propagate: false,
+                            wait: true
+                            parallelJobResults["${job}"] = jobResults
+                        }
+                    };
+
+                    parallel parallelJobs2Run
+                    parallelJobResults.each { name, result ->
+                        echo "Details for job ${name}"
+                        echo "RESULT: ${result.result}"
+                        echo "URL: ${result.absoluteUrl}"
+                        echo "NUMBER: ${result.number}"
+                    }
+
+
+                    def JobSuccess = true
+                    parallelJobResults.each {name, result ->
+                        echo result.result
+                        if (result.result == "SUCCESS") {
+                            resultIcon = ":white_check_mark: "
+                        } else {
+                            JobSuccess = false
+                            resultIcon = ":x:"
+                        }
+                        giteeComments += "|  ${name} | ${resultIcon}**${result.result}** |  [#${result.number}](${result.absoluteUrl}/console) |\n"
+                    }
+
+                    if (!JobSuccess){
+                    	error "Build and llt failed"
+                    }
+                }
+            }
+        }
+        stage('smoke test') {
+            steps {
+            	script {
+                    def jobsString = "MindSpore_Gate_Smoke_Davinci,MindSpore_Gate_Smoke_GPU"
+                    ArrayList jobsList = jobsString.split('\\,')
+                    def parallelJobs2Run = [:]
+                    def parallelJobResults = [:]
+                    jobsList.each { job ->
+                        echo "Going to parallel for job ${job}"
+                        parallelJobs2Run["${job}"] = { ->
+                            echo "Calling job ${job}"
+                            jobResults=build job: "${job}",
+                            parameters: [
+                                string(name: 'GATE_BUILD_ID', value: env.BUILD_ID),
+                                    ],
+                            propagate: false,
+                            wait: true
+                            parallelJobResults["${job}"] = jobResults
+                        }
+                    };
+
+                    parallel parallelJobs2Run
+                    parallelJobResults.each { name, result ->
+                        echo "Details for job ${name}"
+                        echo "RESULT: ${result.result}"
+                        echo "URL: ${result.absoluteUrl}"
+                        echo "NUMBER: ${result.number}"
+                    }
+
+
+                    def JobSuccess = true
+                    parallelJobResults.each {name, result ->
+                        echo result.result
+                        if (result.result == "SUCCESS") {
+                            resultIcon = ":white_check_mark: "
+                        } else {
+                            JobSuccess = false
+                            resultIcon = ":x:"
+                        }
+                        giteeComments += "|  ${name} | ${resultIcon}**${result.result}** |  [#${result.number}](${result.absoluteUrl}/console) |\n"
+                    }
+
+                    if (!JobSuccess){
+                    	error "Smoke test failed"
+                    }
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+        	addGiteeMRComment comment: giteeComments
+            echo 'succeeeded!'
+        }
+
+        failure {
+        	addGiteeMRComment comment: giteeComments
+            echo 'failed :('
+        }
+    }
+}
