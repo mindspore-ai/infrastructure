@@ -15,5 +15,5 @@ jobs:
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
         snapshot: true
-        dockerfile: development/jenkins/dockerfile/slaves/ubuntu-gpu/Dockerfile
-        workdir: development/jenkins/dockerfile/slaves/ubuntu-gpu
+        dockerfile: ./development/jenkins/dockerfile/slaves/ubuntu-gpu/Dockerfile
+        workdir: ./development/jenkins/dockerfile/slaves/ubuntu-gpu
