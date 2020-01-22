@@ -14,4 +14,3 @@ jobs:
         snapshot: true
         dockerfile: development/jenkins/dockerfile/slaves/ubuntu-gpu/Dockerfile
         workdir: development/jenkins/dockerfile/slaves/ubuntu-gpu
-        context: development/jenkins/dockerfile/slaves/ubuntu-gpu
