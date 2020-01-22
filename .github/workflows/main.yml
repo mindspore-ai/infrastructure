@@ -5,6 +5,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@master
+    - name: Display the path
+      run: pwd && ls 
+      shell: bash
     - name: Publish to Registry
       uses: elgohr/Publish-Docker-Github-Action@master
       with:
