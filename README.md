@@ -89,4 +89,4 @@ Now all mindspore components are deployed into two HuaweiCloud k8s clusters[CCE]
 
 1. CCE on cn-north-1 which are all x86 based nodes
 
-2. CCE ib cn-north-4 which are all arm based nodes
+2. CCE on cn-north-4 which are all arm based nodes
