@@ -69,7 +69,7 @@ Yaml中包含了跟部署业务相关的配置，需要在迁移前手动修改:
 3. `mail.example.com.`: 配置exim4 Service所在的EIP，类型A
 4. `example.com`: 类型MX，指向`mail.example.com`
 5. `example.com`: 类型TXT，配置内容: `"v=spf1 ip4:<使用smtp.example.com指向的IP> -all"`
-6. `default._domainkey.mindspore.cn.`: 类型TXT，配置内容: `"v=DKIM1;k=rsa;p=<dkim公钥内容base64加密>"`
+6. `default._domainkey.mindspore.cn.`: 类型TXT，配置内容: `"v=DKIM1;k=rsa;p=<dkim公钥内容>"`
 7. `_dmarc.mindspore.cn.`: 类型TXT，配置内容: `"v=DMARC1;p=none;sp=none;adkim=r;aspf=r;fo=1;rf=afrf;pct=100;ruf=mailto:tommylikehu@gmail.com;ri=86400"`: 邮箱更换为管理员邮箱即可。
 
 配置完成后可以通过工具检查spf，dkim dmarc等配置是否正确:
