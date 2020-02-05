@@ -94,8 +94,11 @@ spec:
             - name: vault-file
               mountPath: /vault/file
             - name: secret-volume
-              readOnly: true
-              mountPath: "/etc/certs"
+              mountPath: /etc/certs/server.crt
+              subPath: server_crt
+            - name: secret-volume
+              mountPath: /etc/certs/server.key
+              subPath: server_key
           env:
             - name: VAULT_LOCAL_CONFIG
               valueFrom:
