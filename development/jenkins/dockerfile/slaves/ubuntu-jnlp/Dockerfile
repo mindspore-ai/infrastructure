@@ -4,13 +4,14 @@ MAINTAINER tommylike <tommylikehu@gmail.com>
 # Install jdk8 and bunch of build tools
 USER root
 ENV USER root
-
 RUN apt update \
-	&& apt install -y wget \
-	&& apt install -y curl \
-	&& apt install -y git \
-	&& apt install -y subversion \
-	&& apt install -y default-jre
+	&& apt install -y wget curl git subversion\
+	&& apt install -y openjdk-8-jdk openjfx maven vim
+
+# Install nodejs related tools
+RUN curl -sL https://deb.nodesource.com/setup_10.x | bash - \
+    && apt install -y nodejs \
+    && npm install -g cnpm --registry=https://registry.npm.taobao.org
 
 # Setup java path
 ENV JAVA_HOME /usr/lib/jvm/java-8-openjdk-amd64/jre
