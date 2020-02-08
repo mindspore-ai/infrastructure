@@ -68,7 +68,7 @@ data:
   01_exim4-config_listmacrosdefs: |
     # Place this file at
     # /etc/exim4/conf.d/main/01_exim4-config_listmacrosdefs
-    log_file_path = /opt/mailman/exim_log/%s.%M
+    log_file_path = /exim4_log/monthly/%s.%M
     exim_path = /usr/sbin/exim4
 
     # Macro defining the main configuration directory.
