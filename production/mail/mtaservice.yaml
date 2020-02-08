@@ -77,16 +77,16 @@ spec:
             - mountPath: /opt/mailman/
               name: mailman-core-data
             - name: mailman-secrets
-              mountPath: /etc/exim4/passwd
+              mountPath: /etc/exim4/passwd.ro
               subPath: exim4_credential
             - name: mailman-cert-secrets
-              mountPath: /etc/exim4/exim.crt
+              mountPath: /etc/exim4/exim.crt.ro
               subPath: server_crt
             - name: mailman-cert-secrets
-              mountPath: /etc/exim4/exim.key
+              mountPath: /etc/exim4/exim.key.ro
               subPath: server_key
             - name: mailman-secrets
-              mountPath: /etc/exim4/dkim/mindspore.key
+              mountPath: /etc/exim4/dkim/mindspore.key.ro
               subPath: dkim_key
           # NOTE: since we added new configuration files we need reload exim4 and start up
           # 1. update password  and key file mode
@@ -97,6 +97,10 @@ spec:
             - /bin/sh
             - -c
             - |
+              cp /etc/exim4/passwd.ro /etc/exim4/passwd
+              cp /etc/exim4/exim.crt.ro /etc/exim4/exim.crt
+              cp /etc/exim4/exim.key.ro /etc/exim4/exim.key
+              cp /etc/exim4/dkim/mindspore.key.ro /etc/exim4/dkim/mindspore.key
               sudo chown root:Debian-exim /etc/exim4/passwd /etc/exim4/exim.crt /etc/exim4/exim.key /etc/exim4/dkim/mindspore.key
               sudo chmod 640 /etc/exim4/passwd /etc/exim4/exim.crt /etc/exim4/exim.key /etc/exim4/dkim/mindspore.key
               mkdir -p /opt/mailman/exim_log
