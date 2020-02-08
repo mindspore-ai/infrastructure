@@ -52,8 +52,6 @@ spec:
           image: mindspore/mail-exim4:v0.1.0
           imagePullPolicy: "IfNotPresent"
           volumeMounts:
-            - mountPath: /exim4_log
-              name: exim4-log-pvc
             - mountPath: /etc/exim4/conf.d/main/25_mm3_macros
               name: mailman-exim4-configmap-volume
               subPath: 25_mm3_macros
@@ -105,8 +103,8 @@ spec:
               cp /etc/exim4/dkim/mindspore.key.ro /etc/exim4/dkim/mindspore.key
               sudo chown root:Debian-exim /etc/exim4/passwd /etc/exim4/exim.crt /etc/exim4/exim.key /etc/exim4/dkim/mindspore.key
               sudo chmod 640 /etc/exim4/passwd /etc/exim4/exim.crt /etc/exim4/exim.key /etc/exim4/dkim/mindspore.key
-              mkdir -p /exim4_log/monthly
-              chown Debian-exim:Debian-exim -R /exim4_log/monthly
+              mkdir -p /opt/mailman/exim_log
+              chown Debian-exim:Debian-exim -R /opt/mailman/exim_log
               sudo update-exim4.conf
               exec tini -- exim -bd -v;
       #NOTE: Empty dir can't be used in a production dir. Please upgrade it before using.
@@ -123,13 +121,4 @@ spec:
         - name: mailman-cert-secrets
           secret:
             secretName: mailman-cert-secrets
-  volumeClaimTemplates:
-    - metadata:
-        name: exim4-log-pvc
-      spec:
-        accessModes: [ "ReadWriteOnce" ]
-        resources:
-          requests:
-            storage: 100Gi
-        storageClassName: "sas"
 
