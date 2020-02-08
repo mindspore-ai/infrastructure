@@ -1,0 +1,113 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: image-sync-configmap
+  namespace: image-sync
+data:
+  image-sync: |
+    {
+        "auth": {
+            "registry.hub.docker.com": {
+                "username": "DOCKERHUB_USER",
+                "password": "DOCKERHUB_PASSWORD"
+            },
+            "swr.cn-north-1.myhuaweicloud.com": {
+                "username": "HUAWEICLOUD_USER",
+                "password": "HUAWEICLOUD_PASSWORD"
+            }
+        },
+        "images": {
+            "mindspore/generic_ubuntu": "swr.cn-north-1.myhuaweicloud.com/hwstaff_h00223369/generic_ubuntu",
+            "mindspore/ubuntu_gpu": "swr.cn-north-1.myhuaweicloud.com/hwstaff_h00223369/ubuntu_gpu",
+            "mindspore/ms_check_slave": "swr.cn-north-1.myhuaweicloud.com/hwstaff_h00223369/ms_check_slave",
+            "mindspore/euleros_aarch64": "swr.cn-north-1.myhuaweicloud.com/hwstaff_h00223369/euleros_aarch64",
+            "mindspore/jenkins-slave-tools": "swr.cn-north-1.myhuaweicloud.com/hwstaff_h00223369/jenkins-slave-tools",
+            "mindspore/euleros": "swr.cn-north-1.myhuaweicloud.com/hwstaff_h00223369/euleros",
+            "mindspore/jenkins-slave-tools-arm": "swr.cn-north-1.myhuaweicloud.com/hwstaff_h00223369/jenkins-slave-tools-arm"
+        }
+    }
+
+
+---
+apiVersion: secrets-manager.tuenti.io/v1alpha1
+kind: SecretDefinition
+metadata:
+  name: image-sync-secrets
+  namespace: image-sync
+spec:
+  name: image-sync-secrets
+  keysMap:
+    dockerhub_user:
+      path: secrets/data/mindspore/image-syncer
+      key: dockerhub_user
+    dockerhub_password:
+      path: secrets/data/mindspore/image-syncer
+      key: dockerhub_password
+    huawecloud_user:
+      path: secrets/data/mindspore/image-syncer
+      key: huawecloud_user
+    huaweicloud_password:
+      path: secrets/data/mindspore/image-syncer
+      key: huaweicloud_password
+
+---
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: image-sync-cronjob
+  namespace: image-sync
+spec:
+  schedule: "*/5 * * * *"
+  concurrencyPolicy: "Forbid"
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: sync-images-from-dockerhub
+              image: mindspore/image-sync:b41e962
+              volumeMounts:
+                - mountPath: /etc/image-syncer/image-syncer.json.ro
+                  name: image-sync-config-vol
+                  subPath: image-sync
+              env:
+                - name: DOCKERHUB_USER
+                  valueFrom:
+                    secretKeyRef:
+                      name: image-sync-secrets
+                      key: dockerhub_user
+                - name: DOCKERHUB_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: image-sync-secrets
+                      key: dockerhub_password
+                - name: HUAWEICLOUD_USER
+                  valueFrom:
+                    secretKeyRef:
+                      name: image-sync-secrets
+                      key: huawecloud_user
+                - name: HUAWEICLOUD_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: image-sync-secrets
+                      key: huaweicloud_password
+              command:
+                - /bin/sh
+                - -c
+                - |
+                  # update image sync json file
+                  sed -e "s/DOCKERHUB_USER/${DOCKERHUB_USER}/g; s/DOCKERHUB_PASSWORD/${DOCKERHUB_PASSWORD}/g; s/HUAWEICLOUD_USER/${HUAWEICLOUD_USER}/g; s/HUAWEICLOUD_PASSWORD/${HUAWEICLOUD_PASSWORD}/g" -- /etc/image-syncer/image-syncer.json.ro  > /etc/image-syncer/image-syncer.json
+                  cat /etc/image-syncer/image-syncer.json
+                  image-syncer --config /etc/image-syncer/image-syncer.json -r 3
+              resources:
+                requests:
+                  cpu: 2000m
+                  memory: 1000Mi
+          volumes:
+            - name: image-sync-config-vol
+              configMap:
+                name: image-sync-configmap
+          restartPolicy: OnFailure

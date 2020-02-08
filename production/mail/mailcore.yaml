@@ -20,7 +20,7 @@ spec:
     spec:
       containers:
         - name: mailman-core
-          image: swr.cn-north-1.myhuaweicloud.com/hwstaff_h00223369/mail-core:v0.1.0
+          image: mindspore/mail-core:v0.1.0
           imagePullPolicy: "IfNotPresent"
           volumeMounts:
             - mountPath: /opt/mailman/
@@ -30,6 +30,16 @@ spec:
               value: postgres
             - name: DATABASE_CLASS
               value: mailman.database.postgresql.PostgreSQLDatabase
+            - name: MAILMAN_REST_USER
+              valueFrom:
+                secretKeyRef:
+                  name: mailman-secrets
+                  key: mailman_core_user
+            - name: MAILMAN_REST_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mailman-secrets
+                  key: mailman_core_password
             - name: HYPERKITTY_API_KEY
               valueFrom:
                 secretKeyRef:

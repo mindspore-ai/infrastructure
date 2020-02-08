@@ -55,13 +55,17 @@ spec:
       containers:
         - name: mailman-web
           # We modified the mail-web image to add static folder.
-          image: swr.cn-north-1.myhuaweicloud.com/hwstaff_h00223369/mail-web:v1.0.1
+          image: mindspore/mail-web:v1.0.1
           imagePullPolicy: "IfNotPresent"
           volumeMounts:
             - mountPath: /opt/mailman-web-config
               name: mailman-web-configmap-volume
-            - mountPath: /etc/nginx/ssl
-              name: mailman-cert-volume
+            - name: mailman-cert-secrets
+              mountPath: /etc/nginx/ssl/server.crt
+              subPath: server_crt
+            - name: mailman-cert-secrets
+              mountPath: /etc/nginx/ssl/server.key
+              subPath: server_key
             - mountPath: /opt/mailman-web-data
               name: mailman-web-volume
             - mountPath: /usr/lib/python3.6/site-packages/postorius/templates/postorius/lists/summary.html
@@ -123,9 +127,9 @@ spec:
         - name: mailman-web-configmap-volume
           configMap:
             name: mailman-web-configmap
-        - name: mailman-cert-volume
-          configMap:
-            name: mailcert
+        - name: mailman-cert-secrets
+          secret:
+            secretName: mailman-cert-secrets
         - name: mailman-webpage-hack-volume
           configMap:
             name: mailman-webpage-hack

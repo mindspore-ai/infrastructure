@@ -49,7 +49,7 @@ spec:
       containers:
         - name: mailman-exim4
           #NOTE: This image is directly built from our dockerfile located in exim4 folder
-          image: swr.cn-north-1.myhuaweicloud.com/hwstaff_h00223369/mail-exim4:v0.1.0
+          image: mindspore/mail-exim4:v0.1.0
           imagePullPolicy: "IfNotPresent"
           volumeMounts:
             - mountPath: /etc/exim4/conf.d/main/25_mm3_macros
@@ -111,9 +111,6 @@ spec:
         - name: mailman-core-data
           persistentVolumeClaim:
             claimName: config-vol
-        - name: mta-dkim-configmap
-          configMap:
-            name: dkim-config
         - name: mailman-secrets
           secret:
             secretName: mailman-secrets
