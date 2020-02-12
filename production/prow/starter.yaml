@@ -52,7 +52,7 @@ data:
           command: ["/bin/date"]
     tide:
       sync_period: 40s
-      target_url: https://dev-prow.mindspore.cn/tide.html
+      target_url: http://dev-prow.mindspore.cn/tide.html
       queries:
       - orgs:
         - mindspore-ai
@@ -415,7 +415,7 @@ spec:
           - backend:
               serviceName: deck
               servicePort: 80
-            path: /*
+            path: /
             property:
               ingress.beta.kubernetes.io/url-match-mode: STARTS_WITH
           - backend:
