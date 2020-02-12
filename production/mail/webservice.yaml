@@ -95,6 +95,16 @@ spec:
               value: mailman-core-0.mail-suit-service.mail.svc.cluster.local
             - name: MAILMAN_ADMIN_USER
               value: mindspore
+            - name: MAILMAN_REST_USER
+              valueFrom:
+                secretKeyRef:
+                  name: mailman-secrets
+                  key: mailman_core_user
+            - name: MAILMAN_REST_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mailman-secrets
+                  key: mailman_core_password
             - name: MAILMAN_ADMIN_EMAIL
               valueFrom:
                 secretKeyRef:
