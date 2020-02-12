@@ -55,7 +55,7 @@ data:
       target_url: https://dev-prow.mindspore.cn/tide.html
       queries:
       - repos:
-        - mindspore-ai/infrastructure
+        - mindspore-ai
         labels:
         - lgtm
         - approved
