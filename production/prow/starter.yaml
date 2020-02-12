@@ -54,7 +54,7 @@ data:
       sync_period: 40s
       target_url: https://dev-prow.mindspore.cn/tide.html
       queries:
-      - repos:
+      - orgs:
         - mindspore-ai
         labels:
         - lgtm
