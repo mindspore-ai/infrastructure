@@ -125,6 +125,9 @@ ARG AGENT_WORKDIR=/home/${user}/agent
 RUN groupadd -g ${gid} ${group}
 RUN useradd -c "Jenkins user" -d /home/${user} -u ${uid} -g ${gid} -m ${user}
 
+# Set sudo
+RUN echo "jenkins ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+
 # Install python(jenkins)
 RUN export MINDSPORE_CMD="su jenkins -s /bin/bash -c " \
 #   && ${MINDSPORE_CMD} "cd /tmp; rm -f /tmp/Python-3.7.5.tar.xz; wget https://www.python.org/ftp/python/3.7.5/Python-3.7.5.tar.xz; tar -xf Python-3.7.5.tar.xz" \
