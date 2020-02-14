@@ -1,5 +1,5 @@
 # Base image euleros_aarch64:2.8
-FROM swr.cn-north-1.myhuaweicloud.com/hwstaff_h00223369/euleros_aarch64/euleros_aarch64:2.8.530
+FROM swr.cn-north-1.myhuaweicloud.com/hwstaff_h00223369/euleros_aarch64:2.8.530
 MAINTAINER tommylike <tommylikehu@gmail.com>
 
 # Set env
@@ -20,7 +20,6 @@ RUN repo_path=/etc/yum.repos.d/euleros_aarch64.repo \
     && yum clean all \
     && yum makecache
 
-
 # Install base tools
 RUN yum update \
     && yum install -y vim \
@@ -33,7 +32,8 @@ RUN yum update \
     && yum install -y curl \
     && yum install -y subversion \
     && yum install -y tar \
-    && yum install -y tcl
+    && yum install -y tcl \
+    && yum install -y java-1.8.0
 
 # Install compile tools
 RUN yum install -y gcc \
@@ -121,39 +121,37 @@ ARG uid=1000
 ARG gid=1000
 ARG AGENT_WORKDIR=/home/${user}/agent
 
+# Create user of jenkins
 RUN groupadd -g ${gid} ${group}
 RUN useradd -c "Jenkins user" -d /home/${user} -u ${uid} -g ${gid} -m ${user}
 
+# Set sudo
+RUN echo "jenkins ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 
-# Create user of mindspore_ci
-RUN groupadd mindspore_ci \
-    && useradd -d /home/mindspore_ci -g mindspore_ci mindspore_ci \
-    && echo "mindsporeci_cc@123"|passwd --stdin mindspore_ci
-
-# Install python(mindspore_ci)
-RUN export MINDSPORE_CMD="su mindspore_ci -s /bin/bash -c " \
+# Install python(jenkins)
+RUN export MINDSPORE_CMD="su jenkins -s /bin/bash -c " \
 #   && ${MINDSPORE_CMD} "cd /tmp; rm -f /tmp/Python-3.7.5.tar.xz; wget https://www.python.org/ftp/python/3.7.5/Python-3.7.5.tar.xz; tar -xf Python-3.7.5.tar.xz" \
     && ${MINDSPORE_CMD} "cd /tmp; rm -f /tmp/Python-3.7.5.tar.xz; wget http://59.36.11.51/tools/build/python/Python-3.7.5.tar.xz; tar -xf Python-3.7.5.tar.xz" \
-    && ${MINDSPORE_CMD} "cd /tmp/Python-3.7.5; ./configure --prefix=/home/mindspore_ci/python375 --enable-shared && make -j4 && make install -j4" \
-    && ${MINDSPORE_CMD} "cd /tmp/Python-3.7.5; ./configure --prefix=/home/mindspore_ci/python375 && make -j4 && make install -j4" \
+    && ${MINDSPORE_CMD} "cd /tmp/Python-3.7.5; ./configure --prefix=/home/jenkins/python375 --enable-shared && make -j4 && make install -j4" \
+    && ${MINDSPORE_CMD} "cd /tmp/Python-3.7.5; ./configure --prefix=/home/jenkins/python375 && make -j4 && make install -j4" \
     && ${MINDSPORE_CMD} "rm -rf /tmp/Python-3.7.5; rm -f /tmp/Python-3.7.5.tar.xz"
 
-# Set pip source(mindspore_ci)
-RUN export MINDSPORE_CMD="su mindspore_ci -s /bin/bash -c " \
-    && ${MINDSPORE_CMD} "mkdir -pv /home/mindspore_ci/.pip; echo '[global]' > /home/mindspore_ci/.pip/pip.conf; echo 'trusted-host=mirrors.aliyun.com' >> /home/mindspore_ci/.pip/pip.conf; echo 'index-url=http://mirrors.aliyun.com/pypi/simple/' >> /home/mindspore_ci/.pip/pip.conf"
+# Set pip source(jenkins)
+RUN export MINDSPORE_CMD="su jenkins -s /bin/bash -c " \
+    && ${MINDSPORE_CMD} "mkdir -pv /home/jenkins/.pip; echo '[global]' > /home/jenkins/.pip/pip.conf; echo 'trusted-host=mirrors.aliyun.com' >> /home/jenkins/.pip/pip.conf; echo 'index-url=http://mirrors.aliyun.com/pypi/simple/' >> /home/jenkins/.pip/pip.conf"
 
-# Install pip package(mindspore_ci)
-RUN export MINDSPORE_CMD="su mindspore_ci -s /bin/bash -c " \
-    && ${MINDSPORE_CMD} "echo 'export PATH=/home/mindspore_ci/python375/bin:\$PATH' >> ~/.bash_profile" \
+# Install pip package(jenkins)
+RUN export MINDSPORE_CMD="su jenkins -s /bin/bash -c " \
+    && ${MINDSPORE_CMD} "echo 'export PATH=/home/jenkins/python375/bin:\$PATH' >> ~/.bash_profile" \
     && ${MINDSPORE_CMD} "source ~/.bash_profile; pip3 install numpy; pip3 install wheel; pip3 install nose; pip3 install pytest; pip3 install pytest-xdist; pip3 list"
 
-# Install cmake(mindspore_ci)
-RUN export MINDSPORE_CMD="su mindspore_ci -s /bin/bash -c " \
+# Install cmake(jenkins)
+RUN export MINDSPORE_CMD="su jenkins -s /bin/bash -c " \
 #   && ${MINDSPORE_CMD} "cd /tmp; rm -f /tmp/cmake-3.15.5.tar.gz; wget https://github.com/Kitware/CMake/releases/download/v3.15.5/cmake-3.15.5.tar.gz; tar -zxf cmake-3.15.5.tar.gz" \
     && ${MINDSPORE_CMD} "cd /tmp; rm -f /tmp/cmake-3.15.5.tar.gz; wget http://59.36.11.51/tools/build/cmake/cmake-3.15.5.tar.gz; tar -zxf cmake-3.15.5.tar.gz" \
-    && ${MINDSPORE_CMD} "cd /tmp/cmake-3.15.5; ./bootstrap --prefix=/home/mindspore_ci/cmake --parallel=4; make -j4; make install -j4" \
+    && ${MINDSPORE_CMD} "cd /tmp/cmake-3.15.5; ./bootstrap --prefix=/home/jenkins/cmake --parallel=4; make -j4; make install -j4" \
     && ${MINDSPORE_CMD} "rm -rf /tmp/cmake-3.15.5; rm -f /tmp/cmake-3.15.5.tar.gz" \
-    && ${MINDSPORE_CMD} "echo 'export PATH=/home/mindspore_ci/cmake/bin:\$PATH' >> ~/.bash_profile"
+    && ${MINDSPORE_CMD} "echo 'export PATH=/home/jenkins/cmake/bin:\$PATH' >> ~/.bash_profile"
 
 # Set sshd and timezone
 RUN sed -i 's/#   StrictHostKeyChecking ask/    StrictHostKeyChecking no/g' /etc/ssh/ssh_config \
@@ -161,7 +159,7 @@ RUN sed -i 's/#   StrictHostKeyChecking ask/    StrictHostKeyChecking no/g' /etc
     && cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
     && echo 'Asia/Shanghai' > /etc/timezone \
     && echo "export TZ='Asia/Shanghai'" >> /etc/profile \
-    && export MINDSPORE_CMD="su mindspore_ci -s /bin/bash -c " \
+    && export MINDSPORE_CMD="su jenkins -s /bin/bash -c " \
     && ${MINDSPORE_CMD} "echo export TZ='Asia/Shanghai' >> ~/.bashrc"
 
 # Set yum source(huaweicloud)
@@ -172,12 +170,6 @@ RUN repo_path=/etc/yum.repos.d/euleros_aarch64.repo \
     && echo "enabled=1" >> ${repo_path} \
     && echo "gpgcheck=1" >> ${repo_path} \
     && echo "gpgkey=http://mirrors.huaweicloud.com/euler/2.8/os/aarch64/RPM-GPG-KEY-EulerOS" >> ${repo_path}
-
-
-# Install jenkins slave
-RUN yum install -y java-1.8.0 \
-    && yum install wget
-
 
 RUN mkdir -p /usr/share/jenkins/ \
   && cd /usr/share/jenkins/ \
