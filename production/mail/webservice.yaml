@@ -72,10 +72,20 @@ spec:
               name: mailman-webpage-hack-volume
               subPath: summary.html
           env:
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: mailman-secrets
+                  key: postgres_user
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mailman-secrets
+                  key: postgres_password
             - name: DATABASE_TYPE
               value: postgres
             - name: DATABASE_URL
-              value: postgres://mailman:mailmanpass@mailman-database-0.mail-suit-service.mail.svc.cluster.local/mailmandb
+              value: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@mailman-database-0.mail-suit-service.mail.svc.cluster.local/mailmandb
             - name: HYPERKITTY_API_KEY
               valueFrom:
                 secretKeyRef:
