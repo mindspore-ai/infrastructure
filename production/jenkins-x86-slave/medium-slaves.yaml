@@ -24,7 +24,7 @@ metadata:
     app: x86-medium-slaves
 spec:
   serviceName: x86-medium-slaves-service
-  replicas: 4
+  replicas: 3
   selector:
     matchLabels:
       app: x86-medium-slaves
@@ -63,8 +63,8 @@ spec:
         - name: jenkins-slave
           image: swr.cn-north-1.myhuaweicloud.com/hwstaff_h00223369/ubuntu_gpu:0.0.2
           securityContext:
-            runAsUser: 0
-            runAsGroup: 0
+            runAsUser: 1000
+            runAsGroup: 1000
           imagePullPolicy: "Always"
           volumeMounts:
             - mountPath: /home/jenkins/agent-working-dir
@@ -81,11 +81,11 @@ spec:
               exec jenkins-agent
           resources:
             requests:
-              cpu: 6000m
+              cpu: 8000m
               memory: 16000Mi
             limits:
-              cpu: 12000m
-              memory: 32000Mi
+              cpu: 8000m
+              memory: 16000Mi
           env:
             - name: JENKINS_TUNNEL
               value: build.mindspore.cn:50000

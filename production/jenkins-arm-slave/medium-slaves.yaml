@@ -24,7 +24,7 @@ metadata:
     app: arm-medium-slaves
 spec:
   serviceName: arm-medium-slaves-service
-  replicas: 4
+  replicas: 1
   selector:
     matchLabels:
       app: arm-medium-slaves
@@ -64,8 +64,8 @@ spec:
           image: swr.cn-north-1.myhuaweicloud.com/hwstaff_h00223369/euleros_davinci:0.0.2
           imagePullPolicy: "Always"
           securityContext:
-            runAsUser: 0
-            runAsGroup: 0
+            runAsUser: 1000
+            runAsGroup: 1000
           volumeMounts:
             - mountPath: /home/jenkins/agent-working-dir
               name: medium-workspace-pvc
@@ -81,10 +81,10 @@ spec:
               exec jenkins-agent
           resources:
             requests:
-              cpu: 6000m
-              memory: 16000Mi
+              cpu: 16000m
+              memory: 32000Mi
             limits:
-              cpu: 12000m
+              cpu: 16000m
               memory: 32000Mi
           env:
             - name: JENKINS_TUNNEL
