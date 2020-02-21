@@ -64,8 +64,8 @@ spec:
           image: swr.cn-north-1.myhuaweicloud.com/hwstaff_h00223369/euleros_davinci:0.0.2
           imagePullPolicy: "Always"
           securityContext:
-            runAsUser: 1000
-            runAsGroup: 1000
+            runAsUser: 0
+            runAsGroup: 0
           volumeMounts:
             - mountPath: /home/jenkins/agent-working-dir
               name: medium-workspace-pvc

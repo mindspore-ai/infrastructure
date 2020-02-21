@@ -63,8 +63,8 @@ spec:
         - name: jenkins-slave
           image: swr.cn-north-1.myhuaweicloud.com/hwstaff_h00223369/ubuntu_gpu:0.0.2
           securityContext:
-            runAsUser: 1000
-            runAsGroup: 1000
+            runAsUser: 0
+            runAsGroup: 0
           imagePullPolicy: "Always"
           volumeMounts:
             - mountPath: /home/jenkins/agent-working-dir
