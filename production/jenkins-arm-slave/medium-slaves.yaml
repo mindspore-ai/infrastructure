@@ -81,8 +81,8 @@ spec:
               exec jenkins-agent
           resources:
             requests:
-              cpu: 16000m
-              memory: 32000Mi
+              cpu: 14000m
+              memory: 27000Mi
             limits:
               cpu: 16000m
               memory: 32000Mi

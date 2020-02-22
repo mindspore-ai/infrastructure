@@ -24,7 +24,7 @@ metadata:
     app: x86-medium-slaves
 spec:
   serviceName: x86-medium-slaves-service
-  replicas: 3
+  replicas: 4
   selector:
     matchLabels:
       app: x86-medium-slaves
@@ -81,8 +81,8 @@ spec:
               exec jenkins-agent
           resources:
             requests:
-              cpu: 8000m
-              memory: 16000Mi
+              cpu: 7000m
+              memory: 14000Mi
             limits:
               cpu: 8000m
               memory: 16000Mi
