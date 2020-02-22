@@ -24,7 +24,7 @@ metadata:
     app: x86-medium-slaves
 spec:
   serviceName: x86-medium-slaves-service
-  replicas: 4
+  replicas: 8
   selector:
     matchLabels:
       app: x86-medium-slaves
