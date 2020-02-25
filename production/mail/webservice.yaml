@@ -84,8 +84,6 @@ spec:
                   key: postgres_password
             - name: DATABASE_TYPE
               value: postgres
-            - name: DATABASE_URL
-              value: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@mailman-database-0.mail-suit-service.mail.svc.cluster.local/mailmandb
             - name: HYPERKITTY_API_KEY
               valueFrom:
                 secretKeyRef:
@@ -138,6 +136,7 @@ spec:
             - /bin/sh
             - -c
             - |
+              export DATABASE_URL=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@mailman-database-0.mail-suit-service.mail.svc.cluster.local/mailmandb
               cp /opt/mailman-web-config/settings_local.py /opt/mailman-web-data;
               docker-entrypoint.sh nginx && uwsgi --ini /opt/mailman-web/uwsgi.ini;
       #NOTE: Empty dir can't be used in a production dir. Please upgrade it before using.
