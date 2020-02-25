@@ -73,11 +73,6 @@ are configured via StatefulSets and will register them self when starting up.
 
 **Website**: http://build.mindspore.cn for more detail.
 
-## Repo Serving System
-It's a simple repo deployment that served with nginx, now it's only for developing purpose.
-
-**Website**: https://dev-repo.mindspore.cn/repository for more detail.
-
 ## Official Website
 It's mindspore's official website, please visit https://wwww.mindspore.cn
 
