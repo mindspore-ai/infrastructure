@@ -42,14 +42,6 @@ data:
   config.yaml: |
     prowjob_namespace: prow
     pod_namespace: prow-pods
-    periodics:
-    - interval: 10m
-      agent: kubernetes
-      name: echo-test
-      spec:
-        containers:
-        - image: alpine
-          command: ["/bin/date"]
     tide:
       sync_period: 40s
       target_url: http://dev-prow.mindspore.cn/tide.html
