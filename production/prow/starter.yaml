@@ -30,7 +30,9 @@ data:
         - hold  # Support /hold to delay merge
         - lgtm  # Allow /lgtm
         - wip  # Auto-hold PRs with WIP in title
-        - welcome # Let prow tell a /joke
+        - welcome
+        - size
+        - needs-rebase
 
 ---
 apiVersion: v1
