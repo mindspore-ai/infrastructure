@@ -32,8 +32,6 @@ data:
         - wip  # Auto-hold PRs with WIP in title
         - welcome
         - size
-        - needs-rebase
-
 ---
 apiVersion: v1
 kind: ConfigMap
