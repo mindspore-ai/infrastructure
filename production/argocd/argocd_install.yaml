@@ -2590,15 +2590,6 @@ metadata:
   name: argocd-ssh-known-hosts-cm
 ---
 apiVersion: v1
-data: null
-kind: ConfigMap
-metadata:
-  labels:
-    app.kubernetes.io/name: argocd-tls-certs-cm
-    app.kubernetes.io/part-of: argocd
-  name: argocd-tls-certs-cm
----
-apiVersion: v1
 kind: Secret
 metadata:
   labels:
@@ -2943,8 +2934,12 @@ spec:
         volumeMounts:
         - mountPath: /app/config/ssh
           name: ssh-known-hosts
-        - mountPath: /app/config/tls
-          name: tls-certs
+        - mountPath: /app/config/tls.crt
+          name: argocd-cert-secrets
+          subPath: server_crt
+        - mountPath: /app/config/tls.key
+          name: argocd-cert-secrets
+          subPath: server_key
       serviceAccountName: argocd-server
       volumes:
       - emptyDir: {}
@@ -2952,6 +2947,6 @@ spec:
       - configMap:
           name: argocd-ssh-known-hosts-cm
         name: ssh-known-hosts
-      - configMap:
-          name: argocd-tls-certs-cm
-        name: tls-certs
+      - name: argocd-cert-secrets
+        secret:
+          secretName: argocd-cert-secrets
