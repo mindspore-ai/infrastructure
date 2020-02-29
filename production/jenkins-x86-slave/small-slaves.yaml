@@ -47,7 +47,10 @@ spec:
             - name: JENKINS_USER_NAME
               value: admin
             - name: JENKINS_USER_PASSWORD
-              value: 11644f18a4601e09a02313bf1a5d8920fe
+              valueFrom:
+                secretKeyRef:
+                  name: jenkins-secret
+                  key: password
             - name: JENKINS_AGENT_WORKDIR
               value: /home/jenkins/agent-working-dir
             - name: JENKINS_URL
@@ -57,7 +60,7 @@ spec:
             - name: EXECUTOR_NUMBERS
               value: "4"
             - name: NODE_LABELS
-              value: x86 k8s-small
+              value: x86 x86-check-ubuntu
           args: ["$(JENKINS_URL)", "$(JENKINS_USER_NAME)", "$(JENKINS_USER_PASSWORD)", "$(JENKINS_NODE_NAME)", "$(EXECUTOR_NUMBERS)", "$(JENKINS_AGENT_WORKDIR)", "$(NODE_LABELS)", "$(JENKINS_SHARE_FOLDER)"]
       containers:
         - name: jenkins-slave
