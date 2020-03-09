@@ -10,7 +10,7 @@ data:
   username: mindspore-ci-bot
   irc_channels: "#mindspore-discuss #mindspore-sc"
   url_info: https://mindspore.cn/
-  log_url_prefix: http://meetings.mindspore.cn/
+  log_url_prefix: http://meeting.mindspore.cn/
   log_pattern: "%(channel)s/%%Y/%(meetingname)s/%%F-%%H.%%M"
   nginx.conf: |
     user  root;
