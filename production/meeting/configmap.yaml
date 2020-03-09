@@ -5,9 +5,9 @@ metadata:
   name: meetbot-config
   namespace: meeting
 data:
-  nick: mindspore-ci-bot
-  ident: mindspore-ci-bot
-  username: mindspore-ci-bot
+  nick: mindspore-meeting-bot
+  ident: mindspore-meeting-bot
+  username: mindspore-meeting-bot
   irc_channels: "#mindspore-discuss #mindspore-sc"
   url_info: https://mindspore.cn/
   log_url_prefix: http://meeting.mindspore.cn/

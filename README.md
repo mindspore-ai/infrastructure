@@ -67,6 +67,10 @@ It's based on the [Docker mailman](https://github.com/maxking/docker-mailman), b
 
 **Website**: https://mailweb.mindspore.cn.
 
+## MeetingBot System
+It's used to record all meeting minutes happened on `#mindspore-discuss` and `#mindspore-sc`, minutes can be found
+at [here](http://meeting.mindspore.cn)
+
 ## Jenkins System
 It's based on [Jenkins Helm chart](https://github.com/helm/charts/tree/master/stable/jenkins) within all slave nodes
 are configured via StatefulSets and will register them self when starting up.
