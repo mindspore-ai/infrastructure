@@ -1,0 +1,26 @@
+# meetbot service
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: meetbot-service
+  namespace: meeting
+  annotations:
+    kubernetes.io/elb.class: union
+    kubernetes.io/elb.id: 298ea061-c0b4-42fd-a8f9-842f4d2e528b
+    kubernetes.io/elb.lb-algorithm: ROUND_ROBIN
+spec:
+  externalTrafficPolicy: Cluster
+  loadBalancerIP: 117.78.18.226
+  ports:
+  - port: 80
+    name: meet-log-http
+    targetPort: 8080
+    protocol: TCP  
+  - port: 81
+    name: meet-bot-http
+    targetPort: 80
+    protocol: TCP
+  selector:
+    app: meet-bot
+  type: LoadBalancer

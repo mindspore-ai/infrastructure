@@ -1,0 +1,31 @@
+#define the data volume of meetbot
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: meetbot-data-vol
+  namespace: meeting
+spec:
+  accessModes:
+  - ReadWriteMany
+  resources:
+    requests:
+      storage: 2000Gi
+  storageClassName: ssd
+  volumeMode: Filesystem
+
+#define the log volume for meetbot
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: meetbot-log-vol
+  namespace: meeting
+spec:
+  accessModes:
+  - ReadWriteMany
+  resources:
+    requests:
+      storage: 500Gi
+  storageClassName: ssd
+  volumeMode: Filesystem
