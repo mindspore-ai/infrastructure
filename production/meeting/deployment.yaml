@@ -32,8 +32,8 @@ spec:
               key: ident
         - name: USERNAME
           valueFrom:
-            configMapKeyRef:
-              name: meetbot-config
+            secretKeyRef:
+              name: meetbot-secret
               key: username
         - name: IRC_PASSWORD
           valueFrom:
