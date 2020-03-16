@@ -6,11 +6,11 @@ metadata:
   namespace: bot
   annotations:
     kubernetes.io/elb.class: union
-    kubernetes.io/elb.id: 5f440e52-97b7-4e4a-9a62-86193cf45f10
+    kubernetes.io/elb.id: 7d53ff7e-5fbb-4a86-84fb-444c647a2fa1
     kubernetes.io/elb.lb-algorithm: ROUND_ROBIN
 spec:
   externalTrafficPolicy: Cluster
-  loadBalancerIP: 119.3.240.10
+  loadBalancerIP: 121.36.29.195
   ports:
     - name: httpport
       protocol: TCP
