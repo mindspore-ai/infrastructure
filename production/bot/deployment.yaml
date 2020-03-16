@@ -24,6 +24,9 @@ spec:
       labels:
         app: botinfo
     spec:
+      #this node selector used to select the node that will serve as backend host for mindspore website elb, for the "/cla" stuff.
+      nodeSelector:
+        botnode: "true"
       containers:
       - name: botinfod
         image: mindspore/ci-bot:0.0.3
