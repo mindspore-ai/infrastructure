@@ -24,6 +24,7 @@ RUN apt update \
     && apt install -y xz-utils \
     && apt install -y net-tools \
     && apt install -y openssh-client \
+    && apt install -y sudo \
     && apt install -y tzdata
 
 # Install compile tools
