@@ -27,6 +27,8 @@ RUN apt update \
     && apt install -y tzdata \
     && apt install -y tcl \
     && apt install -y sudo \
+    && apt install -y bzip2 \
+    && apt install -y libsm6 \
     && apt install -y default-jre
 
 # Install compile tools
@@ -45,66 +47,97 @@ RUN apt install -y gcc \
 RUN echo "dash dash/sh boolean false" | debconf-set-selections
 RUN DEBIAN_FRONTEND=noninteractive dpkg-reconfigure dash
 
-# Install python
+# Install gcc-7.3.0(root)
+RUN cd /tmp \
+    && rm -f gcc-7.3.0-ubuntu16.04-Linux-x86_64.run \
+    && wget http://59.36.11.51/tools/build/gcc/gcc-7.3.0/bin/gcc-7.3.0-ubuntu16.04-Linux-x86_64/gcc-7.3.0-ubuntu16.04-Linux-x86_64.run \
+    && mkdir -pv /usr/local/gcc \
+    && bash gcc-7.3.0-ubuntu16.04-Linux-x86_64.run /usr/local/gcc \
+    && rm -f /tmp/gcc-7.3.0-ubuntu16.04-Linux-x86_64.run
+
+# Set gcc env
+ENV PATH /usr/local/gcc/gcc730/bin:$PATH
+ENV LD_LIBRARY_PATH /usr/local/gcc/gcc730/lib64:$LD_LIBRARY_PATH
+
+# Install python(root)
 RUN apt install -y libffi-dev libssl-dev zlib1g-dev libbz2-dev libncurses5-dev libgdbm-dev liblzma-dev libreadline-dev \
     && cd /tmp \
     && rm -f /tmp/Python-3.7.5.tar.xz \
-#   && wget https://www.python.org/ftp/python/3.7.5/Python-3.7.5.tar.xz \
+#   && wget https://www.python.org/ftp/python/3.7.5/Python-3.7.5.tar.xz 
     && wget http://59.36.11.51/tools/build/python/Python-3.7.5.tar.xz \
     && tar -xf Python-3.7.5.tar.xz \
     && cd /tmp/Python-3.7.5 \
     && ./configure --prefix=${PYTHON_ROOT_PATH} --enable-shared \
-    && make -j4 \
-    && make install -j4 \
+    && make -j8 \
+    && make install -j8 \
     && ./configure --prefix=${PYTHON_ROOT_PATH} \
-    && make -j4 \
-    && make install -j4 \
-    && rm -f /usr/local/bin/python3 \
-    && rm -f /usr/local/bin/pip3 \
-    && ln -s ${PYTHON_ROOT_PATH}/bin/python3.7 /usr/local/bin/python3 \
-    && ln -s ${PYTHON_ROOT_PATH}/bin/pip3.7 /usr/local/bin/pip3 \
+    && make -j8 \
+    && make install -j8 \
+    && cd ${PYTHON_ROOT_PATH}/bin \
+    && rm -f python \
+    && rm -f pip \
+    && ln -s python3.7 python \
+    && ln -s pip3.7 pip \
+    && echo "export PATH=${PYTHON_ROOT_PATH}/bin:\$PATH" >> ~/.bashrc \
     && rm -rf /tmp/Python-3.7.5 \
     && rm -f /tmp/Python-3.7.5.tar.xz
 
 # Set pip source(root)
-RUN mkdir -pv /root/.pip \
+RUN mkdir /root/.pip \
     && echo "[global]" > /root/.pip/pip.conf \
-    && echo "trusted-host=mirrors.aliyun.com" >> /root/.pip/pip.conf \
-    && echo "index-url=http://mirrors.aliyun.com/pypi/simple/" >> /root/.pip/pip.conf
+    && echo "index-url=https://repo.huaweicloud.com/repository/pypi/simple" >> /root/.pip/pip.conf \
+    && echo "trusted-host=repo.huaweicloud.com" >> /root/.pip/pip.conf \
+    && echo "timeout=120" >> /root/.pip/pip.conf
 
 # Install pip package(root)
-RUN echo "export PATH=${PYTHON_ROOT_PATH}/bin:\$PATH" >> ~/.bash_profile \
-    && source ~/.bash_profile \
-    && pip3 install numpy \
-    && pip3 install wheel \
-    && pip3 install nose \
-    && pip3 install pytest \
-    && pip3 install pytest-xdist \
+COPY requirements.txt /tmp/
+RUN chmod 644 /tmp/requirements.txt \
+    && export PATH=${PYTHON_ROOT_PATH}/bin:$PATH \
+    && pip3 install -r /tmp/requirements.txt \
     && pip3 list
 
 # Install cmake(root)
 RUN cd /tmp \
-    && rm -f /tmp/cmake-3.15.5.tar.gz \
-#   && wget https://github.com/Kitware/CMake/releases/download/v3.15.5/cmake-3.15.5.tar.gz \
-    && wget http://59.36.11.51/tools/build/cmake/cmake-3.15.5.tar.gz \
-    && tar -zxf cmake-3.15.5.tar.gz \
-    && cd cmake-3.15.5 \
+    && rm -f /tmp/cmake-3.14.1.tar.gz \
+#   && wget https://github.com/Kitware/CMake/releases/download/v3.14.1/cmake-3.14.1.tar.gz 
+    && wget http://59.36.11.51/tools/build/cmake/cmake-3.14.1.tar.gz \
+    && tar -zxf cmake-3.14.1.tar.gz \
+    && cd cmake-3.14.1 \
     && ./bootstrap --prefix=/usr --parallel=4 \
-    && make -j4 \
-    && make install -j4 \
-    && rm -rf /tmp/cmake-3.15.5 \
-    && rm -f /tmp/cmake-3.15.5.tar.gz
+    && make -j8 \
+    && make install -j8 \
+    && rm -rf /tmp/cmake-3.14.1 \
+    && rm -f /tmp/cmake-3.14.1.tar.gz
+
+# Install nodejs(root)
+RUN cd /tmp \
+    && rm -f node-v10.19.0-linux-x64.tar.gz \
+    && wget https://mirrors.huaweicloud.com/nodejs/latest-v10.x/node-v10.19.0-linux-x64.tar.gz \
+    && rm -rf node-v10.19.0-linux-x64 \
+    && tar -zxf node-v10.19.0-linux-x64.tar.gz \
+    && rm -rf /usr/local/nodejs \
+    && mkdir -pv /usr/local/nodejs \
+    && mv /tmp/node-v10.19.0-linux-x64 /usr/local/nodejs/ \
+    && chmod 755 -R /usr/local/nodejs \
+    && ln -sf /usr/local/nodejs/node-v10.19.0-linux-x64/bin/node /usr/bin/node \
+    && ln -sf /usr/local/nodejs/node-v10.19.0-linux-x64/bin/npm /usr/bin/npm \
+    && npm config rm proxy \
+    && npm config rm http-proxy \
+    && npm config rm https-proxy \
+    && npm config set no-proxy .huawei.com \
+    && npm config set registry https://mirrors.huaweicloud.com/repository/npm \
+    && rm -f /tmp/node-v10.19.0-linux-x64.tar.gz
 
 # Install ccache
 RUN cd /tmp \
-    && rm -f /tmp/ccache-3.7.6.tar.gz \
-#   && wget https://github.com/ccache/ccache/releases/download/v3.7.6/ccache-3.7.6.tar.gz \
-    && wget http://59.36.11.51/tools/build/ccache/ccache-3.7.6.tar.gz \
-    && tar -zxf ccache-3.7.6.tar.gz \
-    && cd ccache-3.7.6 \
+    && rm -f /tmp/ccache-3.7.7.tar.gz \
+#   && wget https://github.com/ccache/ccache/releases/download/v3.7.7/ccache-3.7.7.tar.gz 
+    && wget http://59.36.11.51/tools/build/ccache/ccache-3.7.7.tar.gz \
+    && tar -zxf ccache-3.7.7.tar.gz \
+    && cd ccache-3.7.7 \
     && ./configure --prefix=/usr/local/ccache \
-    && make -j4 \
-    && make install -j4 \
+    && make -j8 \
+    && make install -j8 \
     && rm -f /usr/local/bin/gcc \
     && rm -f /usr/local/bin/g++ \
     && rm -f /usr/local/bin/cc \
@@ -113,52 +146,64 @@ RUN cd /tmp \
     && ln -s /usr/local/ccache/bin/ccache /usr/local/bin/g++ \
     && ln -s /usr/local/ccache/bin/ccache /usr/local/bin/cc \
     && ln -s /usr/local/ccache/bin/ccache /usr/local/bin/c++ \
-    && rm -rf /tmp/ccache-3.7.6 \
-    && rm -f /tmp/ccache-3.7.6.tar.gz
+    && /usr/local/ccache/bin/ccache -C \
+    && /usr/local/ccache/bin/ccache --max-size=8 \
+    && /usr/local/ccache/bin/ccache -p \
+    && rm -rf /tmp/ccache-3.7.7 \
+    && rm -f /tmp/ccache-3.7.7.tar.gz
 
 # Setup java path
 ENV JAVA_HOME /usr/lib/jvm/java-8-openjdk-amd64/jre
 ENV PATH $PATH:$JAVA_HOME/bin
 
-# Install jenkins slave
+# Create user of jenkins
 ARG VERSION=3.35
 ARG user=jenkins
 ARG group=jenkins
 ARG uid=1000
 ARG gid=1000
-
+ARG AGENT_WORKDIR=/home/${user}/agent
 RUN groupadd -g ${gid} ${group}
 RUN useradd -c "Jenkins user" -d /home/${user} -u ${uid} -g ${gid} -m ${user}
-
-ARG AGENT_WORKDIR=/home/${user}/agent
 
 # Set sudo
 RUN echo "jenkins ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 
+# Install gcc-7.3.0(root)
+RUN export MINDSPORE_CMD="su jenkins -s /bin/bash -c " \
+    && ${MINDSPORE_CMD} "cd /tmp; rm -f gcc-7.3.0-ubuntu16.04-Linux-x86_64.run; wget http://59.36.11.51/tools/build/gcc/gcc-7.3.0/bin/gcc-7.3.0-ubuntu16.04-Linux-x86_64/gcc-7.3.0-ubuntu16.04-Linux-x86_64.run" \
+    && ${MINDSPORE_CMD} "cd /tmp; mkdir -pv /home/jenkins/tools/gcc; bash gcc-7.3.0-ubuntu16.04-Linux-x86_64.run /home/jenkins/tools/gcc" \
+    && ${MINDSPORE_CMD} "rm -f /tmp/gcc-7.3.0-ubuntu16.04-Linux-x86_64.run"
+
 # Install python(jenkins)
 RUN export MINDSPORE_CMD="su jenkins -s /bin/bash -c " \
-#   && ${MINDSPORE_CMD} "cd /tmp; rm -f /tmp/Python-3.7.5.tar.xz; wget https://www.python.org/ftp/python/3.7.5/Python-3.7.5.tar.xz; tar -xf Python-3.7.5.tar.xz" \
+    && export MINDSPORE_CMD="su jenkins -s /bin/bash -c " \
+#   && ${MINDSPORE_CMD} "cd /tmp; rm -f /tmp/Python-3.7.5.tar.xz; wget https://www.python.org/ftp/python/3.7.5/Python-3.7.5.tar.xz; tar -xf Python-3.7.5.tar.xz" 
     && ${MINDSPORE_CMD} "cd /tmp; rm -f /tmp/Python-3.7.5.tar.xz; wget http://59.36.11.51/tools/build/python/Python-3.7.5.tar.xz; tar -xf Python-3.7.5.tar.xz" \
-    && ${MINDSPORE_CMD} "cd /tmp/Python-3.7.5; ./configure --prefix=/home/jenkins/python375 --enable-shared && make -j4 && make install -j4" \
-    && ${MINDSPORE_CMD} "cd /tmp/Python-3.7.5; ./configure --prefix=/home/jenkins/python375 && make -j4 && make install -j4" \
+    && ${MINDSPORE_CMD} "export PATH=/home/jenkins/tools/gcc/gcc730/bin:$PATH; export LD_LIBRARY_PATH=/home/jenkins/tools/gcc/gcc730/lib64:$LD_LIBRARY_PATH; cd /tmp/Python-3.7.5; ./configure --prefix=/home/jenkins/tools/python375 --enable-shared && make -j8 && make install -j8" \
+    && ${MINDSPORE_CMD} "export PATH=/home/jenkins/tools/gcc/gcc730/bin:$PATH; export LD_LIBRARY_PATH=/home/jenkins/tools/gcc/gcc730/lib64:$LD_LIBRARY_PATH; cd /tmp/Python-3.7.5; ./configure --prefix=/home/jenkins/tools/python375 && make -j8 && make install -j8" \
+    && ${MINDSPORE_CMD} "cd /home/jenkins/tools/python375/bin; rm -f python; rm -f pip; ln -s python3.7 python; ln -s pip3.7 pip" \
+    && ${MINDSPORE_CMD} "echo 'export PATH=/home/jenkins/tools/python375/bin:\$PATH' >> ~/.bashrc" \
     && ${MINDSPORE_CMD} "rm -rf /tmp/Python-3.7.5; rm -f /tmp/Python-3.7.5.tar.xz"
 
 # Set pip source(jenkins)
 RUN export MINDSPORE_CMD="su jenkins -s /bin/bash -c " \
-    && ${MINDSPORE_CMD} "mkdir -pv /home/jenkins/.pip; echo '[global]' > /home/jenkins/.pip/pip.conf; echo 'trusted-host=mirrors.aliyun.com' >> /home/jenkins/.pip/pip.conf; echo 'index-url=http://mirrors.aliyun.com/pypi/simple/' >> /home/jenkins/.pip/pip.conf"
+    && ${MINDSPORE_CMD} "mkdir -pv /home/jenkins/.pip; echo '[global]' > /home/jenkins/.pip/pip.conf" \
+    && ${MINDSPORE_CMD} "echo 'index-url=https://repo.huaweicloud.com/repository/pypi/simple' >> /home/jenkins/.pip/pip.conf" \
+    && ${MINDSPORE_CMD} "echo 'trusted-host=repo.huaweicloud.com' >> /home/jenkins/.pip/pip.conf" \
+    && ${MINDSPORE_CMD} "echo 'timeout=120' >> /home/jenkins/.pip/pip.conf"
 
 # Install pip package(jenkins)
 RUN export MINDSPORE_CMD="su jenkins -s /bin/bash -c " \
-    && ${MINDSPORE_CMD} "echo 'export PATH=/home/jenkins/python375/bin:\$PATH' >> ~/.bash_profile" \
-    && ${MINDSPORE_CMD} "source ~/.bash_profile; pip3 install numpy; pip3 install wheel; pip3 install nose; pip3 install pytest; pip3 install pytest-xdist; pip3 list"
+    && ${MINDSPORE_CMD} "export PATH=/home/jenkins/tools/python375/bin:$PATH; pip3 install -r /tmp/requirements.txt; pip3 list"
 
 # Install cmake(jenkins)
 RUN export MINDSPORE_CMD="su jenkins -s /bin/bash -c " \
-#   && ${MINDSPORE_CMD} "cd /tmp; rm -f /tmp/cmake-3.15.5.tar.gz; wget https://github.com/Kitware/CMake/releases/download/v3.15.5/cmake-3.15.5.tar.gz; tar -zxf cmake-3.15.5.tar.gz" \
-    && ${MINDSPORE_CMD} "cd /tmp; rm -f /tmp/cmake-3.15.5.tar.gz; wget http://59.36.11.51/tools/build/cmake/cmake-3.15.5.tar.gz; tar -zxf cmake-3.15.5.tar.gz" \
-    && ${MINDSPORE_CMD} "cd /tmp/cmake-3.15.5; ./bootstrap --prefix=/home/jenkins/cmake --parallel=4; make -j4; make install -j4" \
-    && ${MINDSPORE_CMD} "rm -rf /tmp/cmake-3.15.5; rm -f /tmp/cmake-3.15.5.tar.gz" \
-    && ${MINDSPORE_CMD} "echo 'export PATH=/home/jenkins/cmake/bin:\$PATH' >> ~/.bash_profile"
+#   && ${MINDSPORE_CMD} "cd /tmp; rm -f /tmp/cmake-3.14.1.tar.gz; wget https://github.com/Kitware/CMake/releases/download/v3.14.1/cmake-3.14.1.tar.gz; tar -zxf cmake-3.14.1.tar.gz" 
+    && ${MINDSPORE_CMD} "cd /tmp; rm -f /tmp/cmake-3.14.1.tar.gz; wget http://59.36.11.51/tools/build/cmake/cmake-3.14.1.tar.gz; tar -zxf cmake-3.14.1.tar.gz" \
+    && ${MINDSPORE_CMD} "export PATH=/home/jenkins/tools/gcc/gcc730/bin:$PATH; export LD_LIBRARY_PATH=/home/jenkins/tools/gcc/gcc730/lib64:$LD_LIBRARY_PATH; cd /tmp/cmake-3.14.1; ./bootstrap --prefix=/home/jenkins/tools/cmake --parallel=4; make -j8; make install -j8" \
+    && ${MINDSPORE_CMD} "echo 'export PATH=/home/jenkins/tools/cmake/bin:\$PATH' >> ~/.bashrc" \
+    && ${MINDSPORE_CMD} "rm -rf /tmp/cmake-3.14.1; rm -f /tmp/cmake-3.14.1.tar.gz"
 
 # Set sshd and timezone
 RUN sed -i 's/#   StrictHostKeyChecking ask/    StrictHostKeyChecking no/g' /etc/ssh/ssh_config \
@@ -169,7 +214,7 @@ RUN sed -i 's/#   StrictHostKeyChecking ask/    StrictHostKeyChecking no/g' /etc
     && export MINDSPORE_CMD="su jenkins -s /bin/bash -c " \
     && ${MINDSPORE_CMD} "echo export TZ='Asia/Shanghai' >> ~/.bashrc"
 
-
+# Install jenkins slave
 RUN mkdir -p /usr/share/jenkins/ \
   && cd /usr/share/jenkins/ \
   && wget -O agent.jar https://repo.jenkins-ci.org/public/org/jenkins-ci/main/remoting/${VERSION}/remoting-${VERSION}.jar \
@@ -177,12 +222,10 @@ RUN mkdir -p /usr/share/jenkins/ \
   && chmod 644 /usr/share/jenkins/agent.jar \
   && ln -sf /usr/share/jenkins/agent.jar /usr/share/jenkins/slave.jar
 
-
 # Install jnlp
 COPY jenkins-agent /usr/local/bin/jenkins-agent
-RUN chmod +x /usr/local/bin/jenkins-agent &&\
-    ln -s /usr/local/bin/jenkins-agent /usr/local/bin/jenkins-slave
-
+RUN chmod +x /usr/local/bin/jenkins-agent \
+    && ln -s /usr/local/bin/jenkins-agent /usr/local/bin/jenkins-slave
 
 # Setting up env
 USER ${user}
