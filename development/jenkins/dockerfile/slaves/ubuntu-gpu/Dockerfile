@@ -28,6 +28,7 @@ RUN apt update \
     && apt install -y tcl \
     && apt install -y sudo \
     && apt install -y bzip2 \
+    && apt install -y libsm6 \
     && apt install -y default-jre
 
 # Install compile tools
@@ -89,12 +90,10 @@ RUN mkdir /root/.pip \
     && echo "timeout=120" >> /root/.pip/pip.conf
 
 # Install pip package(root)
-ENV PATH /usr/local/python/python375/bin:$PATH
-RUN pip3 install numpy \
-    && pip3 install wheel \
-    && pip3 install nose \
-    && pip3 install pytest \
-    && pip3 install pytest-xdist \
+COPY requirements.txt /tmp/
+RUN chmod 644 /tmp/requirements.txt \
+    && export PATH=${PYTHON_ROOT_PATH}/bin:$PATH \
+    && pip3 install -r /tmp/requirements.txt \
     && pip3 list
 
 # Install cmake(root)
@@ -109,6 +108,25 @@ RUN cd /tmp \
     && make install -j8 \
     && rm -rf /tmp/cmake-3.14.1 \
     && rm -f /tmp/cmake-3.14.1.tar.gz
+
+# Install nodejs(root)
+RUN cd /tmp \
+    && rm -f node-v10.19.0-linux-x64.tar.gz \
+    && wget https://mirrors.huaweicloud.com/nodejs/latest-v10.x/node-v10.19.0-linux-x64.tar.gz \
+    && rm -rf node-v10.19.0-linux-x64 \
+    && tar -zxf node-v10.19.0-linux-x64.tar.gz \
+    && rm -rf /usr/local/nodejs \
+    && mkdir -pv /usr/local/nodejs \
+    && mv /tmp/node-v10.19.0-linux-x64 /usr/local/nodejs/ \
+    && chmod 755 -R /usr/local/nodejs \
+    && ln -sf /usr/local/nodejs/node-v10.19.0-linux-x64/bin/node /usr/bin/node \
+    && ln -sf /usr/local/nodejs/node-v10.19.0-linux-x64/bin/npm /usr/bin/npm \
+    && npm config rm proxy \
+    && npm config rm http-proxy \
+    && npm config rm https-proxy \
+    && npm config set no-proxy .huawei.com \
+    && npm config set registry https://mirrors.huaweicloud.com/repository/npm \
+    && rm -f /tmp/node-v10.19.0-linux-x64.tar.gz
 
 # Install ccache
 RUN cd /tmp \
@@ -177,12 +195,7 @@ RUN export MINDSPORE_CMD="su jenkins -s /bin/bash -c " \
 
 # Install pip package(jenkins)
 RUN export MINDSPORE_CMD="su jenkins -s /bin/bash -c " \
-    && ${MINDSPORE_CMD} "export PATH=/home/jenkins/tools/python375/bin:$PATH; pip3 install numpy" \
-    && ${MINDSPORE_CMD} "export PATH=/home/jenkins/tools/python375/bin:$PATH; pip3 install wheel" \
-    && ${MINDSPORE_CMD} "export PATH=/home/jenkins/tools/python375/bin:$PATH; pip3 install nose" \
-    && ${MINDSPORE_CMD} "export PATH=/home/jenkins/tools/python375/bin:$PATH; pip3 install pytest" \
-    && ${MINDSPORE_CMD} "export PATH=/home/jenkins/tools/python375/bin:$PATH; pip3 install pytest-xdist" \
-    && ${MINDSPORE_CMD} "export PATH=/home/jenkins/tools/python375/bin:$PATH; pip3 list"
+    && ${MINDSPORE_CMD} "export PATH=/home/jenkins/tools/python375/bin:$PATH; pip3 install -r /tmp/requirements.txt; pip3 list"
 
 # Install cmake(jenkins)
 RUN export MINDSPORE_CMD="su jenkins -s /bin/bash -c " \
