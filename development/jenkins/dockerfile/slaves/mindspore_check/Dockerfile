@@ -50,14 +50,11 @@ RUN apt install -y libffi-dev libssl-dev zlib1g-dev libbz2-dev libncurses5-dev l
     && ./configure --prefix=${PYTHON_ROOT_PATH} \
     && make -j4 \
     && make install -j4 \
-    && rm -f /usr/local/bin/python3 \
-    && rm -f /usr/local/bin/python \
-    && rm -f /usr/local/bin/pip3 \
-    && rm -f /usr/local/bin/pip \
-    && ln -s ${PYTHON_ROOT_PATH}/bin/python3.7 /usr/local/bin/python3 \
-    && ln -s ${PYTHON_ROOT_PATH}/bin/python3.7 /usr/local/bin/python \
-    && ln -s ${PYTHON_ROOT_PATH}/bin/pip3.7 /usr/local/bin/pip3 \
-    && ln -s ${PYTHON_ROOT_PATH}/bin/pip3.7 /usr/local/bin/pip \
+    && cd ${PYTHON_ROOT_PATH}/bin \
+    && rm -f python \
+    && rm -f pip \
+    && ln -s python3.7 python \
+    && ln -s pip3.7 pip \
     && echo "export PATH=${PYTHON_ROOT_PATH}/bin:\$PATH" >> ~/.bashrc \
     && rm -rf /tmp/Python-3.7.5 \
     && rm -f /tmp/Python-3.7.5.tar.xz
