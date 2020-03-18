@@ -78,6 +78,7 @@ RUN export PATH=${PYTHON_ROOT_PATH}/bin:$PATH \
 
 # Install cppcheck
 RUN apt install -y libpcre3-dev \
+    && export PATH=${PYTHON_ROOT_PATH}/bin:$PATH \
     && cd /tmp \
     && rm -f /tmp/1.89.tar.gz \
     && wget https://github.com/danmar/cppcheck/archive/1.89.tar.gz \
