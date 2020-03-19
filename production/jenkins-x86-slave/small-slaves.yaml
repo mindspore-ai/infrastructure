@@ -84,10 +84,10 @@ spec:
           resources:
             requests:
               cpu: 7000m
-              memory: 14000Mi
+              memory: 23000Mi
             limits:
               cpu: 8000m
-              memory: 16000Mi
+              memory: 24000Mi
           env:
             - name: JENKINS_TUNNEL
               value: build.mindspore.cn:50000
