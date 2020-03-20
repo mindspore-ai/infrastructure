@@ -81,6 +81,21 @@ RUN mkdir -pv /root/.pip \
     && echo "trusted-host=repo.huaweicloud.com" >> /root/.pip/pip.conf \
     && echo "timeout=120" >> /root/.pip/pip.conf
 
+# Fix build timeout when pip install(root)
+RUN cd /tmp \
+    && rm -f /tmp/*.whl \
+    && wget http://59.36.11.51/tools/pip/aarch64/euleros_2_8/numpy-1.18.1-cp37-cp37m-linux_aarch64.whl \
+    && wget http://59.36.11.51/tools/pip/aarch64/euleros_2_8/scipy-1.3.3-cp37-cp37m-linux_aarch64.whl \
+    && wget http://59.36.11.51/tools/pip/aarch64/euleros_2_8/Pillow-7.0.0-cp37-cp37m-linux_aarch64.whl \
+    && wget http://59.36.11.51/tools/pip/aarch64/euleros_2_8/matplotlib-3.2.1-cp37-cp37m-linux_aarch64.whl\
+    && chmod 755 -R /tmp/*.whl \
+    && export PATH=${PYTHON_ROOT_PATH}/bin:$PATH \
+    && pip3 install numpy-1.18.1-cp37-cp37m-linux_aarch64.whl \
+    && pip3 install scipy-1.3.3-cp37-cp37m-linux_aarch64.whl \
+    && pip3 install Pillow-7.0.0-cp37-cp37m-linux_aarch64.whl \
+    && pip3 install matplotlib-3.2.1-cp37-cp37m-linux_aarch64.whl \
+    && pip3 list
+
 # Install pip package(root)
 COPY requirements.txt /tmp/
 RUN chmod 644 /tmp/requirements.txt \
@@ -159,7 +174,6 @@ RUN echo "jenkins ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 
 # Install python(jenkins)
 RUN export MINDSPORE_CMD="su jenkins -s /bin/bash -c " \
-    && export MINDSPORE_CMD="su jenkins -s /bin/bash -c " \
 #   && ${MINDSPORE_CMD} "cd /tmp; rm -f /tmp/Python-3.7.5.tar.xz; wget https://www.python.org/ftp/python/3.7.5/Python-3.7.5.tar.xz; tar -xf Python-3.7.5.tar.xz" 
     && ${MINDSPORE_CMD} "cd /tmp; rm -f /tmp/Python-3.7.5.tar.xz; wget http://59.36.11.51/tools/build/python/Python-3.7.5.tar.xz; tar -xf Python-3.7.5.tar.xz" \
     && ${MINDSPORE_CMD} "cd /tmp/Python-3.7.5; ./configure --prefix=/home/jenkins/tools/python375 --enable-shared && make -j8 && make install -j8" \
@@ -175,6 +189,10 @@ RUN export MINDSPORE_CMD="su jenkins -s /bin/bash -c " \
     && ${MINDSPORE_CMD} "echo 'trusted-host=repo.huaweicloud.com' >> /home/jenkins/.pip/pip.conf" \
     && ${MINDSPORE_CMD} "echo 'timeout=120' >> /home/jenkins/.pip/pip.conf"
 
+# Fix build timeout when pip install(jenkins)
+RUN export MINDSPORE_CMD="su jenkins -s /bin/bash -c " \
+    && ${MINDSPORE_CMD} "export PATH=/home/jenkins/tools/python375/bin:$PATH; cd /tmp; pip3 install numpy-1.18.1-cp37-cp37m-linux_aarch64.whl; pip3 install scipy-1.3.3-cp37-cp37m-linux_aarch64.whl; pip3 install Pillow-7.0.0-cp37-cp37m-linux_aarch64.whl; pip3 install matplotlib-3.2.1-cp37-cp37m-linux_aarch64.whl; pip3 list"
+
 # Install pip package(jenkins)
 RUN export MINDSPORE_CMD="su jenkins -s /bin/bash -c " \
     && ${MINDSPORE_CMD} "export PATH=/home/jenkins/tools/python375/bin:$PATH; pip3 install -r /tmp/requirements.txt; pip3 list"
@@ -186,6 +204,9 @@ RUN export MINDSPORE_CMD="su jenkins -s /bin/bash -c " \
     && ${MINDSPORE_CMD} "cd /tmp/cmake-3.14.1; ./bootstrap --prefix=/home/jenkins/tools/cmake --parallel=4; make -j4; make install -j4" \
     && ${MINDSPORE_CMD} "echo 'export PATH=/home/jenkins/tools/cmake/bin:\$PATH' >> ~/.bashrc" \
     && ${MINDSPORE_CMD} "rm -rf /tmp/cmake-3.14.1; rm -f /tmp/cmake-3.14.1.tar.gz"
+
+# Delete pip package
+RUN rm -f /tmp/*.whl
 
 # Set sshd and timezone
 RUN sed -i 's/#   StrictHostKeyChecking ask/    StrictHostKeyChecking no/g' /etc/ssh/ssh_config \
@@ -227,4 +248,4 @@ VOLUME /home/${user}/.jenkins
 VOLUME ${AGENT_WORKDIR}
 WORKDIR /home/${user}
 
-ENTRYPOINT ["jenkins-agent"]
+#ENTRYPOINT ["jenkins-agent"]
