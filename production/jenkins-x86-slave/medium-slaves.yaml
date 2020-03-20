@@ -24,7 +24,7 @@ metadata:
     app: x86-medium-slaves
 spec:
   serviceName: x86-medium-slaves-service
-  replicas: 8
+  replicas: 40
   selector:
     matchLabels:
       app: x86-medium-slaves
@@ -84,10 +84,10 @@ spec:
           resources:
             requests:
               cpu: 7000m
-              memory: 23000Mi
+              memory: 27000Mi
             limits:
               cpu: 8000m
-              memory: 24000Mi
+              memory: 32000Mi
           env:
             - name: JENKINS_TUNNEL
               value: build.mindspore.cn:50000
