@@ -60,11 +60,11 @@ RUN yum install -y libffi-devel zlib-devel bzip2-devel openssl-devel ncurses-dev
     && tar -xf Python-3.7.5.tar.xz \
     && cd /tmp/Python-3.7.5 \
     && ./configure --prefix=${PYTHON_ROOT_PATH} --enable-shared \
-    && make -j8 \
-    && make install -j8 \
+    && make -j4 \
+    && make install -j4 \
     && ./configure --prefix=${PYTHON_ROOT_PATH} \
-    && make -j8 \
-    && make install -j8 \
+    && make -j4 \
+    && make install -j4 \
     && cd ${PYTHON_ROOT_PATH}/bin \
     && rm -f python \
     && rm -f pip \
@@ -111,8 +111,8 @@ RUN cd /tmp \
     && tar -zxf cmake-3.14.1.tar.gz \
     && cd cmake-3.14.1 \
     && ./bootstrap --prefix=/usr --parallel=4 \
-    && make -j8 \
-    && make install -j8 \
+    && make -j4 \
+    && make install -j4 \
     && rm -rf /tmp/cmake-3.14.1 \
     && rm -f /tmp/cmake-3.14.1.tar.gz
 
@@ -143,8 +143,8 @@ RUN cd /tmp \
     && tar -zxf ccache-3.7.7.tar.gz \
     && cd ccache-3.7.7 \
     && ./configure --prefix=/usr/local/ccache \
-    && make -j8 \
-    && make install -j8 \
+    && make -j4 \
+    && make install -j4 \
     && rm -f /usr/local/bin/gcc \
     && rm -f /usr/local/bin/g++ \
     && rm -f /usr/local/bin/cc \
@@ -176,8 +176,8 @@ RUN echo "jenkins ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 RUN export MINDSPORE_CMD="su jenkins -s /bin/bash -c " \
 #   && ${MINDSPORE_CMD} "cd /tmp; rm -f /tmp/Python-3.7.5.tar.xz; wget https://www.python.org/ftp/python/3.7.5/Python-3.7.5.tar.xz; tar -xf Python-3.7.5.tar.xz" 
     && ${MINDSPORE_CMD} "cd /tmp; rm -f /tmp/Python-3.7.5.tar.xz; wget http://59.36.11.51/tools/build/python/Python-3.7.5.tar.xz; tar -xf Python-3.7.5.tar.xz" \
-    && ${MINDSPORE_CMD} "cd /tmp/Python-3.7.5; ./configure --prefix=/home/jenkins/tools/python375 --enable-shared && make -j8 && make install -j8" \
-    && ${MINDSPORE_CMD} "cd /tmp/Python-3.7.5; ./configure --prefix=/home/jenkins/tools/python375 && make -j8 && make install -j8" \
+    && ${MINDSPORE_CMD} "cd /tmp/Python-3.7.5; ./configure --prefix=/home/jenkins/tools/python375 --enable-shared && make -j4 && make install -j4" \
+    && ${MINDSPORE_CMD} "cd /tmp/Python-3.7.5; ./configure --prefix=/home/jenkins/tools/python375 && make -j4 && make install -j4" \
     && ${MINDSPORE_CMD} "cd /home/jenkins/tools/python375/bin; rm -f python; rm -f pip; ln -s python3.7 python; ln -s pip3.7 pip" \
     && ${MINDSPORE_CMD} "echo 'export PATH=/home/jenkins/tools/python375/bin:\$PATH' >> ~/.bashrc" \
     && ${MINDSPORE_CMD} "rm -rf /tmp/Python-3.7.5; rm -f /tmp/Python-3.7.5.tar.xz"
@@ -248,4 +248,5 @@ VOLUME /home/${user}/.jenkins
 VOLUME ${AGENT_WORKDIR}
 WORKDIR /home/${user}
 
-#ENTRYPOINT ["jenkins-agent"]
+ENTRYPOINT ["jenkins-agent"]
+
