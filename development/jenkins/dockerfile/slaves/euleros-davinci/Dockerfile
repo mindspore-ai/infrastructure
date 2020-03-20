@@ -33,6 +33,14 @@ RUN yum update \
     && yum install -y subversion \
     && yum install -y tar \
     && yum install -y tcl \
+    && yum install -y sudo \
+    && yum install -y libSM \
+    && yum install -y libjpeg-turbo-devel \
+    && yum install -y freetype-devel \
+    && yum install -y openblas \
+    && yum install -y blas \
+    && yum install -y lapack \
+    && yum install -y atlas-devel \
     && yum install -y java-1.8.0
 
 # Install compile tools
@@ -47,7 +55,7 @@ RUN yum install -y gcc \
 RUN yum install -y libffi-devel zlib-devel bzip2-devel openssl-devel ncurses-devel sqlite-devel readline-devel gdbm-devel \
     && cd /tmp \
     && rm -f /tmp/Python-3.7.5.tar.xz \
-#   && wget https://www.python.org/ftp/python/3.7.5/Python-3.7.5.tar.xz \
+#   && wget https://www.python.org/ftp/python/3.7.5/Python-3.7.5.tar.xz 
     && wget http://59.36.11.51/tools/build/python/Python-3.7.5.tar.xz \
     && tar -xf Python-3.7.5.tar.xz \
     && cd /tmp/Python-3.7.5 \
@@ -57,49 +65,83 @@ RUN yum install -y libffi-devel zlib-devel bzip2-devel openssl-devel ncurses-dev
     && ./configure --prefix=${PYTHON_ROOT_PATH} \
     && make -j4 \
     && make install -j4 \
-    && rm -f /usr/local/bin/python3 \
-    && rm -f /usr/local/bin/pip3 \
-    && ln -s ${PYTHON_ROOT_PATH}/bin/python3.7 /usr/local/bin/python3 \
-    && ln -s ${PYTHON_ROOT_PATH}/bin/pip3.7 /usr/local/bin/pip3 \
+    && cd ${PYTHON_ROOT_PATH}/bin \
+    && rm -f python \
+    && rm -f pip \
+    && ln -s python3.7 python \
+    && ln -s pip3.7 pip \
+    && echo "export PATH=${PYTHON_ROOT_PATH}/bin:\$PATH" >> ~/.bashrc \
     && rm -rf /tmp/Python-3.7.5 \
     && rm -f /tmp/Python-3.7.5.tar.xz
 
 # Set pip source(root)
 RUN mkdir -pv /root/.pip \
     && echo "[global]" > /root/.pip/pip.conf \
-    && echo "trusted-host=mirrors.aliyun.com" >> /root/.pip/pip.conf \
-    && echo "index-url=http://mirrors.aliyun.com/pypi/simple/" >> /root/.pip/pip.conf
+    && echo "index-url=https://repo.huaweicloud.com/repository/pypi/simple" >> /root/.pip/pip.conf \
+    && echo "trusted-host=repo.huaweicloud.com" >> /root/.pip/pip.conf \
+    && echo "timeout=120" >> /root/.pip/pip.conf
+
+# Fix build timeout when pip install(root)
+RUN cd /tmp \
+    && rm -f /tmp/*.whl \
+    && wget http://59.36.11.51/tools/pip/aarch64/euleros_2_8/numpy-1.18.1-cp37-cp37m-linux_aarch64.whl \
+    && wget http://59.36.11.51/tools/pip/aarch64/euleros_2_8/scipy-1.3.3-cp37-cp37m-linux_aarch64.whl \
+    && wget http://59.36.11.51/tools/pip/aarch64/euleros_2_8/Pillow-7.0.0-cp37-cp37m-linux_aarch64.whl \
+    && wget http://59.36.11.51/tools/pip/aarch64/euleros_2_8/matplotlib-3.2.1-cp37-cp37m-linux_aarch64.whl\
+    && chmod 755 -R /tmp/*.whl \
+    && export PATH=${PYTHON_ROOT_PATH}/bin:$PATH \
+    && pip3 install numpy-1.18.1-cp37-cp37m-linux_aarch64.whl \
+    && pip3 install scipy-1.3.3-cp37-cp37m-linux_aarch64.whl \
+    && pip3 install Pillow-7.0.0-cp37-cp37m-linux_aarch64.whl \
+    && pip3 install matplotlib-3.2.1-cp37-cp37m-linux_aarch64.whl \
+    && pip3 list
 
 # Install pip package(root)
-RUN echo "export PATH=${PYTHON_ROOT_PATH}/bin:\$PATH" >> ~/.bash_profile \
-    && source ~/.bash_profile \
-    && pip3 install numpy \
-    && pip3 install wheel \
-    && pip3 install nose \
-    && pip3 install pytest \
-    && pip3 install pytest-xdist \
+COPY requirements.txt /tmp/
+RUN chmod 644 /tmp/requirements.txt \
+    && export PATH=${PYTHON_ROOT_PATH}/bin:$PATH \
+    && pip3 install -r /tmp/requirements.txt \
     && pip3 list
 
 # Install cmake(root)
 RUN cd /tmp \
-    && rm -f /tmp/cmake-3.15.5.tar.gz \
-#   && wget https://github.com/Kitware/CMake/releases/download/v3.15.5/cmake-3.15.5.tar.gz \
-    && wget http://59.36.11.51/tools/build/cmake/cmake-3.15.5.tar.gz \
-    && tar -zxf cmake-3.15.5.tar.gz \
-    && cd cmake-3.15.5 \
+    && rm -f /tmp/cmake-3.14.1.tar.gz \
+#   && wget https://github.com/Kitware/CMake/releases/download/v3.14.1/cmake-3.14.1.tar.gz 
+    && wget http://59.36.11.51/tools/build/cmake/cmake-3.14.1.tar.gz \
+    && tar -zxf cmake-3.14.1.tar.gz \
+    && cd cmake-3.14.1 \
     && ./bootstrap --prefix=/usr --parallel=4 \
     && make -j4 \
     && make install -j4 \
-    && rm -rf /tmp/cmake-3.15.5 \
-    && rm -f /tmp/cmake-3.15.5.tar.gz
+    && rm -rf /tmp/cmake-3.14.1 \
+    && rm -f /tmp/cmake-3.14.1.tar.gz
+
+# Install nodejs(root)
+RUN cd /tmp \
+    && rm -f node-v10.19.0-linux-arm64.tar.gz \
+    && wget https://mirrors.huaweicloud.com/nodejs/latest-v10.x/node-v10.19.0-linux-arm64.tar.gz \
+    && rm -rf node-v10.19.0-linux-arm64 \
+    && tar -zxf node-v10.19.0-linux-arm64.tar.gz \
+    && rm -rf /usr/local/nodejs \
+    && mkdir -pv /usr/local/nodejs \
+    && mv /tmp/node-v10.19.0-linux-arm64 /usr/local/nodejs/ \
+    && chmod 755 -R /usr/local/nodejs \
+    && ln -sf /usr/local/nodejs/node-v10.19.0-linux-arm64/bin/node /usr/bin/node \
+    && ln -sf /usr/local/nodejs/node-v10.19.0-linux-arm64/bin/npm /usr/bin/npm \
+    && npm config rm proxy \
+    && npm config rm http-proxy \
+    && npm config rm https-proxy \
+    && npm config set no-proxy .huawei.com \
+    && npm config set registry https://mirrors.huaweicloud.com/repository/npm \
+    && rm -f /tmp/node-v10.19.0-linux-arm64.tar.gz
 
 # Install ccache
 RUN cd /tmp \
-    && rm -f /tmp/ccache-3.7.6.tar.gz \
-#   && wget https://github.com/ccache/ccache/releases/download/v3.7.6/ccache-3.7.6.tar.gz \
-    && wget http://59.36.11.51/tools/build/ccache/ccache-3.7.6.tar.gz \
-    && tar -zxf ccache-3.7.6.tar.gz \
-    && cd ccache-3.7.6 \
+    && rm -f /tmp/ccache-3.7.7.tar.gz \
+#   && wget https://github.com/ccache/ccache/releases/download/v3.7.7/ccache-3.7.7.tar.gz 
+    && wget http://59.36.11.51/tools/build/ccache/ccache-3.7.7.tar.gz \
+    && tar -zxf ccache-3.7.7.tar.gz \
+    && cd ccache-3.7.7 \
     && ./configure --prefix=/usr/local/ccache \
     && make -j4 \
     && make install -j4 \
@@ -111,17 +153,19 @@ RUN cd /tmp \
     && ln -s /usr/local/ccache/bin/ccache /usr/local/bin/g++ \
     && ln -s /usr/local/ccache/bin/ccache /usr/local/bin/cc \
     && ln -s /usr/local/ccache/bin/ccache /usr/local/bin/c++ \
-    && rm -rf /tmp/ccache-3.7.6 \
-    && rm -f /tmp/ccache-3.7.6.tar.gz
+    && /usr/local/ccache/bin/ccache -C \
+    && /usr/local/ccache/bin/ccache --max-size=8 \
+    && /usr/local/ccache/bin/ccache -p \
+    && rm -rf /tmp/ccache-3.7.7 \
+    && rm -f /tmp/ccache-3.7.7.tar.gz
 
+# Create user of jenkins
 ARG VERSION=3.35
 ARG user=jenkins
 ARG group=jenkins
 ARG uid=1000
 ARG gid=1000
 ARG AGENT_WORKDIR=/home/${user}/agent
-
-# Create user of jenkins
 RUN groupadd -g ${gid} ${group}
 RUN useradd -c "Jenkins user" -d /home/${user} -u ${uid} -g ${gid} -m ${user}
 
@@ -130,28 +174,39 @@ RUN echo "jenkins ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 
 # Install python(jenkins)
 RUN export MINDSPORE_CMD="su jenkins -s /bin/bash -c " \
-#   && ${MINDSPORE_CMD} "cd /tmp; rm -f /tmp/Python-3.7.5.tar.xz; wget https://www.python.org/ftp/python/3.7.5/Python-3.7.5.tar.xz; tar -xf Python-3.7.5.tar.xz" \
+#   && ${MINDSPORE_CMD} "cd /tmp; rm -f /tmp/Python-3.7.5.tar.xz; wget https://www.python.org/ftp/python/3.7.5/Python-3.7.5.tar.xz; tar -xf Python-3.7.5.tar.xz" 
     && ${MINDSPORE_CMD} "cd /tmp; rm -f /tmp/Python-3.7.5.tar.xz; wget http://59.36.11.51/tools/build/python/Python-3.7.5.tar.xz; tar -xf Python-3.7.5.tar.xz" \
-    && ${MINDSPORE_CMD} "cd /tmp/Python-3.7.5; ./configure --prefix=/home/jenkins/python375 --enable-shared && make -j4 && make install -j4" \
-    && ${MINDSPORE_CMD} "cd /tmp/Python-3.7.5; ./configure --prefix=/home/jenkins/python375 && make -j4 && make install -j4" \
+    && ${MINDSPORE_CMD} "cd /tmp/Python-3.7.5; ./configure --prefix=/home/jenkins/tools/python375 --enable-shared && make -j4 && make install -j4" \
+    && ${MINDSPORE_CMD} "cd /tmp/Python-3.7.5; ./configure --prefix=/home/jenkins/tools/python375 && make -j4 && make install -j4" \
+    && ${MINDSPORE_CMD} "cd /home/jenkins/tools/python375/bin; rm -f python; rm -f pip; ln -s python3.7 python; ln -s pip3.7 pip" \
+    && ${MINDSPORE_CMD} "echo 'export PATH=/home/jenkins/tools/python375/bin:\$PATH' >> ~/.bashrc" \
     && ${MINDSPORE_CMD} "rm -rf /tmp/Python-3.7.5; rm -f /tmp/Python-3.7.5.tar.xz"
 
 # Set pip source(jenkins)
 RUN export MINDSPORE_CMD="su jenkins -s /bin/bash -c " \
-    && ${MINDSPORE_CMD} "mkdir -pv /home/jenkins/.pip; echo '[global]' > /home/jenkins/.pip/pip.conf; echo 'trusted-host=mirrors.aliyun.com' >> /home/jenkins/.pip/pip.conf; echo 'index-url=http://mirrors.aliyun.com/pypi/simple/' >> /home/jenkins/.pip/pip.conf"
+    && ${MINDSPORE_CMD} "mkdir -pv /home/jenkins/.pip; echo '[global]' > /home/jenkins/.pip/pip.conf" \
+    && ${MINDSPORE_CMD} "echo 'index-url=https://repo.huaweicloud.com/repository/pypi/simple' >> /home/jenkins/.pip/pip.conf" \
+    && ${MINDSPORE_CMD} "echo 'trusted-host=repo.huaweicloud.com' >> /home/jenkins/.pip/pip.conf" \
+    && ${MINDSPORE_CMD} "echo 'timeout=120' >> /home/jenkins/.pip/pip.conf"
+
+# Fix build timeout when pip install(jenkins)
+RUN export MINDSPORE_CMD="su jenkins -s /bin/bash -c " \
+    && ${MINDSPORE_CMD} "export PATH=/home/jenkins/tools/python375/bin:$PATH; cd /tmp; pip3 install numpy-1.18.1-cp37-cp37m-linux_aarch64.whl; pip3 install scipy-1.3.3-cp37-cp37m-linux_aarch64.whl; pip3 install Pillow-7.0.0-cp37-cp37m-linux_aarch64.whl; pip3 install matplotlib-3.2.1-cp37-cp37m-linux_aarch64.whl; pip3 list"
 
 # Install pip package(jenkins)
 RUN export MINDSPORE_CMD="su jenkins -s /bin/bash -c " \
-    && ${MINDSPORE_CMD} "echo 'export PATH=/home/jenkins/python375/bin:\$PATH' >> ~/.bash_profile" \
-    && ${MINDSPORE_CMD} "source ~/.bash_profile; pip3 install numpy; pip3 install wheel; pip3 install nose; pip3 install pytest; pip3 install pytest-xdist; pip3 list"
+    && ${MINDSPORE_CMD} "export PATH=/home/jenkins/tools/python375/bin:$PATH; pip3 install -r /tmp/requirements.txt; pip3 list"
 
 # Install cmake(jenkins)
 RUN export MINDSPORE_CMD="su jenkins -s /bin/bash -c " \
-#   && ${MINDSPORE_CMD} "cd /tmp; rm -f /tmp/cmake-3.15.5.tar.gz; wget https://github.com/Kitware/CMake/releases/download/v3.15.5/cmake-3.15.5.tar.gz; tar -zxf cmake-3.15.5.tar.gz" \
-    && ${MINDSPORE_CMD} "cd /tmp; rm -f /tmp/cmake-3.15.5.tar.gz; wget http://59.36.11.51/tools/build/cmake/cmake-3.15.5.tar.gz; tar -zxf cmake-3.15.5.tar.gz" \
-    && ${MINDSPORE_CMD} "cd /tmp/cmake-3.15.5; ./bootstrap --prefix=/home/jenkins/cmake --parallel=4; make -j4; make install -j4" \
-    && ${MINDSPORE_CMD} "rm -rf /tmp/cmake-3.15.5; rm -f /tmp/cmake-3.15.5.tar.gz" \
-    && ${MINDSPORE_CMD} "echo 'export PATH=/home/jenkins/cmake/bin:\$PATH' >> ~/.bash_profile"
+#   && ${MINDSPORE_CMD} "cd /tmp; rm -f /tmp/cmake-3.14.1.tar.gz; wget https://github.com/Kitware/CMake/releases/download/v3.14.1/cmake-3.14.1.tar.gz; tar -zxf cmake-3.14.1.tar.gz" 
+    && ${MINDSPORE_CMD} "cd /tmp; rm -f /tmp/cmake-3.14.1.tar.gz; wget http://59.36.11.51/tools/build/cmake/cmake-3.14.1.tar.gz; tar -zxf cmake-3.14.1.tar.gz" \
+    && ${MINDSPORE_CMD} "cd /tmp/cmake-3.14.1; ./bootstrap --prefix=/home/jenkins/tools/cmake --parallel=4; make -j4; make install -j4" \
+    && ${MINDSPORE_CMD} "echo 'export PATH=/home/jenkins/tools/cmake/bin:\$PATH' >> ~/.bashrc" \
+    && ${MINDSPORE_CMD} "rm -rf /tmp/cmake-3.14.1; rm -f /tmp/cmake-3.14.1.tar.gz"
+
+# Delete pip package
+RUN rm -f /tmp/*.whl
 
 # Set sshd and timezone
 RUN sed -i 's/#   StrictHostKeyChecking ask/    StrictHostKeyChecking no/g' /etc/ssh/ssh_config \
@@ -171,19 +226,18 @@ RUN repo_path=/etc/yum.repos.d/euleros_aarch64.repo \
     && echo "gpgcheck=1" >> ${repo_path} \
     && echo "gpgkey=http://mirrors.huaweicloud.com/euler/2.8/os/aarch64/RPM-GPG-KEY-EulerOS" >> ${repo_path}
 
+# Install jenkins slave
 RUN mkdir -p /usr/share/jenkins/ \
-  && cd /usr/share/jenkins/ \
-  && wget -O agent.jar https://repo.jenkins-ci.org/public/org/jenkins-ci/main/remoting/${VERSION}/remoting-${VERSION}.jar \
-  && chmod 755 /usr/share/jenkins \
-  && chmod 644 /usr/share/jenkins/agent.jar \
-  && ln -sf /usr/share/jenkins/agent.jar /usr/share/jenkins/slave.jar
-
+    && cd /usr/share/jenkins/ \
+    && wget -O agent.jar https://repo.jenkins-ci.org/public/org/jenkins-ci/main/remoting/${VERSION}/remoting-${VERSION}.jar \
+    && chmod 755 /usr/share/jenkins \
+    && chmod 644 /usr/share/jenkins/agent.jar \
+    && ln -sf /usr/share/jenkins/agent.jar /usr/share/jenkins/slave.jar
 
 # Install jnlp
 COPY jenkins-agent /usr/local/bin/jenkins-agent
-RUN chmod +x /usr/local/bin/jenkins-agent &&\
-    ln -s /usr/local/bin/jenkins-agent /usr/local/bin/jenkins-slave
-
+RUN chmod +x /usr/local/bin/jenkins-agent \
+    && ln -s /usr/local/bin/jenkins-agent /usr/local/bin/jenkins-slave
 
 # Setting up env
 USER ${user}
@@ -195,3 +249,4 @@ VOLUME ${AGENT_WORKDIR}
 WORKDIR /home/${user}
 
 ENTRYPOINT ["jenkins-agent"]
+
