@@ -64,10 +64,8 @@ spec:
           args: ["$(JENKINS_URL)", "$(JENKINS_USER_NAME)", "$(JENKINS_USER_PASSWORD)", "$(JENKINS_NODE_NAME)", "$(EXECUTOR_NUMBERS)", "$(JENKINS_AGENT_WORKDIR)", "$(NODE_LABELS)", "$(JENKINS_SHARE_FOLDER)"]
       containers:
         - name: jenkins-slave
-          image: swr.cn-north-1.myhuaweicloud.com/hwstaff_h00223369/ms_check_slave:0.0.2
+          image: swr.cn-north-1.myhuaweicloud.com/hwstaff_h00223369/ms_check_slave:0.0.3
           imagePullPolicy: "Always"
-          securityContext:
-            runAsUser: 0
           volumeMounts:
             - mountPath: /home/jenkins/agent-working-dir
               name: generic-workspace-pvc
