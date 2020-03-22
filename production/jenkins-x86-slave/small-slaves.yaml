@@ -66,6 +66,9 @@ spec:
         - name: jenkins-slave
           image: swr.cn-north-1.myhuaweicloud.com/hwstaff_h00223369/ms_check_slave:0.0.3
           imagePullPolicy: "Always"
+          securityContext:
+            runAsUser: 1000
+            runAsGroup: 1000
           volumeMounts:
             - mountPath: /home/jenkins/agent-working-dir
               name: small-workspace-pvc
