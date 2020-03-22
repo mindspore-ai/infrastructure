@@ -65,7 +65,7 @@ spec:
       containers:
         - name: jenkins-slave
           image: swr.cn-north-1.myhuaweicloud.com/hwstaff_h00223369/generic_ubuntu:0.0.1
-          imagePullPolicy: "Always"
+          imagePullPolicy: "IfNotPresent"
           volumeMounts:
             - mountPath: /home/jenkins/agent-working-dir
               name: ubuntu-generic-workspace-pvc
