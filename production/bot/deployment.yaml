@@ -29,8 +29,23 @@ spec:
         botnode: "true"
       containers:
       - name: botinfod
-        image: mindspore/ci-bot:0.0.3
+        image: mindspore/ci-bot:0.1.0
         imagePullPolicy: IfNotPresent
+        env:
+        - name: WEBSITE_URL
+          value: 'https://139.9.112.83/'
+        - name: CLA_REDIRECT_URL
+          value: /cla_en
+        - name: GITEE_OAUTH2_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: bot
+              key: gitee_auth_token
+        - name: GITEE_OAUTH2_CLIENT_CODE
+          valueFrom:
+            secretKeyRef:
+              name: bot
+              key: gitee_auth_clientcode
         ports:
         - containerPort: 8888
           name: http
@@ -38,6 +53,7 @@ spec:
         volumeMounts:
         - mountPath: /bot/
           name: configmap-volume
+        args: ["--alsologtostderr"]
       volumes:
       - name: configmap-volume
         configMap:
