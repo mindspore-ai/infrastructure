@@ -11,5 +11,6 @@ MAIL_CORE=mindspore/mail-core:v0.1.0
 MAIL_GIT_UTIL=mindspore/git-tools:0.0.1
 MAIL_CORE_UTIL=mindspore/mailman-core-utils:0.0.3
 MAIL_DATABASE=postgres:9.6-alpine
+REPO_NGINX=mindspore/nginx-extras:1.10.3
 
 

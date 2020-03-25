@@ -83,6 +83,9 @@ It's mindspore's official website, please visit https://wwww.mindspore.cn
 ## CI Bot System
 It's based on kubernetess' [prow](https://github.com/kubernetes/test-infra) system, but some features are trimmed.
 
+## Repo System
+There are two containers inside, one is nginx with fancy index module and the other is rsync server, please visit [official repo website](https://repo.mindspore.cn)
+
 # Clusters
 Now all mindspore components are deployed into two HuaweiCloud k8s clusters[CCE]. They are:
 

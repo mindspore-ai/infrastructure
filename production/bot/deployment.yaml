@@ -53,7 +53,7 @@ spec:
         volumeMounts:
         - mountPath: /bot/
           name: configmap-volume
-        args: ["--alsologtostderr"]
+        args: ["--stderrthreshold=0"]
       volumes:
       - name: configmap-volume
         configMap:
