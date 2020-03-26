@@ -5,8 +5,6 @@ metadata:
   name: mindspore-configmap
   namespace: repo
 data:
-  rsyncd.secrets: |
-    root:mindspore@1234
   ssh.pub: |
     ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQChSk+/FF79F8ut0hpNuYQ4uhAgUSY4hzRIPvQ2uVTukP0B0A99NYPfDNICp7gLa6e7yzaj+bvCpgWZoZCNAWTBWkq+zHTgDDHrLtUE4zPC1guzuR+Gz3yeIzSt0iAzi9uG2p+qh7jUfl8QAwNOs3wosNenoZj7NmgsCF9M1o85msimRc8Roxnn5caao1RtdNkDHDqhw5QiS9doSUjoxT+esD0CI7RHAyMgMCfSlXXl/phpdSU2hVJSFXsHVBTiymkuMQe8Ylmls+OEmCe8Cy7lIqE/Q+56l62Pxv4UJpOWs9T/SrOEr5vtEPGghZzgo5ViewzAs3dGMaODSO25XhrIiRZ7hjBK9tjLOX7ZXfAsb4DpJljq2aPCrlEaGJsHc2laixKIOKogDbqFffM3eXwgEAxPUevX/mYnuyhAVrsRUl8HXIQnTuVIEeYVdmn2MA8I/y6MPWdN5VbLR5gOiNLOuSVhCq3sQLpTZ9CONF+zq+1layCoaGMIZw5JwYgWCQgCGNclbx8eMVY3+J3slH6VjzE/05Eys18HtpuAMCivBLGgpBGeCVdpQqkHodTn5ZjNZEBAgzHypiOgR/txMHhkTi4+1ZvTmSRWs9hggv4/IcDQFaj1f2JVds6lxGvJyOnoy9k1VUC0q4N6sptpJ/n+ElCJ4UaHE48La3Mu79R6+Q== mindspore_hosts
   rsyncd.conf: |
