@@ -40,7 +40,7 @@ metadata:
     component: mail-web-service
     app: mail-suit-service
 spec:
-  replicas: 2
+  replicas: 4
   selector:
     matchLabels:
       component: mail-web-service
@@ -131,6 +131,13 @@ spec:
             #NOTE: this is the domain name that mailman web will serve
             - name: SERVE_FROM_DOMAIN
               value: mailweb.mindspore.cn
+          resources:
+            requests:
+              cpu: 4000m
+              memory: 6000Mi
+            limits:
+              cpu: 8000m
+              memory: 8000Mi
           #NOTE: Command is overwritten for the purpose of copy config file into dest folder
           command:
             - /bin/sh
