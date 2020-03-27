@@ -24,7 +24,7 @@ metadata:
     app: x86-small-slaves
 spec:
   serviceName: x86-small-slaves-service
-  replicas: 6
+  replicas: 1
   selector:
     matchLabels:
       app: x86-small-slaves
