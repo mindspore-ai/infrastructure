@@ -1,6 +1,11 @@
 name: MindSpore Gitee repos mirror periodic job
 
 on:
+  pull_request:
+    # Runs at every PRs submitted in master workflows  
+    branches: [ master ]
+    paths:
+    - '.github/workflows/**'
   schedule:
     # Runs at 01:00 UTC (9:00 AM Beijing) every day
     - cron:  '0 1 * * *'
@@ -11,11 +16,18 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+    - name: Cache mindspore src repos
+      uses: actions/cache@v1
+      with:
+        path: /home/runner/work/infrastructure/infrastructure/mindspore-cache
+        key: ${{ runner.os }}-mindspore-repos-cache
+
     - name: Mirror the gitee/mindspore org repos to github/mindspore-ai.
-      uses: Yikun/hub-mirror-action@v0.04
+      uses: Yikun/hub-mirror-action@v0.05
       with:
         src: gitee/mindspore
         dst: github/mindspore-ai
         dst_key: ${{ secrets.SYNC_MINDSPORE_PRIVATE_KEY }}
         dst_token:  ${{ secrets.SYNC_MINDSPORE_TOKEN }}
         account_type: org
+        cache_path: /github/workspace/mindspore-cache
