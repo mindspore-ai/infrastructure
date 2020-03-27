@@ -24,7 +24,7 @@ metadata:
     app: arm-medium-slaves
 spec:
   serviceName: arm-medium-slaves-service
-  replicas: 10
+  replicas: 20
   selector:
     matchLabels:
       app: arm-medium-slaves
@@ -64,7 +64,7 @@ spec:
           args: ["$(JENKINS_URL)", "$(JENKINS_USER_NAME)", "$(JENKINS_USER_PASSWORD)", "$(JENKINS_NODE_NAME)", "$(EXECUTOR_NUMBERS)", "$(JENKINS_AGENT_WORKDIR)", "$(NODE_LABELS)", "$(JENKINS_SHARE_FOLDER)"]
       containers:
         - name: jenkins-slave
-          image: swr.cn-north-1.myhuaweicloud.com/hwstaff_h00223369/euleros_davinci:0.0.4
+          image: swr.cn-north-1.myhuaweicloud.com/hwstaff_h00223369/euleros_davinci:0.0.5
           imagePullPolicy: "Always"
           volumeMounts:
             - mountPath: /home/jenkins/agent-working-dir
@@ -81,11 +81,8 @@ spec:
               exec jenkins-agent
           resources:
             requests:
-              cpu: 14000m
-              memory: 26000Mi
-            limits:
-              cpu: 16000m
-              memory: 32000Mi
+              cpu: 20000m
+              memory: 40000Mi
           env:
             - name: JENKINS_TUNNEL
               value: build.mindspore.cn:50000
