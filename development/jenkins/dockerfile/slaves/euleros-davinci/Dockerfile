@@ -1,5 +1,5 @@
 # Base image
-FROM swr.cn-north-1.myhuaweicloud.com/hwstaff_h00223369/euleros_aarch64:2.8.C00SPC301B730
+FROM swr.cn-north-1.myhuaweicloud.com/hwstaff_h00223369/euleros_aarch64:2.8.530
 MAINTAINER tommylike <tommylikehu@gmail.com>
 
 # Set env
@@ -13,10 +13,10 @@ RUN repo_path=/etc/yum.repos.d/euleros_aarch64.repo \
     && rm -f /etc/yum.repos.d/euleros*.repo \
     && echo "[base]" > ${repo_path} \
     && echo "name=EulerOS-2.0SP8 base" >> ${repo_path} \
-    && echo "baseurl=http://59.36.11.51/productrepo/repo/EulerOS_Server_V200R008C00SPC301B730//" >> ${repo_path} \
+    && echo "baseurl=http://59.36.11.51/productrepo/repo/EulerOS_Server_V200R008C00SPC201B530/" >> ${repo_path} \
     && echo "enabled=1" >> ${repo_path} \
     && echo "gpgcheck=1" >> ${repo_path} \
-    && echo "gpgkey=http://59.36.11.51/productrepo/repo/EulerOS_Server_V200R008C00SPC301B730/RPM-GPG-KEY-EulerOS" >> ${repo_path} \
+    && echo "gpgkey=http://59.36.11.51/productrepo/repo/EulerOS_Server_V200R008C00SPC201B530/RPM-GPG-KEY-EulerOS" >> ${repo_path} \
     && yum clean all \
     && yum makecache
 
