@@ -1,5 +1,5 @@
-# Base image euleros_aarch64:2.8
-FROM swr.cn-north-1.myhuaweicloud.com/hwstaff_h00223369/euleros_aarch64:2.8.530
+# Base image
+FROM swr.cn-north-1.myhuaweicloud.com/hwstaff_h00223369/euleros_aarch64:2.8.C00SPC301B730
 MAINTAINER tommylike <tommylikehu@gmail.com>
 
 # Set env
@@ -13,10 +13,10 @@ RUN repo_path=/etc/yum.repos.d/euleros_aarch64.repo \
     && rm -f /etc/yum.repos.d/euleros*.repo \
     && echo "[base]" > ${repo_path} \
     && echo "name=EulerOS-2.0SP8 base" >> ${repo_path} \
-    && echo "baseurl=http://59.36.11.51/productrepo/repo/EulerOS_Server_V200R008C00SPC201B530/" >> ${repo_path} \
+    && echo "baseurl=http://59.36.11.51/productrepo/repo/EulerOS_Server_V200R008C00SPC301B730//" >> ${repo_path} \
     && echo "enabled=1" >> ${repo_path} \
     && echo "gpgcheck=1" >> ${repo_path} \
-    && echo "gpgkey=http://59.36.11.51/productrepo/repo/EulerOS_Server_V200R008C00SPC201B530/EulerOS_Server_V200R008C00SPC201B530/RPM-GPG-KEY-EulerOS" >> ${repo_path} \
+    && echo "gpgkey=http://59.36.11.51/productrepo/repo/EulerOS_Server_V200R008C00SPC301B730/RPM-GPG-KEY-EulerOS" >> ${repo_path} \
     && yum clean all \
     && yum makecache
 
@@ -41,6 +41,9 @@ RUN yum update \
     && yum install -y blas \
     && yum install -y lapack \
     && yum install -y atlas-devel \
+    && yum install -y automake \
+    && yum install -y autoconf \
+    && yum install -y libtool \
     && yum install -y java-1.8.0
 
 # Install compile tools
@@ -60,11 +63,11 @@ RUN yum install -y libffi-devel zlib-devel bzip2-devel openssl-devel ncurses-dev
     && tar -xf Python-3.7.5.tar.xz \
     && cd /tmp/Python-3.7.5 \
     && ./configure --prefix=${PYTHON_ROOT_PATH} --enable-shared \
-    && make -j4 \
-    && make install -j4 \
+    && make -j8 \
+    && make install -j8 \
     && ./configure --prefix=${PYTHON_ROOT_PATH} \
-    && make -j4 \
-    && make install -j4 \
+    && make -j8 \
+    && make install -j8 \
     && cd ${PYTHON_ROOT_PATH}/bin \
     && rm -f python \
     && rm -f pip \
@@ -110,9 +113,9 @@ RUN cd /tmp \
     && wget http://59.36.11.51/tools/build/cmake/cmake-3.14.1.tar.gz \
     && tar -zxf cmake-3.14.1.tar.gz \
     && cd cmake-3.14.1 \
-    && ./bootstrap --prefix=/usr --parallel=4 \
-    && make -j4 \
-    && make install -j4 \
+    && ./bootstrap --prefix=/usr --parallel=8 \
+    && make -j8 \
+    && make install -j8 \
     && rm -rf /tmp/cmake-3.14.1 \
     && rm -f /tmp/cmake-3.14.1.tar.gz
 
@@ -143,8 +146,8 @@ RUN cd /tmp \
     && tar -zxf ccache-3.7.7.tar.gz \
     && cd ccache-3.7.7 \
     && ./configure --prefix=/usr/local/ccache \
-    && make -j4 \
-    && make install -j4 \
+    && make -j8 \
+    && make install -j8 \
     && rm -f /usr/local/bin/gcc \
     && rm -f /usr/local/bin/g++ \
     && rm -f /usr/local/bin/cc \
@@ -176,8 +179,8 @@ RUN echo "jenkins ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 RUN export MINDSPORE_CMD="su jenkins -s /bin/bash -c " \
 #   && ${MINDSPORE_CMD} "cd /tmp; rm -f /tmp/Python-3.7.5.tar.xz; wget https://www.python.org/ftp/python/3.7.5/Python-3.7.5.tar.xz; tar -xf Python-3.7.5.tar.xz" 
     && ${MINDSPORE_CMD} "cd /tmp; rm -f /tmp/Python-3.7.5.tar.xz; wget http://59.36.11.51/tools/build/python/Python-3.7.5.tar.xz; tar -xf Python-3.7.5.tar.xz" \
-    && ${MINDSPORE_CMD} "cd /tmp/Python-3.7.5; ./configure --prefix=/home/jenkins/tools/python375 --enable-shared && make -j4 && make install -j4" \
-    && ${MINDSPORE_CMD} "cd /tmp/Python-3.7.5; ./configure --prefix=/home/jenkins/tools/python375 && make -j4 && make install -j4" \
+    && ${MINDSPORE_CMD} "cd /tmp/Python-3.7.5; ./configure --prefix=/home/jenkins/tools/python375 --enable-shared && make -j8 && make install -j8" \
+    && ${MINDSPORE_CMD} "cd /tmp/Python-3.7.5; ./configure --prefix=/home/jenkins/tools/python375 && make -j8 && make install -j8" \
     && ${MINDSPORE_CMD} "cd /home/jenkins/tools/python375/bin; rm -f python; rm -f pip; ln -s python3.7 python; ln -s pip3.7 pip" \
     && ${MINDSPORE_CMD} "echo 'export PATH=/home/jenkins/tools/python375/bin:\$PATH' >> ~/.bashrc" \
     && ${MINDSPORE_CMD} "rm -rf /tmp/Python-3.7.5; rm -f /tmp/Python-3.7.5.tar.xz"
@@ -201,7 +204,7 @@ RUN export MINDSPORE_CMD="su jenkins -s /bin/bash -c " \
 RUN export MINDSPORE_CMD="su jenkins -s /bin/bash -c " \
 #   && ${MINDSPORE_CMD} "cd /tmp; rm -f /tmp/cmake-3.14.1.tar.gz; wget https://github.com/Kitware/CMake/releases/download/v3.14.1/cmake-3.14.1.tar.gz; tar -zxf cmake-3.14.1.tar.gz" 
     && ${MINDSPORE_CMD} "cd /tmp; rm -f /tmp/cmake-3.14.1.tar.gz; wget http://59.36.11.51/tools/build/cmake/cmake-3.14.1.tar.gz; tar -zxf cmake-3.14.1.tar.gz" \
-    && ${MINDSPORE_CMD} "cd /tmp/cmake-3.14.1; ./bootstrap --prefix=/home/jenkins/tools/cmake --parallel=4; make -j4; make install -j4" \
+    && ${MINDSPORE_CMD} "cd /tmp/cmake-3.14.1; ./bootstrap --prefix=/home/jenkins/tools/cmake --parallel=8; make -j8; make install -j8" \
     && ${MINDSPORE_CMD} "echo 'export PATH=/home/jenkins/tools/cmake/bin:\$PATH' >> ~/.bashrc" \
     && ${MINDSPORE_CMD} "rm -rf /tmp/cmake-3.14.1; rm -f /tmp/cmake-3.14.1.tar.gz"
 
@@ -249,4 +252,3 @@ VOLUME ${AGENT_WORKDIR}
 WORKDIR /home/${user}
 
 ENTRYPOINT ["jenkins-agent"]
-
