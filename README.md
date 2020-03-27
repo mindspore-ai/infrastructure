@@ -87,7 +87,7 @@ It's based on kubernetess' [prow](https://github.com/kubernetes/test-infra) syst
 There are two containers inside, one is nginx with fancy index module and the other is rsync server, please visit [official repo website](https://repo.mindspore.cn)
 
 # Clusters
-Now all mindspore components are deployed into two HuaweiCloud k8s clusters[CCE]. They are:
+Now all mindspore components are deployed into two HuaweiCloud k8s cluster[CCE]. They are:
 
 1. CCE on cn-north-1 which are all x86 based nodes
 
