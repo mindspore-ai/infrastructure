@@ -32,7 +32,7 @@ spec:
         - name: WEBSITE_URL
           value: 'https://139.9.112.83/'
         - name: CLA_REDIRECT_URL
-          value: /cla_en
+          value: /icla
         - name: GITEE_OAUTH2_SECRET
           valueFrom:
             secretKeyRef:
