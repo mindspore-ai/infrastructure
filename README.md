@@ -89,6 +89,6 @@ There are two containers inside, one is nginx with fancy index module and the ot
 # Clusters
 Now all mindspore components are deployed into two HuaweiCloud k8s clusters[CCE]. They are:
 
-1. CCE on cn-north-1 which are all x86 based nodes
+1. CCE on cn-north-1 which are all x86 based nodessssss
 
 2. CCE on cn-north-4 which are all arm based nodes
