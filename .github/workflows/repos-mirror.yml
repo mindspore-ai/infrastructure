@@ -24,4 +24,4 @@ jobs:
         dst_key: ${{ secrets.SYNC_MINDSPORE_PRIVATE_KEY }}
         dst_token:  ${{ secrets.SYNC_MINDSPORE_TOKEN }}
         account_type: org
-        static_list: 'mindinsight,mindarmour,graphengine,docs,book,community'
+        static_list: 'mindspore,mindinsight,mindarmour,graphengine,docs,book,community'
