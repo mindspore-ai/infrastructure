@@ -6,9 +6,9 @@ on:
     - '.github/workflows/**'
     # Runs at every pull requests submitted in master branch 
     branches: [ master ]
-#  schedule:
-#    # Runs at 01:00 UTC (9:00 AM Beijing) every day
-#    - cron:  '0 1 * * *'
+  schedule:
+    # Runs at 01:00 UTC (9:00 AM Beijing) every day
+    - cron:  '0 1 * * *'
 
 jobs:
   build:
@@ -24,4 +24,4 @@ jobs:
         dst_key: ${{ secrets.SYNC_MINDSPORE_PRIVATE_KEY }}
         dst_token:  ${{ secrets.SYNC_MINDSPORE_TOKEN }}
         account_type: org
-        static_list: 'ms-operator,mindspore,mindinsight,mindarmour,graphengine,docs,book,community'
+        static_list: 'mindspore,mindinsight,mindarmour,graphengine,docs,book,community,ms-operator'
