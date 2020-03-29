@@ -24,5 +24,4 @@ jobs:
         dst_key: ${{ secrets.SYNC_MINDSPORE_PRIVATE_KEY }}
         dst_token:  ${{ secrets.SYNC_MINDSPORE_TOKEN }}
         account_type: org
-        clone_style: ssh
         static_list: 'mindspore,mindinsight,mindarmour,graphengine,docs,book,community,ms-operator'
