@@ -363,36 +363,17 @@ spec:
     - port: 80
       targetPort: 8888
   type: NodePort
-# We need create this manually before actually appending this into yaml file.
-#---
-#apiVersion: extensions/v1beta1
-#kind: Ingress
-#metadata:
-#  namespace: prow
-#  name: ing
-#spec:
-#  rules:
-#    - http:
-#        paths:
-#          - path: /* # Correct for GKE, need / on many other distros
-#            backend:
-#              serviceName: deck
-#              servicePort: 80
-#          - path: /hook
-#            backend:
-#              serviceName: hook
-#              servicePort: 8888
 ---
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
   annotations:
-    kubernetes.io/elb.autocreate: '{"type":"public","bandwidth_name":"cce-bandwidth-1577260579032","bandwidth_chargemode":"bandwidth","bandwidth_size":5,"bandwidth_sharetype":"PER","eip_type":"5_bgp"}'
-    kubernetes.io/elb.eip-id: ba5aaa37-9c12-4923-b2d3-03bfc87fd899
-    kubernetes.io/elb.id: 359a748b-8a9a-412a-b5e6-9846cdc2fab8
-    kubernetes.io/elb.ip: 117.78.19.234
+    kubernetes.io/elb.autocreate: '{"type":"public","bandwidth_name":"cce-bandwidth-1585620583223","bandwidth_chargemode":"bandwidth","bandwidth_size":5,"bandwidth_sharetype":"PER","eip_type":"5_bgp"}'
+    kubernetes.io/elb.eip-id: 934c0c7d-eb79-49c3-8eb7-c2d53f34cc73
+    kubernetes.io/elb.id: 99d02a9b-71ed-43c2-8c07-6a8523433254
+    kubernetes.io/elb.ip: 119.8.35.238
     kubernetes.io/elb.port: "80"
-    kubernetes.io/elb.subnet-id: a7c8fc31-50cc-4c64-b9cd-d2f54c973230
+    kubernetes.io/elb.subnet-id: cbabc2a6-3aba-4ae8-a896-eb7d94bbe87c
     kubernetes.io/ingress.class: cce
   labels:
     isExternal: "true"
