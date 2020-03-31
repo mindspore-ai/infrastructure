@@ -45,11 +45,11 @@ RUN apt install -y libffi-dev libssl-dev zlib1g-dev libbz2-dev libncurses5-dev l
     && tar -xf Python-3.7.5.tar.xz \
     && cd /tmp/Python-3.7.5 \
     && ./configure --prefix=${PYTHON_ROOT_PATH} --enable-shared \
-    && make -j4 \
-    && make install -j4 \
+    && make -j8 \
+    && make install -j8 \
     && ./configure --prefix=${PYTHON_ROOT_PATH} \
-    && make -j4 \
-    && make install -j4 \
+    && make -j8 \
+    && make install -j8 \
     && cd ${PYTHON_ROOT_PATH}/bin \
     && rm -f python \
     && rm -f pip \
@@ -84,8 +84,8 @@ RUN apt install -y libpcre3-dev \
     && wget https://github.com/danmar/cppcheck/archive/1.89.tar.gz \
     && tar -zxf 1.89.tar.gz \
     && cd cppcheck-1.89 \
-    && make MATCHCOMPILER=yes FILESDIR=/usr/share/cppcheck HAVE_RULES=yes CXXFLAGS="-O2 -DNDEBUG -Wall -Wno-sign-compare -Wno-unused-function" -j4 \
-    && make install FILESDIR=/usr/share/cppcheck -j4 \
+    && make MATCHCOMPILER=yes FILESDIR=/usr/share/cppcheck HAVE_RULES=yes CXXFLAGS="-O2 -DNDEBUG -Wall -Wno-sign-compare -Wno-unused-function" -j8 \
+    && make install FILESDIR=/usr/share/cppcheck -j8 \
     && rm -rf /tmp/cppcheck-1.89 \
     && rm -f /tmp/1.89.tar.gz
 
@@ -127,6 +127,14 @@ RUN cd /tmp \
     && rm -rf /tmp/clang+llvm-9.0.1-x86_64-linux-gnu-ubuntu-16.04 \
     && rm -f /tmp/clang+llvm-9.0.1-x86_64-linux-gnu-ubuntu-16.04.tar.xz
 
+# Reinstall git
+# Problem: error: RPC failed; curl 56 GnuTLS recv error (-110): The TLS connection was non-properly terminated
+RUN cd /tmp \
+    && rm -f git-huawei_2.18.0.25_amd64.deb \
+    && wget http://59.36.11.51/tools/build/git/git-huawei/git-huawei_2.18.0.25_amd64.deb \
+    && dpkg -i git-huawei_2.18.0.25_amd64.deb \
+    && rm -f git-huawei_2.18.0.25_amd64.deb
+
 # Setup java path
 ENV JAVA_HOME /usr/lib/jvm/java-8-openjdk-amd64/jre
 ENV PATH $PATH:$JAVA_HOME/bin
@@ -163,7 +171,7 @@ RUN mkdir -p /usr/share/jenkins/ \
 
 # Install jnlp
 COPY jenkins-agent /usr/local/bin/jenkins-agent
-RUN chmod +x /usr/local/bin/jenkins-agent \
+RUN chmod 755 /usr/local/bin/jenkins-agent \
     && ln -s /usr/local/bin/jenkins-agent /usr/local/bin/jenkins-slave
 
 # Setting up env
