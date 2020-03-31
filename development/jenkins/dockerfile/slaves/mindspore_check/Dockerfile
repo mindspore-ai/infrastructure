@@ -129,14 +129,11 @@ RUN cd /tmp \
 
 # Reinstall git
 # Problem: error: RPC failed; curl 56 GnuTLS recv error (-110): The TLS connection was non-properly terminated
-# Reference: https://blog.csdn.net/FJDJFKDJFKDJFKD/article/details/92636451
-RUN apt install -y build-essential fakeroot dpkg-dev \
-    && apt install -y libcurl4-openssl-dev \
-    && cd /tmp \
-    && rm -f git_2.7.4-0ubuntu1.7_amd64.deb \
-    && wget http://59.36.11.51/tools/build/git/git_2.7.4-0ubuntu1.7_amd64.deb \
-    && dpkg -i git_2.7.4-0ubuntu1.7_amd64.deb \
-    && rm -f git_2.7.4-0ubuntu1.7_amd64.deb
+RUN cd /tmp \
+    && rm -f git-huawei_2.18.0.25_amd64.deb \
+    && wget http://59.36.11.51/tools/build/git/git-huawei/git-huawei_2.18.0.25_amd64.deb \
+    && dpkg -i git-huawei_2.18.0.25_amd64.deb \
+    && rm -f git-huawei_2.18.0.25_amd64.deb
 
 # Setup java path
 ENV JAVA_HOME /usr/lib/jvm/java-8-openjdk-amd64/jre
