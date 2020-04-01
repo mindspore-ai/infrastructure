@@ -4,7 +4,7 @@
 my_dir=$(dirname $0)
 workspace=/home/workspace
 deploy_path=$workspace/mindspore_deploy
-project_path=$GOPATH/src/github.com/TommyLike/mindspore
+project_path=$GOPATH/src/github.com/mindspore-ai/mindinsight
 
 # Source env
 export PATH=/usr/local/python/python375/bin:$PATH

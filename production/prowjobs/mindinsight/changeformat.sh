@@ -7,7 +7,7 @@ deploy_path=$workspace/mindspore_deploy
 project_path=$GOPATH/src/github.com/mindspore-ai/mindinsight
 
 # Source env
-export PATH=/usr/local/python/python375/bin:$PATH
+export PATH=/usr/local/python/python375/bin:/usr/local/clang-format/bin:$PATH
 
 # Source utils
 cd $my_dir/../common
@@ -42,24 +42,8 @@ for folder in ${exclude_folder//,/ }; do
     delete_path "${project_path}/${folder}"
 done
 
-# Get scan filename
-
-target_files() {
-  find ${project_path} -iname "*.py"
-}
-
-LOG_HEAD "Print file number."
-LOG_INFO "File number: $(target_files | wc -l)"
-
-# Run pylint
-LOG_HEAD "Run pylint."
-pylintrc_path="${deploy_path}/common/rules/pylint/pylintrc"
-output=${workspace}/pylint.log
-target_files | xargs pylint --rcfile=${pylintrc_path} -j 2 --output-format=parseable > $output
-DP_ASSERT_FILE "$output" "check $output"
-
-error_number=$(grep "^mindspore/" ${output} | wc -l)
-if [ $error_number -ne 0 ]; then
-  LOG_ERROR "Run pylint failed, error number = $error_number"
-  # exit 1
-fi
+# Check clang-format
+LOG_HEAD "Check clang-format."
+cd $project_path
+bash -x scripts/check_clang_format.sh -l
+DP_ASSERT_EQUAL "$?" "0" "Check clang-format"
