@@ -2,7 +2,7 @@
 
 clone_mindspore_deploy() {
   local out_dir=$1
-  git clone https://github.com/mindspore-ai/mindspore_deploy.git ${out_dir}
+  git clone https://${MINDSPORE_DEPLOY_USER}:${MINDSPORE_DEPLOY_TOKEN}@gitee.com/mindspore/mindspore_deploy.git ${out_dir}
   if [ $? -ne 0 ]; then
     echo "Clone mindspore_deploy failed"
     return 1
