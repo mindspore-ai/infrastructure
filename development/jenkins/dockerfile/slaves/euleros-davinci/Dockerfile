@@ -1,5 +1,5 @@
 # Base image
-FROM swr.cn-north-1.myhuaweicloud.com/hwstaff_h00223369/euleros_aarch64:2.8.530
+FROM swr.cn-north-1.myhuaweicloud.com/mindspore/euleros_aarch64:2.8.530
 MAINTAINER tommylike <tommylikehu@gmail.com>
 
 # Set env

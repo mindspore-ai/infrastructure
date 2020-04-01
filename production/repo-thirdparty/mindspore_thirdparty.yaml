@@ -133,7 +133,7 @@ spec:
     spec:
       containers:
         - name: repo-nginx
-          image: swr.cn-north-1.myhuaweicloud.com/hwstaff_h00223369/nginx-extras:1.10.3
+          image: swr.cn-north-1.myhuaweicloud.com/mindspore/nginx-extras:1.10.3
           imagePullPolicy: "Always"
           volumeMounts:
             - name: website-secrets-volume

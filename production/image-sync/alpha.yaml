@@ -18,13 +18,6 @@ data:
             }
         },
         "images": {
-            "mindspore/generic_ubuntu": "swr.cn-north-1.myhuaweicloud.com/hwstaff_h00223369/generic_ubuntu",
-            "mindspore/ubuntu_gpu": "swr.cn-north-1.myhuaweicloud.com/hwstaff_h00223369/ubuntu_gpu",
-            "mindspore/ms_check_slave": "swr.cn-north-1.myhuaweicloud.com/hwstaff_h00223369/ms_check_slave",
-            "mindspore/euleros_aarch64": "swr.cn-north-1.myhuaweicloud.com/hwstaff_h00223369/euleros_aarch64",
-            "mindspore/jenkins-slave-tools": "swr.cn-north-1.myhuaweicloud.com/hwstaff_h00223369/jenkins-slave-tools",
-            "mindspore/euleros": "swr.cn-north-1.myhuaweicloud.com/hwstaff_h00223369/euleros",
-            "mindspore/jenkins-slave-tools-arm": "swr.cn-north-1.myhuaweicloud.com/hwstaff_h00223369/jenkins-slave-tools-arm"
         }
     }
 

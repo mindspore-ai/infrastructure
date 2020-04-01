@@ -1,5 +1,5 @@
 # Base image euleros:2.5
-FROM swr.cn-north-1.myhuaweicloud.com/hwstaff_h00223369/euleros:2.5
+FROM swr.cn-north-1.myhuaweicloud.com/mindspore/euleros:2.5
 MAINTAINER tommylike <tommylikehu@gmail.com>
 
 # Set env
