@@ -20,4 +20,4 @@ if [ $? -ne 0 ]; then
   exit 1
 fi
 
-${my_dir}/../jobs/shellcheck.sh $GOPATH/src/github.com/mindspore-ai mindinsight $MINDSPORE_DEPLOY_PATH
+${my_dir}/../jobs/clang_format.sh $GOPATH/src/github.com/mindspore-ai mindinsight $MINDSPORE_DEPLOY_PATH
