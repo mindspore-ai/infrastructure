@@ -33,7 +33,7 @@ clone_mindspore_deploy() {
 
 delete_path() {
   local path=$1
-  if [ -d "$path" || -f "$path" ]; then
+  if [[ -d "$path" || -f "$path" ]]; then
     rm $path -fr
   fi
 }
