@@ -2,60 +2,6 @@
 # components. Don't edit resources in this file. Instead, pull them out into
 # their own files.
 ---
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  namespace: prow
-  name: plugins
-data:
-  plugins.yaml: |
-    approve:
-      - repos:
-        - mindspore-ai
-        lgtm_acts_as_approve: false
-        require_self_approval: false
-    lgtm:
-      - repos:
-        - mindspore-ai
-        review_acts_as_lgtm: true
-    welcome:
-      - repos:
-          - mindspore-ai
-        message_template: "Welcome @{{.AuthorLogin}}! <br><br>It looks like this is your first PR to <a href='https://github.com/{{.Org}}/{{.Repo}}'>{{.Org}}/{{.Repo}}</a> 🎉. <br><br>You will be prompted by a bot to use commands during the review process. Do not be afraid to follow the prompts! It is okay to experiment. [Here is the bot commands documentation](https://go.k8s.io/bot-commands). <br><br>You can also check if {{.Org}}/{{.Repo}} has [its own contribution guidelines](https://github.com/{{.Org}}/{{.Repo}}/tree/master/CONTRIBUTING.md). We want to make sure your contribution gets all the attention it needs! <br><br>Thank you, and welcome to MindSpore. :smiley:"
-    plugins:
-      mindspore-ai:
-        - approve  # Allow OWNERS to /approve
-        - assign  # Allow /assign and /cc
-        - help  # Support /help and /good-first-issue
-        - hold  # Support /hold to delay merge
-        - lgtm  # Allow /lgtm
-        - wip  # Auto-hold PRs with WIP in title
-        - welcome
-        - size
----
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  namespace: prow
-  name: config
-data:
-  config.yaml: |
-    prowjob_namespace: prow
-    pod_namespace: prow-pods
-    tide:
-      sync_period: 40s
-      target_url: http://dev-prow.mindspore.cn/tide.html
-      queries:
-      - orgs:
-        - mindspore-ai
-        labels:
-        - lgtm
-        - approved
-        missingLabels:
-        - do-not-merge
-        - do-not-merge/hold
-        - do-not-merge/work-in-progress
----
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
@@ -79,7 +25,7 @@ spec:
       terminationGracePeriodSeconds: 180
       containers:
         - name: hook
-          image: tommylike/hook:v20190625-9f02db3fe
+          image: mindspore/hook:v20200228-31c76444e
           imagePullPolicy: Always
           args:
             - --dry-run=false
@@ -159,7 +105,7 @@ spec:
       serviceAccountName: "plank"
       containers:
         - name: plank
-          image: tommylike/plank:v20190625-9f02db3fe
+          image: mindspore/plank:v20200228-31c76444b
           args:
             - --dry-run=false
             - --config-path=/etc/config/config.yaml
@@ -232,17 +178,30 @@ spec:
       terminationGracePeriodSeconds: 30
       containers:
         - name: deck
-          image: tommylike/deck:v20190625-9f02db3fe
+          image: mindspore/deck:v20200228-31c76444bb
           args:
             - --config-path=/etc/config/config.yaml
+            - --plugin-config=/etc/plugins/plugins.yaml
             - --tide-url=http://tide/
             - --hook-url=http://hook:8888/plugin-help
+            - --github-token-path=/etc/github/oauth
+            - --gcs-credentials-file=/etc/config1/service-account.json
+            - --spyglass=true
           ports:
             - name: http
               containerPort: 8080
           volumeMounts:
             - name: config
               mountPath: /etc/config
+              readOnly: true
+            - name: oauth
+              mountPath: /etc/github
+              readOnly: true
+            - name: credential
+              mountPath: /etc/config1
+              readOnly: true
+            - name: plugins
+              mountPath: /etc/plugins
               readOnly: true
           livenessProbe:
             httpGet:
@@ -261,6 +220,15 @@ spec:
         - name: config
           configMap:
             name: config
+        - name: oauth
+          secret:
+            secretName: oauth-token
+        - name: credential
+          secret:
+            secretName: gcs-credentials
+        - name: plugins
+          configMap:
+            name: plugins
 
 ---
 apiVersion: v1
@@ -490,6 +458,7 @@ rules:
     verbs:
       - get
       - list
+      - watch
       # Required when deck runs with `--rerun-creates-job=true`
       # **Warning:** Only use this for non-public deck instances, this allows
       # anyone with access to your Deck instance to create new Prowjobs
@@ -562,6 +531,7 @@ rules:
       - create
       - list
       - update
+      - patch
 ---
 kind: Role
 apiVersion: rbac.authorization.k8s.io/v1beta1
@@ -624,6 +594,24 @@ rules:
     verbs:
       - delete
       - list
+      - watch
+      - get
+  - apiGroups:
+      - ""
+    resources:
+      - configmaps
+    resourceNames:
+      - prow-sinker-leaderlock
+    verbs:
+      - get
+      - update
+  - apiGroups:
+      - ""
+    resources:
+      - configmaps
+      - events
+    verbs:
+      - create
 ---
 kind: Role
 apiVersion: rbac.authorization.k8s.io/v1beta1
@@ -726,6 +714,8 @@ rules:
     verbs:
       - create
       - list
+      - get
+      - watch
 ---
 kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1beta1
