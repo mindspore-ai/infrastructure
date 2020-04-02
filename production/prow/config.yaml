@@ -36,6 +36,38 @@ data:
       max_pod_age: 48h
       terminated_pod_ttl: 30m
 
+    deck:
+      spyglass:
+        size_limit: 500000000 # 500MB
+        gcs_browser_prefix: https://storage.huaweicloud.com/obs/
+        testgrid_config: gs://k8s-testgrid/config
+        testgrid_root: http://testgrid.k8s.io/
+        lenses:
+        - lens:
+            name: metadata
+          required_files:
+          - started.json|finished.json
+          optional_files:
+          - podinfo.json
+        - lens:
+            name: buildlog
+          required_files:
+            - build-log.txt
+        - lens:
+            name: junit
+          required_files:
+            - artifacts/junit.*\.xml
+        - lens:
+            name: coverage
+          required_files:
+            - artifacts/filtered.cov
+          optional_files:
+            - artifacts/filtered.html
+        - lens:
+            name: podinfo
+          required_files:
+            - podinfo.json
+
     presets:
     - env:
       - name: MINDSPORE_DEPLOY_USER
@@ -121,34 +153,209 @@ data:
               git clone https://github.com/mindspore-ai/infrastructure.git /tmp/mindspore-infrastructure
               /tmp/mindspore-infrastructure/production/prowjobs/mindinsight/shellcheck.sh
 
-    deck:
-      spyglass:
-        size_limit: 500000000 # 500MB
-        gcs_browser_prefix: https://storage.huaweicloud.com/obs/
-        testgrid_config: gs://k8s-testgrid/config
-        testgrid_root: http://testgrid.k8s.io/
-        lenses:
-        - lens:
-            name: metadata
-          required_files:
-          - started.json|finished.json
-          optional_files:
-          - podinfo.json
-        - lens:
-            name: buildlog
-          required_files:
-            - build-log.txt
-        - lens:
-            name: junit
-          required_files:
-            - artifacts/junit.*\.xml
-        - lens:
-            name: coverage
-          required_files:
-            - artifacts/filtered.cov
-          optional_files:
-            - artifacts/filtered.html
-        - lens:
-            name: podinfo
-          required_files:
-            - podinfo.json
+      mindspore-ai/mindspore:
+      - name: cppcheck
+        decorate: true
+        always_run: true
+        # skip_report: true
+        skip_submodules: true
+        spec:
+          containers:
+          - image: swr.cn-north-1.myhuaweicloud.com/hwstaff_h00223369/ms_check_slave:0.0.4
+            securityContext:
+              runAsUser: 0
+            command:
+            - /bin/sh
+            - -c
+            - |
+              git clone https://github.com/mindspore-ai/infrastructure.git /tmp/mindspore-infrastructure
+              /tmp/mindspore-infrastructure/production/prowjobs/mindspore/cppcheck.sh
+
+      - name: cpplint
+        decorate: true
+        always_run: true
+        # skip_report: true
+        skip_submodules: true
+        spec:
+          containers:
+          - image: swr.cn-north-1.myhuaweicloud.com/hwstaff_h00223369/ms_check_slave:0.0.4
+            securityContext:
+              runAsUser: 0
+            command:
+            - /bin/sh
+            - -c
+            - |
+              git clone https://github.com/mindspore-ai/infrastructure.git /tmp/mindspore-infrastructure
+              /tmp/mindspore-infrastructure/production/prowjobs/mindspore/cpplint.sh
+
+      - name: pylint
+        decorate: true
+        always_run: true
+        # skip_report: true
+        skip_submodules: true
+        spec:
+          containers:
+          - image: swr.cn-north-1.myhuaweicloud.com/hwstaff_h00223369/ms_check_slave:0.0.4
+            securityContext:
+              runAsUser: 0
+            command:
+            - /bin/sh
+            - -c
+            - |
+              git clone https://github.com/mindspore-ai/infrastructure.git /tmp/mindspore-infrastructure
+              /tmp/mindspore-infrastructure/production/prowjobs/mindspore/pylint.sh
+
+      - name: shellcheck
+        decorate: true
+        always_run: true
+        # skip_report: true
+        skip_submodules: true
+        spec:
+          containers:
+          - image: swr.cn-north-1.myhuaweicloud.com/hwstaff_h00223369/ms_check_slave:0.0.4
+            securityContext:
+              runAsUser: 0
+            command:
+            - /bin/sh
+            - -c
+            - |
+              git clone https://github.com/mindspore-ai/infrastructure.git /tmp/mindspore-infrastructure
+              /tmp/mindspore-infrastructure/production/prowjobs/mindspore/shellcheck.sh
+
+      mindspore-ai/graphengine:
+      - name: cppcheck
+        decorate: true
+        always_run: true
+        # skip_report: true
+        skip_submodules: true
+        spec:
+          containers:
+          - image: swr.cn-north-1.myhuaweicloud.com/hwstaff_h00223369/ms_check_slave:0.0.4
+            securityContext:
+              runAsUser: 0
+            command:
+            - /bin/sh
+            - -c
+            - |
+              git clone https://github.com/mindspore-ai/infrastructure.git /tmp/mindspore-infrastructure
+              /tmp/mindspore-infrastructure/production/prowjobs/graphengine/cppcheck.sh
+
+      - name: cpplint
+        decorate: true
+        always_run: true
+        # skip_report: true
+        skip_submodules: true
+        spec:
+          containers:
+          - image: swr.cn-north-1.myhuaweicloud.com/hwstaff_h00223369/ms_check_slave:0.0.4
+            securityContext:
+              runAsUser: 0
+            command:
+            - /bin/sh
+            - -c
+            - |
+              git clone https://github.com/mindspore-ai/infrastructure.git /tmp/mindspore-infrastructure
+              /tmp/mindspore-infrastructure/production/prowjobs/graphengine/cpplint.sh
+
+      - name: pylint
+        decorate: true
+        always_run: true
+        # skip_report: true
+        skip_submodules: true
+        spec:
+          containers:
+          - image: swr.cn-north-1.myhuaweicloud.com/hwstaff_h00223369/ms_check_slave:0.0.4
+            securityContext:
+              runAsUser: 0
+            command:
+            - /bin/sh
+            - -c
+            - |
+              git clone https://github.com/mindspore-ai/infrastructure.git /tmp/mindspore-infrastructure
+              /tmp/mindspore-infrastructure/production/prowjobs/graphengine/pylint.sh
+
+      - name: shellcheck
+        decorate: true
+        always_run: true
+        # skip_report: true
+        skip_submodules: true
+        spec:
+          containers:
+          - image: swr.cn-north-1.myhuaweicloud.com/hwstaff_h00223369/ms_check_slave:0.0.4
+            securityContext:
+              runAsUser: 0
+            command:
+            - /bin/sh
+            - -c
+            - |
+              git clone https://github.com/mindspore-ai/infrastructure.git /tmp/mindspore-infrastructure
+              /tmp/mindspore-infrastructure/production/prowjobs/graphengine/shellcheck.sh
+
+      mindspore-ai/mindarmour:
+      - name: cppcheck
+        decorate: true
+        always_run: true
+        # skip_report: true
+        skip_submodules: true
+        spec:
+          containers:
+          - image: swr.cn-north-1.myhuaweicloud.com/hwstaff_h00223369/ms_check_slave:0.0.4
+            securityContext:
+              runAsUser: 0
+            command:
+            - /bin/sh
+            - -c
+            - |
+              git clone https://github.com/mindspore-ai/infrastructure.git /tmp/mindspore-infrastructure
+              /tmp/mindspore-infrastructure/production/prowjobs/mindarmour/cppcheck.sh
+
+      - name: cpplint
+        decorate: true
+        always_run: true
+        # skip_report: true
+        skip_submodules: true
+        spec:
+          containers:
+          - image: swr.cn-north-1.myhuaweicloud.com/hwstaff_h00223369/ms_check_slave:0.0.4
+            securityContext:
+              runAsUser: 0
+            command:
+            - /bin/sh
+            - -c
+            - |
+              git clone https://github.com/mindspore-ai/infrastructure.git /tmp/mindspore-infrastructure
+              /tmp/mindspore-infrastructure/production/prowjobs/mindarmour/cpplint.sh
+
+      - name: pylint
+        decorate: true
+        always_run: true
+        # skip_report: true
+        skip_submodules: true
+        spec:
+          containers:
+          - image: swr.cn-north-1.myhuaweicloud.com/hwstaff_h00223369/ms_check_slave:0.0.4
+            securityContext:
+              runAsUser: 0
+            command:
+            - /bin/sh
+            - -c
+            - |
+              git clone https://github.com/mindspore-ai/infrastructure.git /tmp/mindspore-infrastructure
+              /tmp/mindspore-infrastructure/production/prowjobs/mindarmour/pylint.sh
+
+      - name: shellcheck
+        decorate: true
+        always_run: true
+        # skip_report: true
+        skip_submodules: true
+        spec:
+          containers:
+          - image: swr.cn-north-1.myhuaweicloud.com/hwstaff_h00223369/ms_check_slave:0.0.4
+            securityContext:
+              runAsUser: 0
+            command:
+            - /bin/sh
+            - -c
+            - |
+              git clone https://github.com/mindspore-ai/infrastructure.git /tmp/mindspore-infrastructure
+              /tmp/mindspore-infrastructure/production/prowjobs/mindarmour/shellcheck.sh
