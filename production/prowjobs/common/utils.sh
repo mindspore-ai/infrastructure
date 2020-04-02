@@ -1,4 +1,8 @@
-#!/bin/sh
+#!/bin/bash
+
+WORKSPACE=/home/workspace
+
+MINDSPORE_DEPLOY_PATH=$WORKSPACE/mindspore_deploy
 
 clone_mindspore_deploy() {
   if [ -z "$MINDSPORE_DEPLOY_USER" ]; then
