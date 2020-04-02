@@ -5,4 +5,6 @@ my_dir=$(dirname $0)
 cd $my_dir
 my_dir=$(pwd)
 
-${my_dir}/../common/run_cmd.sh $(basename $0) "$GOPATH/src/github.com/mindspore-ai/mindinsight"
+source $my_dir/common.sh
+
+${my_dir}/../common/run_cmd.sh "${my_dir}/../jobs/$(basename $0)" "$CODE_PATH"
