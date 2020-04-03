@@ -27,28 +27,40 @@ data:
             dont compress = *
   default.conf: |
     server {
-            listen 80;
+        listen 80;
 
-            access_log  /var/log/nginx/host.access.log  main;
-            server_name repo.mindspore.cn;
+        if ($time_iso8601 ~ "^(\d{4})-(\d{2})-(\d{2})") {
+               set $year $1;
+               set $month $2;
+               set $day $3;
+        }
+        access_log /var/log/nginx/access.log.$year$month$day main;
 
-            location / {
-                root   /repo/mindspore;
-                fancyindex on;
-                fancyindex_exact_size off;
-                autoindex   on;
-            }
-            location = /favicon.ico {
-                      log_not_found off;
-                      access_log off;
-            }
+        server_name *.mindspore.cn;
+
+        location / {
+            root   /repo/mindspore;
+            fancyindex on;
+            fancyindex_exact_size off;
+            autoindex   on;
+        }
+        location = /favicon.ico {
+                  log_not_found off;
+                  access_log off;
+        }
     }
     server {
+
+        if ($time_iso8601 ~ "^(\d{4})-(\d{2})-(\d{2})") {
+                set $year $1;
+                set $month $2;
+                set $day $3;
+        }
+        access_log /var/log/nginx/access.log.$year$month$day main;
+
         listen 443 ssl;
 
-        access_log  /var/log/nginx/host.access.log  main;
-
-        server_name repo.mindspore.cn;
+        server_name *.mindspore.cn;
         ssl on;
         ssl_certificate /etc/nginx/conf/ssl/fullchain.pem;
         ssl_certificate_key  /etc/nginx/conf/ssl/privkey.pem;
@@ -83,14 +95,30 @@ data:
         include       /etc/nginx/conf/mime.types;
         default_type  application/octet-stream;
 
-        log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
-                          '$status $body_bytes_sent "$http_referer" '
-                          '"$http_user_agent" "$http_x_forwarded_for"';
+        # used for geoip2
+        geoip2 /etc/nginx/geoip/country/GeoLite2-Country.mmdb {
+            $geoip2_metadata_country_build metadata build_epoch;
+            $geoip2_data_country_code default=US source=$remote_addr country iso_code;
+            $geoip2_data_country_name country names en;
+        }
 
-        access_log  /var/log/nginx/access.log  main;
+        geoip2 /etc/nginx/geoip/city/GeoLite2-City.mmdb {
+            $geoip2_data_city_name default=ShenZhen city names en;
+            $geoip2_data_location_latitude location latitude;
+            $geoip2_data_location_longitude location longitude;
+        }
+
+        # the cidr used for elb cluster
+        set_real_ip_from 100.125.0.0/16;
+        real_ip_recursive on;
+        real_ip_header X-Forwarded-For;
+
+        log_format  main  '$remote_addr <$geoip2_data_country_code, $geoip2_data_country_name, $geoip2_data_city_name, $geoip2_data_location_latitude, $geoip2_data_location_longitude> '
+                          '[$time_local] "$request" $status $body_bytes_sent "$http_referer" '
+                          '"$http_user_agent" $request_filename';
 
         sendfile        on;
-        #tcp_nopush     on;
+        tcp_nopush      on;
 
         keepalive_timeout  65;
 
@@ -131,6 +159,9 @@ spec:
       labels:
         app: repo-nginx-pod
     spec:
+      nodeSelector:
+        # this used to select pod into the node which has toa enabled.
+        toa_enabled: "true"
       containers:
         - name: repo-nginx
           image: swr.cn-north-1.myhuaweicloud.com/mindspore/nginx-extras:1.10.3
@@ -150,6 +181,8 @@ spec:
               subPath: default.conf
             - mountPath: /repo
               name: mindspore-data-volume
+            - mountPath: /var/log/nginx
+              name: mindspore-log-volume
           command:
             - /bin/sh
             - -c
@@ -197,6 +230,9 @@ spec:
         - name: mindspore-data-volume
           persistentVolumeClaim:
             claimName: mindspore-data-volume
+        - name: mindspore-log-volume
+          persistentVolumeClaim:
+            claimName: cce-obs-import-mindspore-thirdparty-log
         - name: website-secrets-volume
           secret:
             secretName: website-secrets
@@ -212,7 +248,8 @@ metadata:
     kubernetes.io/elb.id: 8cab8278-eda8-4255-bcc8-cb6aec3d4607
     kubernetes.io/elb.lb-algorithm: ROUND_ROBIN
 spec:
-  externalTrafficPolicy: Cluster
+  #We need set this into 'Local' since we need get the client IP of elb.
+  externalTrafficPolicy: Local
   ports:
     - port: 443
       name: nginx-repo-https

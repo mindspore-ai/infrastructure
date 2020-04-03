@@ -26,11 +26,11 @@ spec:
         botnode: "true"
       containers:
       - name: botinfod
-        image: mindspore/ci-bot:0.1.0
+        image: swr.cn-south-1.myhuaweicloud.com/openeuler/bot:v1.0.202004012144305627
         imagePullPolicy: IfNotPresent
         env:
         - name: WEBSITE_URL
-          value: 'https://139.9.112.83/'
+          value: 'https://www.mindspore.cn/'
         - name: CLA_REDIRECT_URL
           value: /icla
         - name: GITEE_OAUTH2_SECRET
