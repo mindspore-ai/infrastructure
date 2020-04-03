@@ -92,7 +92,7 @@ data:
         skip_submodules: true
         spec:
           containers:
-          - image: swr.cn-north-1.myhuaweicloud.com/hwstaff_h00223369/ms_check_slave:0.0.4
+          - image: swr.cn-north-1.myhuaweicloud.com/mindspore/ms_check_slave:0.0.4
             securityContext:
               runAsUser: 0
             command:
@@ -109,7 +109,7 @@ data:
         skip_submodules: true
         spec:
           containers:
-          - image: swr.cn-north-1.myhuaweicloud.com/hwstaff_h00223369/ms_check_slave:0.0.4
+          - image: swr.cn-north-1.myhuaweicloud.com/mindspore/ms_check_slave:0.0.4
             securityContext:
               runAsUser: 0
             command:
@@ -126,7 +126,7 @@ data:
         skip_submodules: true
         spec:
           containers:
-          - image: swr.cn-north-1.myhuaweicloud.com/hwstaff_h00223369/ms_check_slave:0.0.4
+          - image: swr.cn-north-1.myhuaweicloud.com/mindspore/ms_check_slave:0.0.4
             securityContext:
               runAsUser: 0
             command:
@@ -143,7 +143,7 @@ data:
         skip_submodules: true
         spec:
           containers:
-          - image: swr.cn-north-1.myhuaweicloud.com/hwstaff_h00223369/ms_check_slave:0.0.4
+          - image: swr.cn-north-1.myhuaweicloud.com/mindspore/ms_check_slave:0.0.4
             securityContext:
               runAsUser: 0
             command:
@@ -161,7 +161,7 @@ data:
         skip_submodules: true
         spec:
           containers:
-          - image: swr.cn-north-1.myhuaweicloud.com/hwstaff_h00223369/ms_check_slave:0.0.4
+          - image: swr.cn-north-1.myhuaweicloud.com/mindspore/ms_check_slave:0.0.4
             securityContext:
               runAsUser: 0
             command:
@@ -178,7 +178,7 @@ data:
         skip_submodules: true
         spec:
           containers:
-          - image: swr.cn-north-1.myhuaweicloud.com/hwstaff_h00223369/ms_check_slave:0.0.4
+          - image: swr.cn-north-1.myhuaweicloud.com/mindspore/ms_check_slave:0.0.4
             securityContext:
               runAsUser: 0
             command:
@@ -195,7 +195,7 @@ data:
         skip_submodules: true
         spec:
           containers:
-          - image: swr.cn-north-1.myhuaweicloud.com/hwstaff_h00223369/ms_check_slave:0.0.4
+          - image: swr.cn-north-1.myhuaweicloud.com/mindspore/ms_check_slave:0.0.4
             securityContext:
               runAsUser: 0
             command:
@@ -212,7 +212,7 @@ data:
         skip_submodules: true
         spec:
           containers:
-          - image: swr.cn-north-1.myhuaweicloud.com/hwstaff_h00223369/ms_check_slave:0.0.4
+          - image: swr.cn-north-1.myhuaweicloud.com/mindspore/ms_check_slave:0.0.4
             securityContext:
               runAsUser: 0
             command:
@@ -230,7 +230,7 @@ data:
         skip_submodules: true
         spec:
           containers:
-          - image: swr.cn-north-1.myhuaweicloud.com/hwstaff_h00223369/ms_check_slave:0.0.4
+          - image: swr.cn-north-1.myhuaweicloud.com/mindspore/ms_check_slave:0.0.4
             securityContext:
               runAsUser: 0
             command:
@@ -247,7 +247,7 @@ data:
         skip_submodules: true
         spec:
           containers:
-          - image: swr.cn-north-1.myhuaweicloud.com/hwstaff_h00223369/ms_check_slave:0.0.4
+          - image: swr.cn-north-1.myhuaweicloud.com/mindspore/ms_check_slave:0.0.4
             securityContext:
               runAsUser: 0
             command:
@@ -264,7 +264,7 @@ data:
         skip_submodules: true
         spec:
           containers:
-          - image: swr.cn-north-1.myhuaweicloud.com/hwstaff_h00223369/ms_check_slave:0.0.4
+          - image: swr.cn-north-1.myhuaweicloud.com/mindspore/ms_check_slave:0.0.4
             securityContext:
               runAsUser: 0
             command:
@@ -281,7 +281,7 @@ data:
         skip_submodules: true
         spec:
           containers:
-          - image: swr.cn-north-1.myhuaweicloud.com/hwstaff_h00223369/ms_check_slave:0.0.4
+          - image: swr.cn-north-1.myhuaweicloud.com/mindspore/ms_check_slave:0.0.4
             securityContext:
               runAsUser: 0
             command:
@@ -299,7 +299,7 @@ data:
         skip_submodules: true
         spec:
           containers:
-          - image: swr.cn-north-1.myhuaweicloud.com/hwstaff_h00223369/ms_check_slave:0.0.4
+          - image: swr.cn-north-1.myhuaweicloud.com/mindspore/ms_check_slave:0.0.4
             securityContext:
               runAsUser: 0
             command:
@@ -316,7 +316,7 @@ data:
         skip_submodules: true
         spec:
           containers:
-          - image: swr.cn-north-1.myhuaweicloud.com/hwstaff_h00223369/ms_check_slave:0.0.4
+          - image: swr.cn-north-1.myhuaweicloud.com/mindspore/ms_check_slave:0.0.4
             securityContext:
               runAsUser: 0
             command:
@@ -333,7 +333,7 @@ data:
         skip_submodules: true
         spec:
           containers:
-          - image: swr.cn-north-1.myhuaweicloud.com/hwstaff_h00223369/ms_check_slave:0.0.4
+          - image: swr.cn-north-1.myhuaweicloud.com/mindspore/ms_check_slave:0.0.4
             securityContext:
               runAsUser: 0
             command:
@@ -350,7 +350,7 @@ data:
         skip_submodules: true
         spec:
           containers:
-          - image: swr.cn-north-1.myhuaweicloud.com/hwstaff_h00223369/ms_check_slave:0.0.4
+          - image: swr.cn-north-1.myhuaweicloud.com/mindspore/ms_check_slave:0.0.4
             securityContext:
               runAsUser: 0
             command:
