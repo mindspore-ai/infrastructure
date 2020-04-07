@@ -189,6 +189,9 @@ spec:
             - |
               mkdir -p /repo/mindspore
               exec nginx -g "daemon off;"
+          env:
+            - name: TZ
+              value: Asia/Shanghai
           resources:
             requests:
               cpu: 6000m
