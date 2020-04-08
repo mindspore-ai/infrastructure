@@ -24,7 +24,7 @@ metadata:
     app: x86-generic-slaves
 spec:
   serviceName: x86-generic-slaves-service
-  replicas: 8
+  replicas: 6
   selector:
     matchLabels:
       app: x86-generic-slaves
