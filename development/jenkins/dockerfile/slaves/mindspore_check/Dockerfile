@@ -41,7 +41,7 @@ RUN apt install -y libffi-dev libssl-dev zlib1g-dev libbz2-dev libncurses5-dev l
     && cd /tmp \
     && rm -f /tmp/Python-3.7.5.tar.xz \
 #   && wget https://www.python.org/ftp/python/3.7.5/Python-3.7.5.tar.xz 
-    && wget http://59.36.11.51/tools/build/python/Python-3.7.5.tar.xz \
+    && wget http://dev-thirdparty.mindspore.cn:8081/tools/build/python/Python-3.7.5.tar.xz \
     && tar -xf Python-3.7.5.tar.xz \
     && cd /tmp/Python-3.7.5 \
     && ./configure --prefix=${PYTHON_ROOT_PATH} --enable-shared \
@@ -113,7 +113,7 @@ RUN cd /tmp \
 RUN cd /tmp \
     && rm -f clang+llvm-9.0.1-x86_64-linux-gnu-ubuntu-16.04.tar.xz \
 #   && wget https://github.com/llvm/llvm-project/releases/download/llvmorg-9.0.1/clang+llvm-9.0.1-x86_64-linux-gnu-ubuntu-16.04.tar.xz
-    && wget http://59.36.11.51/tools/static_check/clang-format/clang-format-9.0.1/clang+llvm-9.0.1-x86_64-linux-gnu-ubuntu-16.04.tar.xz \
+    && wget http://dev-thirdparty.mindspore.cn:8081/tools/static_check/clang-format/clang-format-9.0.1/clang+llvm-9.0.1-x86_64-linux-gnu-ubuntu-16.04.tar.xz \
     && rm -rf clang+llvm-9.0.1-x86_64-linux-gnu-ubuntu-16.04 \
     && tar xf clang+llvm-9.0.1-x86_64-linux-gnu-ubuntu-16.04.tar.xz \
     && rm -rf /usr/local/clang-format \
@@ -131,7 +131,7 @@ RUN cd /tmp \
 # Problem: error: RPC failed; curl 56 GnuTLS recv error (-110): The TLS connection was non-properly terminated
 RUN cd /tmp \
     && rm -f git-huawei_2.18.0.25_amd64.deb \
-    && wget http://59.36.11.51/tools/build/git/git-huawei/git-huawei_2.18.0.25_amd64.deb \
+    && wget http://dev-thirdparty.mindspore.cn:8081/tools/build/git/git-huawei/git-huawei_2.18.0.25_amd64.deb \
     && dpkg -i git-huawei_2.18.0.25_amd64.deb \
     && rm -f git-huawei_2.18.0.25_amd64.deb
 
