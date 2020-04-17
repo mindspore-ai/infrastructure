@@ -50,7 +50,7 @@ RUN DEBIAN_FRONTEND=noninteractive dpkg-reconfigure dash
 # Install gcc-7.3.0(root)
 RUN cd /tmp \
     && rm -f gcc-7.3.0-ubuntu16.04-Linux-x86_64.run \
-    && wget http://59.36.11.51/tools/build/gcc/gcc-7.3.0/bin/gcc-7.3.0-ubuntu16.04-Linux-x86_64/gcc-7.3.0-ubuntu16.04-Linux-x86_64.run \
+    && wget http://dev-thirdparty.mindspore.cn:8081/tools/build/gcc/gcc-7.3.0/bin/gcc-7.3.0-ubuntu16.04-Linux-x86_64/gcc-7.3.0-ubuntu16.04-Linux-x86_64.run \
     && mkdir -pv /usr/local/gcc \
     && bash gcc-7.3.0-ubuntu16.04-Linux-x86_64.run /usr/local/gcc \
     && rm -f /tmp/gcc-7.3.0-ubuntu16.04-Linux-x86_64.run
@@ -64,7 +64,7 @@ RUN apt install -y libffi-dev libssl-dev zlib1g-dev libbz2-dev libncurses5-dev l
     && cd /tmp \
     && rm -f /tmp/Python-3.7.5.tar.xz \
 #   && wget https://www.python.org/ftp/python/3.7.5/Python-3.7.5.tar.xz 
-    && wget http://59.36.11.51/tools/build/python/Python-3.7.5.tar.xz \
+    && wget http://dev-thirdparty.mindspore.cn:8081/tools/build/python/Python-3.7.5.tar.xz \
     && tar -xf Python-3.7.5.tar.xz \
     && cd /tmp/Python-3.7.5 \
     && ./configure --prefix=${PYTHON_ROOT_PATH} --enable-shared \
@@ -100,7 +100,7 @@ RUN chmod 644 /tmp/requirements.txt \
 RUN cd /tmp \
     && rm -f /tmp/cmake-3.14.1.tar.gz \
 #   && wget https://github.com/Kitware/CMake/releases/download/v3.14.1/cmake-3.14.1.tar.gz 
-    && wget http://59.36.11.51/tools/build/cmake/cmake-3.14.1.tar.gz \
+    && wget http://dev-thirdparty.mindspore.cn:8081/tools/build/cmake/cmake-3.14.1.tar.gz \
     && tar -zxf cmake-3.14.1.tar.gz \
     && cd cmake-3.14.1 \
     && ./bootstrap --prefix=/usr --parallel=8 \
@@ -112,7 +112,7 @@ RUN cd /tmp \
 # Install nodejs(root)
 RUN cd /tmp \
     && rm -f node-v10.19.0-linux-x64.tar.gz \
-    && wget https://mirrors.huaweicloud.com/nodejs/latest-v10.x/node-v10.19.0-linux-x64.tar.gz \
+    && wget https://mirrors.huaweicloud.com/nodejs/v10.19.0/node-v10.19.0-linux-x64.tar.gz \
     && rm -rf node-v10.19.0-linux-x64 \
     && tar -zxf node-v10.19.0-linux-x64.tar.gz \
     && rm -rf /usr/local/nodejs \
@@ -132,7 +132,7 @@ RUN cd /tmp \
 RUN cd /tmp \
     && rm -f /tmp/ccache-3.7.7.tar.gz \
 #   && wget https://github.com/ccache/ccache/releases/download/v3.7.7/ccache-3.7.7.tar.gz 
-    && wget http://59.36.11.51/tools/build/ccache/ccache-3.7.7.tar.gz \
+    && wget http://dev-thirdparty.mindspore.cn:8081/tools/build/ccache/ccache-3.7.7.tar.gz \
     && tar -zxf ccache-3.7.7.tar.gz \
     && cd ccache-3.7.7 \
     && ./configure --prefix=/usr/local/ccache \
@@ -156,7 +156,7 @@ RUN cd /tmp \
 # Problem: error: RPC failed; curl 56 GnuTLS recv error (-110): The TLS connection was non-properly terminated
 RUN cd /tmp \
     && rm -f git-huawei_2.18.0.25_amd64.deb \
-    && wget http://59.36.11.51/tools/build/git/git-huawei/git-huawei_2.18.0.25_amd64.deb \
+    && wget http://dev-thirdparty.mindspore.cn:8081/tools/build/git/git-huawei/git-huawei_2.18.0.25_amd64.deb \
     && dpkg -i git-huawei_2.18.0.25_amd64.deb \
     && rm -f git-huawei_2.18.0.25_amd64.deb
 
@@ -179,14 +179,14 @@ RUN echo "jenkins ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 
 # Install gcc-7.3.0(jenkins)
 RUN export MINDSPORE_CMD="su jenkins -s /bin/bash -c " \
-    && ${MINDSPORE_CMD} "cd /tmp; rm -f gcc-7.3.0-ubuntu16.04-Linux-x86_64.run; wget http://59.36.11.51/tools/build/gcc/gcc-7.3.0/bin/gcc-7.3.0-ubuntu16.04-Linux-x86_64/gcc-7.3.0-ubuntu16.04-Linux-x86_64.run" \
+    && ${MINDSPORE_CMD} "cd /tmp; rm -f gcc-7.3.0-ubuntu16.04-Linux-x86_64.run; wget http://dev-thirdparty.mindspore.cn:8081/tools/build/gcc/gcc-7.3.0/bin/gcc-7.3.0-ubuntu16.04-Linux-x86_64/gcc-7.3.0-ubuntu16.04-Linux-x86_64.run" \
     && ${MINDSPORE_CMD} "cd /tmp; mkdir -pv /home/jenkins/tools/gcc; bash gcc-7.3.0-ubuntu16.04-Linux-x86_64.run /home/jenkins/tools/gcc" \
     && ${MINDSPORE_CMD} "rm -f /tmp/gcc-7.3.0-ubuntu16.04-Linux-x86_64.run"
 
 # Install python(jenkins)
 RUN export MINDSPORE_CMD="su jenkins -s /bin/bash -c " \
 #   && ${MINDSPORE_CMD} "cd /tmp; rm -f /tmp/Python-3.7.5.tar.xz; wget https://www.python.org/ftp/python/3.7.5/Python-3.7.5.tar.xz; tar -xf Python-3.7.5.tar.xz" 
-    && ${MINDSPORE_CMD} "cd /tmp; rm -f /tmp/Python-3.7.5.tar.xz; wget http://59.36.11.51/tools/build/python/Python-3.7.5.tar.xz; tar -xf Python-3.7.5.tar.xz" \
+    && ${MINDSPORE_CMD} "cd /tmp; rm -f /tmp/Python-3.7.5.tar.xz; wget http://dev-thirdparty.mindspore.cn:8081/tools/build/python/Python-3.7.5.tar.xz; tar -xf Python-3.7.5.tar.xz" \
     && ${MINDSPORE_CMD} "export PATH=/home/jenkins/tools/gcc/gcc730/bin:$PATH; export LD_LIBRARY_PATH=/home/jenkins/tools/gcc/gcc730/lib64:$LD_LIBRARY_PATH; cd /tmp/Python-3.7.5; ./configure --prefix=/home/jenkins/tools/python375 --enable-shared && make -j8 && make install -j8" \
     && ${MINDSPORE_CMD} "export PATH=/home/jenkins/tools/gcc/gcc730/bin:$PATH; export LD_LIBRARY_PATH=/home/jenkins/tools/gcc/gcc730/lib64:$LD_LIBRARY_PATH; cd /tmp/Python-3.7.5; ./configure --prefix=/home/jenkins/tools/python375 && make -j8 && make install -j8" \
     && ${MINDSPORE_CMD} "cd /home/jenkins/tools/python375/bin; rm -f python; rm -f pip; ln -s python3.7 python; ln -s pip3.7 pip" \
@@ -207,7 +207,7 @@ RUN export MINDSPORE_CMD="su jenkins -s /bin/bash -c " \
 # Install cmake(jenkins)
 RUN export MINDSPORE_CMD="su jenkins -s /bin/bash -c " \
 #   && ${MINDSPORE_CMD} "cd /tmp; rm -f /tmp/cmake-3.14.1.tar.gz; wget https://github.com/Kitware/CMake/releases/download/v3.14.1/cmake-3.14.1.tar.gz; tar -zxf cmake-3.14.1.tar.gz" 
-    && ${MINDSPORE_CMD} "cd /tmp; rm -f /tmp/cmake-3.14.1.tar.gz; wget http://59.36.11.51/tools/build/cmake/cmake-3.14.1.tar.gz; tar -zxf cmake-3.14.1.tar.gz" \
+    && ${MINDSPORE_CMD} "cd /tmp; rm -f /tmp/cmake-3.14.1.tar.gz; wget http://dev-thirdparty.mindspore.cn:8081/tools/build/cmake/cmake-3.14.1.tar.gz; tar -zxf cmake-3.14.1.tar.gz" \
     && ${MINDSPORE_CMD} "export PATH=/home/jenkins/tools/gcc/gcc730/bin:$PATH; export LD_LIBRARY_PATH=/home/jenkins/tools/gcc/gcc730/lib64:$LD_LIBRARY_PATH; cd /tmp/cmake-3.14.1; ./bootstrap --prefix=/home/jenkins/tools/cmake --parallel=8; make -j8; make install -j8" \
     && ${MINDSPORE_CMD} "echo 'export PATH=/home/jenkins/tools/cmake/bin:\$PATH' >> ~/.bashrc" \
     && ${MINDSPORE_CMD} "rm -rf /tmp/cmake-3.14.1; rm -f /tmp/cmake-3.14.1.tar.gz"

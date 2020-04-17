@@ -13,10 +13,10 @@ RUN repo_path=/etc/yum.repos.d/euleros_aarch64.repo \
     && rm -f /etc/yum.repos.d/euleros*.repo \
     && echo "[base]" > ${repo_path} \
     && echo "name=EulerOS-2.0SP8 base" >> ${repo_path} \
-    && echo "baseurl=http://59.36.11.51/productrepo/repo/EulerOS_Server_V200R008C00SPC201B530/" >> ${repo_path} \
+    && echo "baseurl=http://dev-thirdparty.mindspore.cn:8081/productrepo/repo/EulerOS_Server_V200R008C00SPC201B530/" >> ${repo_path} \
     && echo "enabled=1" >> ${repo_path} \
     && echo "gpgcheck=1" >> ${repo_path} \
-    && echo "gpgkey=http://59.36.11.51/productrepo/repo/EulerOS_Server_V200R008C00SPC201B530/RPM-GPG-KEY-EulerOS" >> ${repo_path} \
+    && echo "gpgkey=http://dev-thirdparty.mindspore.cn:8081/productrepo/repo/EulerOS_Server_V200R008C00SPC201B530/RPM-GPG-KEY-EulerOS" >> ${repo_path} \
     && yum clean all \
     && yum makecache
 
@@ -59,7 +59,7 @@ RUN yum install -y libffi-devel zlib-devel bzip2-devel openssl-devel ncurses-dev
     && cd /tmp \
     && rm -f /tmp/Python-3.7.5.tar.xz \
 #   && wget https://www.python.org/ftp/python/3.7.5/Python-3.7.5.tar.xz 
-    && wget http://59.36.11.51/tools/build/python/Python-3.7.5.tar.xz \
+    && wget http://dev-thirdparty.mindspore.cn:8081/tools/build/python/Python-3.7.5.tar.xz \
     && tar -xf Python-3.7.5.tar.xz \
     && cd /tmp/Python-3.7.5 \
     && ./configure --prefix=${PYTHON_ROOT_PATH} --enable-shared \
@@ -87,10 +87,10 @@ RUN mkdir -pv /root/.pip \
 # Fix build timeout when pip install(root)
 RUN cd /tmp \
     && rm -f /tmp/*.whl \
-    && wget http://59.36.11.51/tools/pip/aarch64/euleros_2_8/numpy-1.18.1-cp37-cp37m-linux_aarch64.whl \
-    && wget http://59.36.11.51/tools/pip/aarch64/euleros_2_8/scipy-1.3.3-cp37-cp37m-linux_aarch64.whl \
-    && wget http://59.36.11.51/tools/pip/aarch64/euleros_2_8/Pillow-7.0.0-cp37-cp37m-linux_aarch64.whl \
-    && wget http://59.36.11.51/tools/pip/aarch64/euleros_2_8/matplotlib-3.2.1-cp37-cp37m-linux_aarch64.whl\
+    && wget http://dev-thirdparty.mindspore.cn:8081/tools/pip/aarch64/euleros_2_8/numpy-1.18.1-cp37-cp37m-linux_aarch64.whl \
+    && wget http://dev-thirdparty.mindspore.cn:8081/tools/pip/aarch64/euleros_2_8/scipy-1.3.3-cp37-cp37m-linux_aarch64.whl \
+    && wget http://dev-thirdparty.mindspore.cn:8081/tools/pip/aarch64/euleros_2_8/Pillow-7.0.0-cp37-cp37m-linux_aarch64.whl \
+    && wget http://dev-thirdparty.mindspore.cn:8081/tools/pip/aarch64/euleros_2_8/matplotlib-3.2.1-cp37-cp37m-linux_aarch64.whl\
     && chmod 755 -R /tmp/*.whl \
     && export PATH=${PYTHON_ROOT_PATH}/bin:$PATH \
     && pip3 install numpy-1.18.1-cp37-cp37m-linux_aarch64.whl \
@@ -110,7 +110,7 @@ RUN chmod 644 /tmp/requirements.txt \
 RUN cd /tmp \
     && rm -f /tmp/cmake-3.14.1.tar.gz \
 #   && wget https://github.com/Kitware/CMake/releases/download/v3.14.1/cmake-3.14.1.tar.gz 
-    && wget http://59.36.11.51/tools/build/cmake/cmake-3.14.1.tar.gz \
+    && wget http://dev-thirdparty.mindspore.cn:8081/tools/build/cmake/cmake-3.14.1.tar.gz \
     && tar -zxf cmake-3.14.1.tar.gz \
     && cd cmake-3.14.1 \
     && ./bootstrap --prefix=/usr --parallel=8 \
@@ -122,7 +122,7 @@ RUN cd /tmp \
 # Install nodejs(root)
 RUN cd /tmp \
     && rm -f node-v10.19.0-linux-arm64.tar.gz \
-    && wget https://mirrors.huaweicloud.com/nodejs/latest-v10.x/node-v10.19.0-linux-arm64.tar.gz \
+    && wget https://mirrors.huaweicloud.com/nodejs/v10.19.0/node-v10.19.0-linux-arm64.tar.gz \
     && rm -rf node-v10.19.0-linux-arm64 \
     && tar -zxf node-v10.19.0-linux-arm64.tar.gz \
     && rm -rf /usr/local/nodejs \
@@ -142,7 +142,7 @@ RUN cd /tmp \
 RUN cd /tmp \
     && rm -f /tmp/ccache-3.7.7.tar.gz \
 #   && wget https://github.com/ccache/ccache/releases/download/v3.7.7/ccache-3.7.7.tar.gz 
-    && wget http://59.36.11.51/tools/build/ccache/ccache-3.7.7.tar.gz \
+    && wget http://dev-thirdparty.mindspore.cn:8081/tools/build/ccache/ccache-3.7.7.tar.gz \
     && tar -zxf ccache-3.7.7.tar.gz \
     && cd ccache-3.7.7 \
     && ./configure --prefix=/usr/local/ccache \
@@ -178,7 +178,7 @@ RUN echo "jenkins ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 # Install python(jenkins)
 RUN export MINDSPORE_CMD="su jenkins -s /bin/bash -c " \
 #   && ${MINDSPORE_CMD} "cd /tmp; rm -f /tmp/Python-3.7.5.tar.xz; wget https://www.python.org/ftp/python/3.7.5/Python-3.7.5.tar.xz; tar -xf Python-3.7.5.tar.xz" 
-    && ${MINDSPORE_CMD} "cd /tmp; rm -f /tmp/Python-3.7.5.tar.xz; wget http://59.36.11.51/tools/build/python/Python-3.7.5.tar.xz; tar -xf Python-3.7.5.tar.xz" \
+    && ${MINDSPORE_CMD} "cd /tmp; rm -f /tmp/Python-3.7.5.tar.xz; wget http://dev-thirdparty.mindspore.cn:8081/tools/build/python/Python-3.7.5.tar.xz; tar -xf Python-3.7.5.tar.xz" \
     && ${MINDSPORE_CMD} "cd /tmp/Python-3.7.5; ./configure --prefix=/home/jenkins/tools/python375 --enable-shared && make -j8 && make install -j8" \
     && ${MINDSPORE_CMD} "cd /tmp/Python-3.7.5; ./configure --prefix=/home/jenkins/tools/python375 && make -j8 && make install -j8" \
     && ${MINDSPORE_CMD} "cd /home/jenkins/tools/python375/bin; rm -f python; rm -f pip; ln -s python3.7 python; ln -s pip3.7 pip" \
@@ -203,7 +203,7 @@ RUN export MINDSPORE_CMD="su jenkins -s /bin/bash -c " \
 # Install cmake(jenkins)
 RUN export MINDSPORE_CMD="su jenkins -s /bin/bash -c " \
 #   && ${MINDSPORE_CMD} "cd /tmp; rm -f /tmp/cmake-3.14.1.tar.gz; wget https://github.com/Kitware/CMake/releases/download/v3.14.1/cmake-3.14.1.tar.gz; tar -zxf cmake-3.14.1.tar.gz" 
-    && ${MINDSPORE_CMD} "cd /tmp; rm -f /tmp/cmake-3.14.1.tar.gz; wget http://59.36.11.51/tools/build/cmake/cmake-3.14.1.tar.gz; tar -zxf cmake-3.14.1.tar.gz" \
+    && ${MINDSPORE_CMD} "cd /tmp; rm -f /tmp/cmake-3.14.1.tar.gz; wget http://dev-thirdparty.mindspore.cn:8081/tools/build/cmake/cmake-3.14.1.tar.gz; tar -zxf cmake-3.14.1.tar.gz" \
     && ${MINDSPORE_CMD} "cd /tmp/cmake-3.14.1; ./bootstrap --prefix=/home/jenkins/tools/cmake --parallel=8; make -j8; make install -j8" \
     && ${MINDSPORE_CMD} "echo 'export PATH=/home/jenkins/tools/cmake/bin:\$PATH' >> ~/.bashrc" \
     && ${MINDSPORE_CMD} "rm -rf /tmp/cmake-3.14.1; rm -f /tmp/cmake-3.14.1.tar.gz"
