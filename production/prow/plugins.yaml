@@ -10,20 +10,32 @@ data:
           - mindspore-ai
         message_template: "Welcome @{{.AuthorLogin}}! <br><br>It looks like this is your first PR to <a href='https://github.com/{{.Org}}/{{.Repo}}'>{{.Org}}/{{.Repo}}</a> 🎉. <br><br>You will be prompted by a bot to use commands during the review process. Do not be afraid to follow the prompts! It is okay to experiment. [Here is the bot commands documentation](https://go.k8s.io/bot-commands). <br><br>You can also check if {{.Org}}/{{.Repo}} has [its own contribution guidelines](https://github.com/{{.Org}}/{{.Repo}}/tree/master/CONTRIBUTING.md). We want to make sure your contribution gets all the attention it needs! <br><br>Thank you, and welcome to MindSpore. :smiley:"
 
+    syncpr:
+      - repos:
+          - mindspore-ai/mindinsight
+          - mindspore-ai/mindspore
+          - mindspore-ai/graphengine
+          - mindspore-ai/mindarmour
+        org: mindspore
+
     plugins:
       mindspore-ai/mindinsight:
         - trigger
         - size
         - welcome
+        - syncpr
       mindspore-ai/mindspore:
         - trigger
         - size
         - welcome
+        - syncpr
       mindspore-ai/graphengine:
         - trigger
         - size
         - welcome
+        - syncpr
       mindspore-ai/mindarmour:
         - trigger
         - size
         - welcome
+        - syncpr

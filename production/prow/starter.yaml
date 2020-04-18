@@ -25,7 +25,7 @@ spec:
       terminationGracePeriodSeconds: 180
       containers:
         - name: hook
-          image: mindspore/hook:v20200228-31c76444e
+          image: mindspore/hook:v20200228-31c76444f
           imagePullPolicy: Always
           args:
             - --dry-run=false
@@ -45,6 +45,9 @@ spec:
               readOnly: true
             - name: plugins
               mountPath: /etc/plugins
+              readOnly: true
+            - name: gitee
+              mountPath: /etc/gitee
               readOnly: true
           livenessProbe:
             httpGet:
@@ -72,6 +75,9 @@ spec:
         - name: plugins
           configMap:
             name: plugins
+        - name: gitee
+          secret:
+            secretName: gitee-token
 ---
 apiVersion: v1
 kind: Service
