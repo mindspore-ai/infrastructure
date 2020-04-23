@@ -1,41 +1,41 @@
-# Resource for arm medium specification slave pods
+# Resource for euleros specification slave pods
 apiVersion: v1
 kind: Service
 metadata:
-  name: arm-medium-slaves-service
+  name: x86-euleros-slaves-service
   namespace: jenkins
   labels:
-    app: arm-medium-slaves
+    app: x86-euleros-slaves
 spec:
   ports:
     - port: 80
       name: port-placeholder
   clusterIP: None
   selector:
-    app: arm-medium-slaves
+    app: x86-euleros-slaves
 
 ---
 kind: StatefulSet
 apiVersion: apps/v1beta1
 metadata:
-  name: arm-medium-slaves
+  name: x86-euleros-slaves
   namespace: jenkins
   labels:
-    app: arm-medium-slaves
+    app: x86-euleros-slaves
 spec:
-  serviceName: arm-medium-slaves-service
-  replicas: 12
+  serviceName: x86-euleros-slaves-service
+  replicas: 4
   selector:
     matchLabels:
-      app: arm-medium-slaves
+      app: x86-euleros-slaves
   template:
     metadata:
       labels:
-        app: arm-medium-slaves
+        app: x86-euleros-slaves
     spec:
       initContainers:
         - name: slave-init
-          image: swr.cn-north-1.myhuaweicloud.com/mindspore/jenkins-slave-tools-arm:0.0.1
+          image: swr.cn-north-1.myhuaweicloud.com/mindspore/jenkins-slave-tools:0.0.1
           volumeMounts:
             - mountPath: /home/jenkins/share-config
               name: jenkins-share-config
@@ -60,15 +60,15 @@ spec:
             - name: EXECUTOR_NUMBERS
               value: "1"
             - name: NODE_LABELS
-              value: arm arm-build-euler
+              value: x86 x86-build-euleros
           args: ["$(JENKINS_URL)", "$(JENKINS_USER_NAME)", "$(JENKINS_USER_PASSWORD)", "$(JENKINS_NODE_NAME)", "$(EXECUTOR_NUMBERS)", "$(JENKINS_AGENT_WORKDIR)", "$(NODE_LABELS)", "$(JENKINS_SHARE_FOLDER)"]
       containers:
         - name: jenkins-slave
-          image: swr.cn-north-1.myhuaweicloud.com/mindspore/euleros_davinci:0.0.6
-          imagePullPolicy: "Always"
+          image: swr.cn-north-1.myhuaweicloud.com/mindspore/ascend_euleros_x86:0.0.5
+          imagePullPolicy: "IfNotPresent"
           volumeMounts:
             - mountPath: /home/jenkins/agent-working-dir
-              name: medium-workspace-pvc
+              name: euleros-workspace-pvc
             - mountPath: /home/jenkins/share-config
               name: jenkins-share-config
             - mountPath: /home/jenkins/share-data
@@ -81,8 +81,11 @@ spec:
               exec jenkins-agent
           resources:
             requests:
-              cpu: 20000m
+              cpu: 10000m
               memory: 40000Mi
+            limits:
+              cpu: 12000m
+              memory: 44000Mi
           env:
             - name: JENKINS_TUNNEL
               value: build.mindspore.cn:50000
@@ -103,16 +106,16 @@ spec:
           emptyDir: {}
         - name: jenkins-share-data
           persistentVolumeClaim:
-            # NOTE: this persistenvolumeclaim is imported on CCE web console, not created by command.
+            # NOTE: this persistvolumeclaim is imported on CCE web console, not created by command.
             claimName: cce-efs-import-new-sfs-pvc
   updateStrategy:
     type: RollingUpdate
   volumeClaimTemplates:
     - metadata:
-        name: medium-workspace-pvc
+        name: euleros-workspace-pvc
       spec:
         accessModes: [ "ReadWriteOnce" ]
         resources:
           requests:
             storage: 200Gi
-        storageClassName: "ssd"
+        storageClassName: "sas"
