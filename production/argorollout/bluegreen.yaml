@@ -17,12 +17,13 @@ spec:
     spec:
       containers:
         - name: rollouts-demo
-          image: argoproj/rollouts-demo:green
+          image: argoproj/rollouts-demo:blue
           imagePullPolicy: Always
           ports:
             - containerPort: 8080
   strategy:
     blueGreen:
+      previewReplicaCount: 1
       # activeService specifies the service to update with the new template hash at time of promotion.
       # This field is mandatory for the blueGreen update strategy.
       activeService: rollout-bluegreen-active
