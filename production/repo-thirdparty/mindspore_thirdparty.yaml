@@ -263,6 +263,9 @@ spec:
     - port: 8081
       name: nginx-repo-http
       targetPort: 80
+    - port: 80
+      name: nginx-repo-http2
+      targetPort: 80
     - port: 22
       name: rsync-ssh-server-port
       targetPort: 22
