@@ -37,6 +37,7 @@ data:
         access_log /var/log/nginx/access.log.$year$month$day main;
 
         server_name *.mindspore.cn;
+        autoindex_localtime on;
 
         location / {
             root   /repo/mindspore;
@@ -64,6 +65,7 @@ data:
         ssl on;
         ssl_certificate /etc/nginx/conf/ssl/fullchain.pem;
         ssl_certificate_key  /etc/nginx/conf/ssl/privkey.pem;
+        autoindex_localtime on;
 
         location / {
             root   /repo/mindspore;

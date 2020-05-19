@@ -1,0 +1,112 @@
+# Resource for ubuntu generic specification slave pods
+apiVersion: v1
+kind: Service
+metadata:
+  name: x86-website-sync-slaves-service
+  namespace: jenkins
+  labels:
+    app: x86-website-sync-slaves
+spec:
+  ports:
+    - port: 80
+      name: port-placeholder
+  clusterIP: None
+  selector:
+    app: x86-website-sync-slaves
+
+---
+kind: StatefulSet
+apiVersion: apps/v1beta1
+metadata:
+  name: x86-website-sync-slaves
+  namespace: jenkins
+  labels:
+    app: x86-website-sync-slaves
+spec:
+  serviceName: x86-website-sync-slaves-service
+  replicas: 1
+  selector:
+    matchLabels:
+      app: x86-website-sync-slaves
+  template:
+    metadata:
+      labels:
+        app: x86-website-sync-slaves
+    spec:
+      initContainers:
+        - name: slave-init
+          image: swr.cn-north-1.myhuaweicloud.com/mindspore/jenkins-slave-tools:0.0.1
+          volumeMounts:
+            - mountPath: /home/jenkins/share-config
+              name: jenkins-share-config
+          env:
+            - name: JENKINS_NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: JENKINS_USER_NAME
+              value: admin
+            - name: JENKINS_USER_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: jenkins-secret
+                  key: password
+            - name: JENKINS_AGENT_WORKDIR
+              value: /home/jenkins/agent-working-dir
+            - name: JENKINS_URL
+              value: http://build.mindspore.cn
+            - name: JENKINS_SHARE_FOLDER
+              value: /home/jenkins/share-config
+            - name: EXECUTOR_NUMBERS
+              value: "1"
+            - name: NODE_LABELS
+              value: x86 website-sync
+          args: ["$(JENKINS_URL)", "$(JENKINS_USER_NAME)", "$(JENKINS_USER_PASSWORD)", "$(JENKINS_NODE_NAME)", "$(EXECUTOR_NUMBERS)", "$(JENKINS_AGENT_WORKDIR)", "$(NODE_LABELS)", "$(JENKINS_SHARE_FOLDER)"]
+      containers:
+        - name: jenkins-slave
+          image: swr.cn-north-1.myhuaweicloud.com/mindspore/website_sync:0.0.1
+          imagePullPolicy: "IfNotPresent"
+          volumeMounts:
+            - mountPath: /home/jenkins/agent-working-dir
+              name: ubuntu-generic-workspace-pvc
+            - mountPath: /home/jenkins/share-config
+              name: jenkins-share-config
+          command:
+            - /bin/sh
+            - -c
+            - |
+              export JENKINS_SECRET=`cat /home/jenkins/share-config/node_secret.id`;
+              exec jenkins-agent
+          resources:
+            requests:
+              cpu: 2000m
+              memory: 4000Mi
+          env:
+            - name: JENKINS_TUNNEL
+              value: build.mindspore.cn:50000
+            - name: JENKINS_AGENT_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: JENKINS_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: JENKINS_AGENT_WORKDIR
+              value: /home/jenkins/agent-working-dir
+            - name: JENKINS_URL
+              value: http://build.mindspore.cn
+      volumes:
+        - name: jenkins-share-config
+          emptyDir: {}
+  updateStrategy:
+    type: RollingUpdate
+  volumeClaimTemplates:
+    - metadata:
+        name: ubuntu-generic-workspace-pvc
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        resources:
+          requests:
+            storage: 100Gi
+        storageClassName: "sas"
