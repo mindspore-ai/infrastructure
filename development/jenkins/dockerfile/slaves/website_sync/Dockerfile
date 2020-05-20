@@ -5,7 +5,7 @@ MAINTAINER tommylike <tommylikehu@gmail.com>
 USER root
 ENV USER root
 RUN apt update \
-	&& apt install -y wget curl git subversion\
+	&& apt install -y wget curl git subversion tzdata\
 	&& apt install -y openjdk-8-jdk openjfx maven vim build-essential
 
 # Install nodejs related tools

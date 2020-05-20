@@ -40,6 +40,8 @@ spec:
             - mountPath: /home/jenkins/share-config
               name: jenkins-share-config
           env:
+            - name: TZ
+              value: Asia/Shanghai
             - name: JENKINS_NODE_NAME
               valueFrom:
                 fieldRef:
