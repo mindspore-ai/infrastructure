@@ -40,8 +40,11 @@ data:
 
         location / {
             root   /repo/mindspore;
+            auth_basic "basic auth required";
+            auth_basic_user_file /etc/nginx/conf/basic_auth_files;
             fancyindex on;
             fancyindex_exact_size off;
+            fancyindex_localtime on;
             autoindex   on;
         }
         location = /favicon.ico {
@@ -67,8 +70,11 @@ data:
 
         location / {
             root   /repo/mindspore;
+            auth_basic "basic auth required";
+            auth_basic_user_file /etc/nginx/conf/basic_auth_files;
             fancyindex on;
             fancyindex_exact_size off;
+            fancyindex_localtime on;
             autoindex   on;
         }
 
@@ -168,6 +174,9 @@ spec:
           imagePullPolicy: "Always"
           volumeMounts:
             - name: website-secrets-volume
+              mountPath: /etc/nginx/conf/basic_auth_files
+              subPath: auth_files
+            - name: website-secrets-volume
               mountPath: /etc/nginx/conf/ssl/fullchain.pem
               subPath: server_crt
             - name: website-secrets-volume
@@ -189,6 +198,9 @@ spec:
             - |
               mkdir -p /repo/mindspore
               exec nginx -g "daemon off;"
+          env:
+            - name: TZ
+              value: Asia/Shanghai
           resources:
             requests:
               cpu: 6000m

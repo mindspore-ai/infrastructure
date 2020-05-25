@@ -42,6 +42,7 @@ data:
             root   /repo/mindspore;
             fancyindex on;
             fancyindex_exact_size off;
+            fancyindex_localtime on;
             autoindex   on;
         }
         location = /favicon.ico {
@@ -69,6 +70,7 @@ data:
             root   /repo/mindspore;
             fancyindex on;
             fancyindex_exact_size off;
+            fancyindex_localtime on;
             autoindex   on;
         }
 
@@ -189,6 +191,9 @@ spec:
             - |
               mkdir -p /repo/mindspore
               exec nginx -g "daemon off;"
+          env:
+            - name: TZ
+              value: Asia/Shanghai
           resources:
             requests:
               cpu: 4000m
@@ -259,6 +264,9 @@ spec:
       targetPort: 873
     - port: 8081
       name: nginx-repo-http
+      targetPort: 80
+    - port: 80
+      name: nginx-repo-http2
       targetPort: 80
     - port: 22
       name: rsync-ssh-server-port

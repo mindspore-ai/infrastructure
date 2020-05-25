@@ -24,7 +24,7 @@ metadata:
     app: x86-medium-slaves
 spec:
   serviceName: x86-medium-slaves-service
-  replicas: 50
+  replicas: 26
   selector:
     matchLabels:
       app: x86-medium-slaves
@@ -106,8 +106,8 @@ spec:
           emptyDir: {}
         - name: jenkins-share-data
           persistentVolumeClaim:
-            # NOTE: this persistenvolumeclaim is imported on CCE web console, not created by command.
-            claimName: cce-efs-import-k3paa03e-auh7
+            # NOTE: this persistvolumeclaim is imported on CCE web console, not created by command.
+            claimName: cce-efs-import-new-sfs-pvc
   updateStrategy:
     type: RollingUpdate
   volumeClaimTemplates:

@@ -1,37 +1,37 @@
-# Resource for generic specification slave pods
+# Resource for euleros specification slave pods
 apiVersion: v1
 kind: Service
 metadata:
-  name: x86-generic-slaves-service
+  name: x86-euleros-slaves-service
   namespace: jenkins
   labels:
-    app: x86-generic-slaves
+    app: x86-euleros-slaves
 spec:
   ports:
     - port: 80
       name: port-placeholder
   clusterIP: None
   selector:
-    app: x86-generic-slaves
+    app: x86-euleros-slaves
 
 ---
 kind: StatefulSet
 apiVersion: apps/v1beta1
 metadata:
-  name: x86-generic-slaves
+  name: x86-euleros-slaves
   namespace: jenkins
   labels:
-    app: x86-generic-slaves
+    app: x86-euleros-slaves
 spec:
-  serviceName: x86-generic-slaves-service
-  replicas: 6
+  serviceName: x86-euleros-slaves-service
+  replicas: 4
   selector:
     matchLabels:
-      app: x86-generic-slaves
+      app: x86-euleros-slaves
   template:
     metadata:
       labels:
-        app: x86-generic-slaves
+        app: x86-euleros-slaves
     spec:
       initContainers:
         - name: slave-init
@@ -58,17 +58,17 @@ spec:
             - name: JENKINS_SHARE_FOLDER
               value: /home/jenkins/share-config
             - name: EXECUTOR_NUMBERS
-              value: "12"
+              value: "1"
             - name: NODE_LABELS
-              value: x86 x86-generic-slaves
+              value: x86 x86-build-euleros
           args: ["$(JENKINS_URL)", "$(JENKINS_USER_NAME)", "$(JENKINS_USER_PASSWORD)", "$(JENKINS_NODE_NAME)", "$(EXECUTOR_NUMBERS)", "$(JENKINS_AGENT_WORKDIR)", "$(NODE_LABELS)", "$(JENKINS_SHARE_FOLDER)"]
       containers:
         - name: jenkins-slave
-          image: swr.cn-north-1.myhuaweicloud.com/mindspore/ms_check_slave:0.0.5
+          image: swr.cn-north-1.myhuaweicloud.com/mindspore/ascend_euleros_x86:0.0.5
           imagePullPolicy: "IfNotPresent"
           volumeMounts:
             - mountPath: /home/jenkins/agent-working-dir
-              name: generic-workspace-pvc
+              name: euleros-workspace-pvc
             - mountPath: /home/jenkins/share-config
               name: jenkins-share-config
             - mountPath: /home/jenkins/share-data
@@ -81,11 +81,11 @@ spec:
               exec jenkins-agent
           resources:
             requests:
-              cpu: 7000m
-              memory: 13000Mi
+              cpu: 10000m
+              memory: 40000Mi
             limits:
-              cpu: 8000m
-              memory: 16000Mi
+              cpu: 12000m
+              memory: 44000Mi
           env:
             - name: JENKINS_TUNNEL
               value: build.mindspore.cn:50000
@@ -106,13 +106,13 @@ spec:
           emptyDir: {}
         - name: jenkins-share-data
           persistentVolumeClaim:
-            # NOTE: this persistenvolumeclaim is imported on CCE web console, not created by command.
+            # NOTE: this persistvolumeclaim is imported on CCE web console, not created by command.
             claimName: cce-efs-import-new-sfs-pvc
   updateStrategy:
     type: RollingUpdate
   volumeClaimTemplates:
     - metadata:
-        name: generic-workspace-pvc
+        name: euleros-workspace-pvc
       spec:
         accessModes: [ "ReadWriteOnce" ]
         resources:

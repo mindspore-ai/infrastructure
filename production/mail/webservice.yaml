@@ -55,8 +55,8 @@ spec:
       containers:
         - name: mailman-web
           # We modified the mail-web image to add static folder.
-          image: mindspore/mail-web:v1.0.1
-          imagePullPolicy: "IfNotPresent"
+          image: mindspore/mail-web:v1.0.2
+          imagePullPolicy: "Always"
           volumeMounts:
             - mountPath: /opt/mailman-web-config
               name: mailman-web-configmap-volume

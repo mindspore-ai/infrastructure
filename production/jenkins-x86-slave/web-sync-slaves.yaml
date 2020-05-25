@@ -1,37 +1,37 @@
-# Resource for generic specification slave pods
+# Resource for ubuntu generic specification slave pods
 apiVersion: v1
 kind: Service
 metadata:
-  name: x86-generic-slaves-service
+  name: x86-website-sync-slaves-service
   namespace: jenkins
   labels:
-    app: x86-generic-slaves
+    app: x86-website-sync-slaves
 spec:
   ports:
     - port: 80
       name: port-placeholder
   clusterIP: None
   selector:
-    app: x86-generic-slaves
+    app: x86-website-sync-slaves
 
 ---
 kind: StatefulSet
 apiVersion: apps/v1beta1
 metadata:
-  name: x86-generic-slaves
+  name: x86-website-sync-slaves
   namespace: jenkins
   labels:
-    app: x86-generic-slaves
+    app: x86-website-sync-slaves
 spec:
-  serviceName: x86-generic-slaves-service
-  replicas: 6
+  serviceName: x86-website-sync-slaves-service
+  replicas: 1
   selector:
     matchLabels:
-      app: x86-generic-slaves
+      app: x86-website-sync-slaves
   template:
     metadata:
       labels:
-        app: x86-generic-slaves
+        app: x86-website-sync-slaves
     spec:
       initContainers:
         - name: slave-init
@@ -58,21 +58,19 @@ spec:
             - name: JENKINS_SHARE_FOLDER
               value: /home/jenkins/share-config
             - name: EXECUTOR_NUMBERS
-              value: "12"
+              value: "1"
             - name: NODE_LABELS
-              value: x86 x86-generic-slaves
+              value: x86 website-sync
           args: ["$(JENKINS_URL)", "$(JENKINS_USER_NAME)", "$(JENKINS_USER_PASSWORD)", "$(JENKINS_NODE_NAME)", "$(EXECUTOR_NUMBERS)", "$(JENKINS_AGENT_WORKDIR)", "$(NODE_LABELS)", "$(JENKINS_SHARE_FOLDER)"]
       containers:
         - name: jenkins-slave
-          image: swr.cn-north-1.myhuaweicloud.com/mindspore/ms_check_slave:0.0.5
+          image: swr.cn-north-1.myhuaweicloud.com/mindspore/website_sync:0.0.2
           imagePullPolicy: "IfNotPresent"
           volumeMounts:
             - mountPath: /home/jenkins/agent-working-dir
-              name: generic-workspace-pvc
+              name: ubuntu-generic-workspace-pvc
             - mountPath: /home/jenkins/share-config
               name: jenkins-share-config
-            - mountPath: /home/jenkins/share-data
-              name: jenkins-share-data
           command:
             - /bin/sh
             - -c
@@ -81,12 +79,11 @@ spec:
               exec jenkins-agent
           resources:
             requests:
-              cpu: 7000m
-              memory: 13000Mi
-            limits:
-              cpu: 8000m
-              memory: 16000Mi
+              cpu: 2000m
+              memory: 4000Mi
           env:
+            - name: TZ
+              value: Asia/Shanghai
             - name: JENKINS_TUNNEL
               value: build.mindspore.cn:50000
             - name: JENKINS_AGENT_NAME
@@ -104,18 +101,14 @@ spec:
       volumes:
         - name: jenkins-share-config
           emptyDir: {}
-        - name: jenkins-share-data
-          persistentVolumeClaim:
-            # NOTE: this persistenvolumeclaim is imported on CCE web console, not created by command.
-            claimName: cce-efs-import-new-sfs-pvc
   updateStrategy:
     type: RollingUpdate
   volumeClaimTemplates:
     - metadata:
-        name: generic-workspace-pvc
+        name: ubuntu-generic-workspace-pvc
       spec:
         accessModes: [ "ReadWriteOnce" ]
         resources:
           requests:
-            storage: 200Gi
+            storage: 100Gi
         storageClassName: "sas"

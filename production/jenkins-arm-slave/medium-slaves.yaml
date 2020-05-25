@@ -24,7 +24,7 @@ metadata:
     app: arm-medium-slaves
 spec:
   serviceName: arm-medium-slaves-service
-  replicas: 20
+  replicas: 12
   selector:
     matchLabels:
       app: arm-medium-slaves
@@ -104,7 +104,7 @@ spec:
         - name: jenkins-share-data
           persistentVolumeClaim:
             # NOTE: this persistenvolumeclaim is imported on CCE web console, not created by command.
-            claimName: cce-efs-import-armslave-001
+            claimName: cce-efs-import-new-sfs-pvc
   updateStrategy:
     type: RollingUpdate
   volumeClaimTemplates:
