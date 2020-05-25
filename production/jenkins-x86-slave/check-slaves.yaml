@@ -65,7 +65,7 @@ spec:
       containers:
         - name: jenkins-slave
           image: swr.cn-north-4.myhuaweicloud.com/mindspore/mindspore_check:0.0.1
-          imagePullPolicy: "IfNotPresent"
+          imagePullPolicy: "Always"
           volumeMounts:
             - mountPath: /home/jenkins/agent-working-dir
               name: check-workspace-pvc
