@@ -1,37 +1,37 @@
-# Resource for euleros specification slave pods
+# Resource for ubuntu specification slave pods
 apiVersion: v1
 kind: Service
 metadata:
-  name: x86-euleros-slaves-service
+  name: x86-ubuntu-slaves-service
   namespace: jenkins
   labels:
-    app: x86-euleros-slaves
+    app: x86-ubuntu-slaves
 spec:
   ports:
     - port: 80
       name: port-placeholder
   clusterIP: None
   selector:
-    app: x86-euleros-slaves
+    app: x86-ubuntu-slaves
 
 ---
 kind: StatefulSet
 apiVersion: apps/v1beta1
 metadata:
-  name: x86-euleros-slaves
+  name: x86-ubuntu-slaves
   namespace: jenkins
   labels:
-    app: x86-euleros-slaves
+    app: x86-ubuntu-slaves
 spec:
-  serviceName: x86-euleros-slaves-service
-  replicas: 4
+  serviceName: x86-ubuntu-slaves-service
+  replicas: 26
   selector:
     matchLabels:
-      app: x86-euleros-slaves
+      app: x86-ubuntu-slaves
   template:
     metadata:
       labels:
-        app: x86-euleros-slaves
+        app: x86-ubuntu-slaves
     spec:
       initContainers:
         - name: slave-init
@@ -60,15 +60,15 @@ spec:
             - name: EXECUTOR_NUMBERS
               value: "1"
             - name: NODE_LABELS
-              value: x86 x86-build-euleros
+              value: x86 x86-build-ubuntu
           args: ["$(JENKINS_URL)", "$(JENKINS_USER_NAME)", "$(JENKINS_USER_PASSWORD)", "$(JENKINS_NODE_NAME)", "$(EXECUTOR_NUMBERS)", "$(JENKINS_AGENT_WORKDIR)", "$(NODE_LABELS)", "$(JENKINS_SHARE_FOLDER)"]
       containers:
         - name: jenkins-slave
-          image: swr.cn-north-4.myhuaweicloud.com/mindspore/mindspore_euleros_x86:0.0.1
+          image: swr.cn-north-4.myhuaweicloud.com/mindspore/mindspore_ubuntu_x86:0.0.1
           imagePullPolicy: "IfNotPresent"
           volumeMounts:
             - mountPath: /home/jenkins/agent-working-dir
-              name: euleros-workspace-pvc
+              name: ubuntu-workspace-pvc
             - mountPath: /home/jenkins/share-config
               name: jenkins-share-config
             - mountPath: /home/jenkins/share-data
@@ -112,7 +112,7 @@ spec:
     type: RollingUpdate
   volumeClaimTemplates:
     - metadata:
-        name: euleros-workspace-pvc
+        name: ubuntu-workspace-pvc
       spec:
         accessModes: [ "ReadWriteOnce" ]
         resources:
