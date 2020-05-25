@@ -10,7 +10,7 @@ apt install -y docker.io
 
 # Docker build
 docker build -t mindspore_check:${IMAGE_VERSION} ${WORKSPACE}
-.
+
 # Docker push
 docker tag mindspore_check:${IMAGE_VERSION} swr.cn-north-4.myhuaweicloud.com/mindspore/mindspore_check:${IMAGE_VERSION}
 docker push swr.cn-north-4.myhuaweicloud.com/mindspore/mindspore_check:${IMAGE_VERSION}
