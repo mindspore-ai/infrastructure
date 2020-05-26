@@ -10,7 +10,7 @@ MAINTAINER tommylike <tommylikehu@gmail.com>
 USER root
 ENV USER root
 ENV PATH /usr/local/bin:$PATH
-ENV JAVA_HOME /usr/lib/jvm/java-8-openjdk-amd64/jre
+ENV JAVA_HOME /usr/lib/jvm/default-java
 ENV PATH $PATH:$JAVA_HOME/bin
 ENV PATH /usr/local/gcc/gcc730/bin:$PATH
 ENV LD_LIBRARY_PATH /usr/local/gcc/gcc730/lib64:$LD_LIBRARY_PATH
@@ -229,6 +229,7 @@ RUN groupadd -g ${gid} ${group} \
 # Set env
 USER ${user}
 ENV AGENT_WORKDIR=${AGENT_WORKDIR}
+ENV PATH /home/${user}/.local/bin:/home/${user}/bin:$PATH
 RUN echo "export TZ='Asia/Shanghai'" >> ~/.bashrc \
     && mkdir -p /home/${user}/.jenkins \
     && mkdir -p ${AGENT_WORKDIR}
@@ -264,7 +265,10 @@ RUN pip3 install --user pytest \
     && pip3 install --user 'Werkzeug>=1.0.0' \
     && pip3 list
 
-RUN rm -rf /home/${user}/.cache/pip
+# Clear cache
+RUN rm -rf /home/${user}/.cache/pip \
+    && /usr/local/ccache/bin/ccache -C
+
 VOLUME /home/${user}/.jenkins
 VOLUME ${AGENT_WORKDIR}
 WORKDIR /home/${user}
