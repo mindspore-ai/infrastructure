@@ -10,7 +10,7 @@ MAINTAINER tommylike <tommylikehu@gmail.com>
 USER root
 ENV USER root
 ENV PATH /usr/local/bin:$PATH
-ENV JAVA_HOME /usr/lib/jvm/java-8-openjdk-amd64/jre
+ENV JAVA_HOME /usr/lib/jvm/default-java
 ENV PATH $PATH:$JAVA_HOME/bin
 ARG PYTHON_PATH=/usr/local/python/python375
 ENV PATH ${PYTHON_PATH}/bin:$PATH
