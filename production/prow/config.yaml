@@ -68,6 +68,9 @@ data:
           required_files:
             - podinfo.json
 
+    jenkins_operators:
+    - job_url_template: '{{if .Spec}}{{if .Status}}https://build.openlookeng.org/job/{{.Spec.Job}}/{{.Status.JenkinsBuildID}}/console{{end}}{{end}}'
+
     presets:
     - env:
       - name: MINDSPORE_DEPLOY_USER
