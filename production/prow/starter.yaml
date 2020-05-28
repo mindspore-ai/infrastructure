@@ -28,7 +28,7 @@ spec:
       terminationGracePeriodSeconds: 180
       containers:
       - name: gitee-hook
-        image: zengchen1024/gitee-hook:v20200228-31c76new9
+        image: zengchen1024/gitee-hook:v20200228-31c76new10
         imagePullPolicy: Always
         args:
         - --dry-run=false
@@ -1123,3 +1123,96 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: "job-reporter"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: prow
+  name: gitee-tide
+  labels:
+    app: gitee-tide
+spec:
+  replicas: 1 # Do not scale up.
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: gitee-tide
+  template:
+    metadata:
+      labels:
+        app: gitee-tide
+    spec:
+      serviceAccountName: "gitee-tide"
+      containers:
+      - name: gitee-tide
+        image: zengchen1024/gitee-tide:v20200228-31c76new12
+        args:
+        - --dry-run=false
+        - --config-path=/etc/config/config.yaml
+        - --job-config-path=/etc/job/config.yaml
+        - --s3-credentials-file=/etc/s3/service-account.json
+        ports:
+          - name: http
+            containerPort: 8888
+        volumeMounts:
+        - name: s3
+          mountPath: /etc/s3
+          readOnly: true
+        - name: oauth
+          mountPath: /etc/gitee
+          readOnly: true
+        - name: config
+          mountPath: /etc/config
+          readOnly: true
+        - name: job
+          mountPath: /etc/job
+          readOnly: true
+      volumes:
+      - name: oauth
+        secret:
+          secretName: gitee-token
+      - name: config
+        configMap:
+          name: gitee-tide
+      - name: job
+        configMap:
+          name: gitee-jobs
+      - name: s3
+        secret:
+          secretName: s3-credentials
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  namespace: prow
+  name: "gitee-tide"
+---
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1beta1
+metadata:
+  namespace: prow
+  name: "gitee-tide"
+rules:
+  - apiGroups:
+      - "prow.k8s.io"
+    resources:
+      - prowjobs
+    verbs:
+      - create
+      - list
+      - get
+      - watch
+---
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1beta1
+metadata:
+  namespace: prow
+  name: "gitee-tide"
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: "gitee-tide"
+subjects:
+- kind: ServiceAccount
+  name: "gitee-tide"

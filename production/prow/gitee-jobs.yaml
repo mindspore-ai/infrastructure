@@ -5,3 +5,17 @@ metadata:
   name: gitee-jobs
 data:
   config.yaml: |
+    presubmits:
+      zengchen1024/repo-test:
+      - name: test-presubmit
+        decorate: true
+        always_run: true
+        # skip_report: true
+        spec:
+          containers:
+          - image: alpine
+            command: ["/bin/printenv"]
+
+      - name: print-env
+        agent: jenkins
+        always_run: true
