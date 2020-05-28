@@ -34,6 +34,7 @@ spec:
         - --dry-run=false
         - --config-path=/etc/config/config.yaml
         - --job-config-path=/etc/jobs/config.yaml
+        - --github-token-path=/etc/github/oauth
         ports:
           - name: http
             containerPort: 8888
@@ -72,6 +73,7 @@ spec:
         args:
         - --dry-run=false
         - --port=9999
+        - --github-token-path=/etc/github/oauth
         ports:
           - name: http
             containerPort: 9999
@@ -94,6 +96,7 @@ spec:
         args:
         - --dry-run=false
         - --port=10000
+        - --github-token-path=/etc/github/oauth
         ports:
           - name: http
             containerPort: 10000
@@ -145,6 +148,9 @@ metadata:
   labels:
     app: plank
 spec:
+  selector:
+    matchLabels:
+      app: plank
   replicas: 1 # Do not scale up.
   strategy:
     type: Recreate
@@ -155,25 +161,27 @@ spec:
     spec:
       serviceAccountName: "plank"
       containers:
-        - name: plank
-          image: mindspore/plank:v20200228-31c76444b
-          args:
-            - --dry-run=false
-            - --config-path=/etc/config/config.yaml
-          volumeMounts:
-            - name: oauth
-              mountPath: /etc/github
-              readOnly: true
-            - name: config
-              mountPath: /etc/config
-              readOnly: true
-      volumes:
+      - name: plank
+        image: zengchen1024/plank:v20200228-31c76new3
+        args:
+        - --dry-run=false
+        - --config-path=/etc/config/config.yaml
+        - --github-token-path=/etc/github/oauth
+        - --skip-report=true
+        volumeMounts:
         - name: oauth
-          secret:
-            secretName: oauth-token
+          mountPath: /etc/github
+          readOnly: true
         - name: config
-          configMap:
-            name: config
+          mountPath: /etc/config
+          readOnly: true
+      volumes:
+      - name: oauth
+        secret:
+          secretName: oauth-token
+      - name: config
+        configMap:
+          name: common-config
 ---
 
 apiVersion: extensions/v1beta1
@@ -609,8 +617,8 @@ roleRef:
   kind: Role
   name: "plank"
 subjects:
-  - kind: ServiceAccount
-    name: "plank"
+- kind: ServiceAccount
+  name: "plank"
 ---
 kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1beta1
@@ -622,9 +630,9 @@ roleRef:
   kind: Role
   name: "plank"
 subjects:
-  - kind: ServiceAccount
-    name: "plank"
-    namespace: prow
+- kind: ServiceAccount
+  name: "plank"
+  namespace: prow
 ---
 kind: ServiceAccount
 apiVersion: v1
@@ -863,7 +871,7 @@ spec:
           secretName: jenkins-token
       - name: config
         configMap:
-          name: config
+          name: common-config
 ---
 kind: ServiceAccount
 apiVersion: v1
