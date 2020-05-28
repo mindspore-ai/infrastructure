@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  namespace: prow
+  name: gitee-jobs
+data:
+  config.yaml: |

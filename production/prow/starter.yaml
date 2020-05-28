@@ -2,6 +2,133 @@
 # components. Don't edit resources in this file. Instead, pull them out into
 # their own files.
 ---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: prow
+  name: gitee-hook
+  labels:
+    app: gitee-hook
+spec:
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  selector:
+    matchLabels:
+      app: gitee-hook
+  template:
+    metadata:
+      labels:
+        app: gitee-hook
+    spec:
+      serviceAccountName: "gitee-hook"
+      terminationGracePeriodSeconds: 180
+      containers:
+      - name: gitee-hook
+        image: zengchen1024/gitee-hook:v20200228-31c76new9
+        imagePullPolicy: Always
+        args:
+        - --dry-run=false
+        - --config-path=/etc/config/config.yaml
+        ports:
+          - name: http
+            containerPort: 8888
+        volumeMounts:
+        - name: hmac
+          mountPath: /etc/webhook
+          readOnly: true
+        - name: gitee
+          mountPath: /etc/gitee
+          readOnly: true
+        - name: config
+          mountPath: /etc/config
+          readOnly: true
+        - name: plugins
+          mountPath: /etc/plugins
+          readOnly: true
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 8081
+          initialDelaySeconds: 3
+          periodSeconds: 3
+        readinessProbe:
+          httpGet:
+            path: /healthz/ready
+            port: 8081
+          initialDelaySeconds: 10
+          periodSeconds: 3
+          timeoutSeconds: 600
+      volumes:
+      - name: hmac
+        secret:
+          secretName: hmac-token
+      - name: gitee
+        secret:
+          secretName: gitee-token
+      - name: config
+        configMap:
+          name: common-config
+      - name: plugins
+        configMap:
+          name: gitee-plugins
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: prow
+  name: gitee-hook
+spec:
+  selector:
+    app: gitee-hook
+  ports:
+  - port: 8888
+  type: NodePort
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  namespace: prow
+  name: "gitee-hook"
+---
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1beta1
+metadata:
+  namespace: prow
+  name: "gitee-hook"
+rules:
+  - apiGroups:
+      - "prow.k8s.io"
+    resources:
+      - prowjobs
+    verbs:
+      - create
+      - get
+  - apiGroups:
+      - ""
+    resources:
+      - configmaps
+    verbs:
+      - create
+      - get
+      - update
+---
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1beta1
+metadata:
+  namespace: prow
+  name: "gitee-hook"
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: "gitee-hook"
+subjects:
+- kind: ServiceAccount
+  name: "gitee-hook"
+---
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
