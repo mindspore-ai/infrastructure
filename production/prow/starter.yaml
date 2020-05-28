@@ -214,7 +214,7 @@ spec:
             name: config
 
 ---
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   namespace: prow
@@ -228,6 +228,9 @@ spec:
     rollingUpdate:
       maxSurge: 1
       maxUnavailable: 1
+  selector:
+    matchLabels:
+      app: deck
   template:
     metadata:
       labels:
@@ -236,59 +239,58 @@ spec:
       serviceAccountName: "deck"
       terminationGracePeriodSeconds: 30
       containers:
-        - name: deck
-          image: mindspore/deck:v20200228-31c76444bb
-          args:
-            - --config-path=/etc/config/config.yaml
-            - --plugin-config=/etc/plugins/plugins.yaml
-            - --tide-url=http://tide/
-            - --hook-url=http://hook:8888/plugin-help
-            - --github-token-path=/etc/github/oauth
-            - --gcs-credentials-file=/etc/config1/service-account.json
-            - --spyglass=true
-          ports:
-            - name: http
-              containerPort: 8080
-          volumeMounts:
-            - name: config
-              mountPath: /etc/config
-              readOnly: true
-            - name: oauth
-              mountPath: /etc/github
-              readOnly: true
-            - name: credential
-              mountPath: /etc/config1
-              readOnly: true
-            - name: plugins
-              mountPath: /etc/plugins
-              readOnly: true
-          livenessProbe:
-            httpGet:
-              path: /healthz
-              port: 8081
-            initialDelaySeconds: 3
-            periodSeconds: 3
-          readinessProbe:
-            httpGet:
-              path: /healthz/ready
-              port: 8081
-            initialDelaySeconds: 10
-            periodSeconds: 3
-            timeoutSeconds: 600
-      volumes:
+      - name: deck
+        image: zengchen1024/deck:v20200228-31c76new4
+        args:
+        - --config-path=/etc/config/config.yaml
+        - --plugin-config=/etc/plugins/plugins.yaml
+        - --tide-url=http://tide/
+        - --hook-url=http://hook:8888/plugin-help
+        - --github-token-path=/etc/github/oauth
+        - --s3-credentials-file=/etc/s3/service-account.json
+        - --spyglass=true
+        ports:
+          - name: http
+            containerPort: 8080
+        volumeMounts:
+        - name: s3
+          mountPath: /etc/s3
+          readOnly: true
         - name: config
-          configMap:
-            name: config
+          mountPath: /etc/config
+          readOnly: true
         - name: oauth
-          secret:
-            secretName: oauth-token
-        - name: credential
-          secret:
-            secretName: gcs-credentials
+          mountPath: /etc/github
+          readOnly: true
         - name: plugins
-          configMap:
-            name: plugins
-
+          mountPath: /etc/plugins
+          readOnly: true
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 8081
+          initialDelaySeconds: 3
+          periodSeconds: 3
+        readinessProbe:
+          httpGet:
+            path: /healthz/ready
+            port: 8081
+          initialDelaySeconds: 10
+          periodSeconds: 3
+          timeoutSeconds: 600
+      volumes:
+      - name: s3
+        secret:
+          secretName: s3-credentials
+      - name: config
+        configMap:
+          name: common-config
+      - name: oauth
+        secret:
+          secretName: oauth-token
+      - name: plugins
+        configMap:
+          name: github-plugins
 ---
 apiVersion: v1
 kind: Service
@@ -299,10 +301,9 @@ spec:
   selector:
     app: deck
   ports:
-    - port: 80
-      targetPort: 8080
+  - port: 80
+    targetPort: 8080
   type: NodePort
-
 ---
 apiVersion: extensions/v1beta1
 kind: Deployment
@@ -487,8 +488,8 @@ roleRef:
   kind: Role
   name: "deck"
 subjects:
-  - kind: ServiceAccount
-    name: "deck"
+- kind: ServiceAccount
+  name: "deck"
 ---
 kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1beta1
@@ -500,9 +501,9 @@ roleRef:
   kind: Role
   name: "deck"
 subjects:
-  - kind: ServiceAccount
-    name: "deck"
-    namespace: prow
+- kind: ServiceAccount
+  name: "deck"
+  namespace: prow
 ---
 kind: Role
 apiVersion: rbac.authorization.k8s.io/v1beta1
