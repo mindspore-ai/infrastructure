@@ -16,6 +16,9 @@ spec:
     rollingUpdate:
       maxSurge: 1
       maxUnavailable: 1
+  selector:
+    matchLabels:
+      app: hook
   template:
     metadata:
       labels:
@@ -24,60 +27,102 @@ spec:
       serviceAccountName: "hook"
       terminationGracePeriodSeconds: 180
       containers:
-        - name: hook
-          image: mindspore/hook:v20200228-31c76444f
-          imagePullPolicy: Always
-          args:
-            - --dry-run=false
-            - --config-path=/etc/config/config.yaml
-          ports:
-            - name: http
-              containerPort: 8888
-          volumeMounts:
-            - name: hmac
-              mountPath: /etc/webhook
-              readOnly: true
-            - name: oauth
-              mountPath: /etc/github
-              readOnly: true
-            - name: config
-              mountPath: /etc/config
-              readOnly: true
-            - name: plugins
-              mountPath: /etc/plugins
-              readOnly: true
-            - name: gitee
-              mountPath: /etc/gitee
-              readOnly: true
-          livenessProbe:
-            httpGet:
-              path: /healthz
-              port: 8081
-            initialDelaySeconds: 3
-            periodSeconds: 3
-          readinessProbe:
-            httpGet:
-              path: /healthz/ready
-              port: 8081
-            initialDelaySeconds: 10
-            periodSeconds: 3
-            timeoutSeconds: 600
-      volumes:
+      - name: hook
+        image: zengchen1024/hook:v20200228-31c76new3
+        imagePullPolicy: Always
+        args:
+        - --dry-run=false
+        - --config-path=/etc/config/config.yaml
+        - --job-config-path=/etc/jobs/config.yaml
+        ports:
+          - name: http
+            containerPort: 8888
+        volumeMounts:
         - name: hmac
-          secret:
-            secretName: hmac-token
+          mountPath: /etc/webhook
+          readOnly: true
         - name: oauth
-          secret:
-            secretName: oauth-token
+          mountPath: /etc/github
+          readOnly: true
         - name: config
-          configMap:
-            name: config
+          mountPath: /etc/config
+          readOnly: true
         - name: plugins
-          configMap:
-            name: plugins
+          mountPath: /etc/plugins
+          readOnly: true
+        - name: job
+          mountPath: /etc/jobs
+          readOnly: true
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 8081
+          initialDelaySeconds: 3
+          periodSeconds: 3
+        readinessProbe:
+          httpGet:
+            path: /healthz/ready
+            port: 8081
+          initialDelaySeconds: 10
+          periodSeconds: 3
+          timeoutSeconds: 600
+      - name: sync-pr
+        image: zengchen1024/sync-pr:v20200228-31c76new10
+        imagePullPolicy: Always
+        args:
+        - --dry-run=false
+        - --port=9999
+        ports:
+          - name: http
+            containerPort: 9999
+        volumeMounts:
+        - name: hmac
+          mountPath: /etc/webhook
+          readOnly: true
+        - name: oauth
+          mountPath: /etc/github
+          readOnly: true
         - name: gitee
-          secret:
-            secretName: gitee-token
+          mountPath: /etc/gitee
+          readOnly: true
+        - name: plugins
+          mountPath: /etc/plugins
+          readOnly: true
+      - name: close-pr
+        image: zengchen1024/close-pr:v20200228-31c76new1
+        imagePullPolicy: Always
+        args:
+        - --dry-run=false
+        - --port=10000
+        ports:
+          - name: http
+            containerPort: 10000
+        volumeMounts:
+        - name: hmac
+          mountPath: /etc/webhook
+          readOnly: true
+        - name: oauth
+          mountPath: /etc/github
+          readOnly: true
+      volumes:
+      - name: hmac
+        secret:
+          secretName: hmac-token
+      - name: oauth
+        secret:
+          secretName: oauth-token
+      - name: gitee
+        secret:
+          secretName: gitee-token
+      - name: config
+        configMap:
+          name: common-config
+      - name: plugins
+        configMap:
+          name: github-plugins
+      - name: job
+        configMap:
+          name: github-jobs
 ---
 apiVersion: v1
 kind: Service
@@ -88,7 +133,7 @@ spec:
   selector:
     app: hook
   ports:
-    - port: 8888
+  - port: 8888
   type: NodePort
 ---
 
@@ -698,8 +743,8 @@ roleRef:
   kind: Role
   name: "hook"
 subjects:
-  - kind: ServiceAccount
-    name: "hook"
+- kind: ServiceAccount
+  name: "hook"
 ---
 apiVersion: v1
 kind: ServiceAccount

@@ -1,0 +1,72 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  namespace: prow
+  name: common-config
+data:
+  config.yaml: |
+    prowjob_namespace: prow
+    pod_namespace: prow-pods
+    plank:
+      job_url_template: '{{if .Spec.Refs}}{{if eq .Spec.Refs.Org "kubernetes-security"}}http://console.cloud.google.com/storage/browser/kubernetes-security-prow/{{else}}http://dev-prow.mindspore.cn/view/gcs/prow-artifacts/{{end}}{{else}}http://dev-prow.mindspore.cn/view/gcs/prow-artifacts/{{end}}{{if eq .Spec.Type "presubmit"}}pr-logs/pull{{else if eq .Spec.Type "batch"}}pr-logs/pull{{else}}logs{{end}}{{if eq .Spec.Type "presubmit"}}{{if .Spec.Refs}}{{if eq .Spec.Refs.Org "kubernetes"}}{{if ne .Spec.Refs.Repo "kubernetes"}}/{{.Spec.Refs.Repo}}{{end}}{{else}}/{{.Spec.Refs.Org}}_{{.Spec.Refs.Repo}}{{end}}{{end}}/{{with index .Spec.Refs.Pulls 0}}{{.Number}}{{end}}{{else if eq .Spec.Type "batch"}}/batch{{end}}/{{.Spec.Job}}/{{.Status.BuildID}}/'
+      job_url_prefix_config:
+        '*': http://119.8.42.216/view/s3/
+      pod_pending_timeout: 15m
+      pod_unscheduled_timeout: 1m
+      default_decoration_configs:
+        '*':
+          utility_images: # using the tag we identified above
+            clonerefs: "zengchen1024/clonerefs:v20200228-31c76new2"
+            initupload: "zengchen1024/initupload:v20200228-31c76new2"
+            sidecar: "zengchen1024/sidecar:v20200228-31c76new2"
+            entrypoint: "gcr.io/k8s-prow/entrypoint:v20200406-5c0e225cf"
+          gcs_configuration:
+            bucket: s3://mindspore-prow-artifacts # the bucket we just made
+            path_strategy: explicit
+          s3_credentials_secret: s3-credentials
+
+    github_reporter:
+      job_types_to_report:
+      - presubmit
+      - postsubmit
+
+    sinker:
+      resync_period: 1m
+      max_prowjob_age: 48h
+      max_pod_age: 48h
+      terminated_pod_ttl: 30m
+
+    deck:
+      spyglass:
+        size_limit: 500000000 # 500MB
+        gcs_browser_prefix: https://storage.huaweicloud.com/obs/
+        testgrid_config: gs://k8s-testgrid/config
+        testgrid_root: http://testgrid.k8s.io/
+        lenses:
+        - lens:
+            name: metadata
+          required_files:
+          - started.json|finished.json
+          optional_files:
+          - podinfo.json
+        - lens:
+            name: buildlog
+          required_files:
+            - build-log.txt
+        - lens:
+            name: junit
+          required_files:
+            - artifacts/junit.*\.xml
+        - lens:
+            name: coverage
+          required_files:
+            - artifacts/filtered.cov
+          optional_files:
+            - artifacts/filtered.html
+        - lens:
+            name: podinfo
+          required_files:
+            - podinfo.json
+
+    jenkins_operators:
+    - job_url_template: '{{if .Spec}}{{if .Status}}https://build.openlookeng.org/job/{{.Spec.Job}}/{{.Status.JenkinsBuildID}}/console{{end}}{{end}}'
