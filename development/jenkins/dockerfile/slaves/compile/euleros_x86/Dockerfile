@@ -237,6 +237,13 @@ RUN echo "export TZ='Asia/Shanghai'" >> ~/.bashrc \
     && mkdir -p /home/${user}/.jenkins \
     && mkdir -p ${AGENT_WORKDIR}
 
+# Set pip source
+RUN mkdir -p /home/${user}/.pip \
+    && echo "[global]" > /home/${user}/.pip/pip.conf \
+    && echo "index-url=https://repo.huaweicloud.com/repository/pypi/simple" >> /home/${user}/.pip/pip.conf \
+    && echo "trusted-host=repo.huaweicloud.com" >> /home/${user}/.pip/pip.conf \
+    && echo "timeout=120" >> /home/${user}/.pip/pip.conf
+
 # Install pip package
 RUN pip3 install --user pytest \
     && pip3 install --user pytest-xdist \

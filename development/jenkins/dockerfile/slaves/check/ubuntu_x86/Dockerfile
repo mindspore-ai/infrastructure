@@ -1,6 +1,6 @@
 # ubuntu:xenial-20200326
 # DIGEST:sha256:a4fc0c40360ff2224db3a483e5d80e9164fe3fdce2a8439d2686270643974632
-FROM ubuntu:xenial
+FROM ubuntu:xenial-20200326
 MAINTAINER tommylike <tommylikehu@gmail.com>
 
 ##############
