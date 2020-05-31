@@ -1,6 +1,6 @@
 # ubuntu:xenial-20200326
 # DIGEST:sha256:a4fc0c40360ff2224db3a483e5d80e9164fe3fdce2a8439d2686270643974632
-FROM ubuntu:xenial
+FROM ubuntu:xenial-20200326
 MAINTAINER tommylike <tommylikehu@gmail.com>
 
 ##############
@@ -233,6 +233,13 @@ ENV PATH /home/${user}/.local/bin:/home/${user}/bin:$PATH
 RUN echo "export TZ='Asia/Shanghai'" >> ~/.bashrc \
     && mkdir -p /home/${user}/.jenkins \
     && mkdir -p ${AGENT_WORKDIR}
+
+# Set pip source
+RUN mkdir -p /home/${user}/.pip \
+    && echo "[global]" > /home/${user}/.pip/pip.conf \
+    && echo "index-url=https://repo.huaweicloud.com/repository/pypi/simple" >> /home/${user}/.pip/pip.conf \
+    && echo "trusted-host=repo.huaweicloud.com" >> /home/${user}/.pip/pip.conf \
+    && echo "timeout=120" >> /home/${user}/.pip/pip.conf
 
 # Install pip package
 RUN pip3 install --user pytest \
