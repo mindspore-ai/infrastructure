@@ -1,0 +1,58 @@
+# configmap for mailman web nginx config
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mailman-nginx-configmap
+  namespace: mail
+data:
+  default.conf: |
+    server {
+        listen 80 default_server;
+
+        root /opt/mailman-web-data;
+        index index.html;
+
+        server_name mailweb.mindspore.cn;
+
+        location /static {
+        alias /opt/mailman-web-data/static;
+        }
+
+        location / {
+        uwsgi_pass 127.0.0.1:8080;
+        include uwsgi_params;
+        uwsgi_read_timeout 300;
+        }
+    }
+  nginx.conf : |
+    user  nginx;
+    worker_processes  auto;
+
+    error_log  /var/log/nginx/error.log warn;
+    pid        /var/run/nginx.pid;
+
+
+    events {
+        worker_connections  2048;
+    }
+
+
+    http {
+        include       /etc/nginx/mime.types;
+        default_type  application/octet-stream;
+
+        log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+                          '$status $body_bytes_sent "$http_referer" '
+                          '"$http_user_agent" "$http_x_forwarded_for"';
+
+        access_log  /var/log/nginx/access.log  main;
+
+        sendfile        on;
+
+        keepalive_timeout  65;
+
+        gzip  on;
+
+        include /etc/nginx/conf.d/*.conf;
+    }
