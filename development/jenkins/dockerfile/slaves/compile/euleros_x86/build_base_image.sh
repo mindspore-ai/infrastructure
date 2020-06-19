@@ -17,7 +17,7 @@ git checkout c60e36eb76d8a260c76d5b8e7d8b5c544e8f6d23
 echo "[INFO] Download ISO."
 cd ${WORKSPACE}
 if [ ! -f ${WORKSPACE}/EulerOS-V2.0SP5-x86_64-dvd.iso ]; then
-    #wget https://tools.mindspore.cn/productrepo/iso/euleros/EulerOS-V2.0SP5-x86_64-dvd-20190709/EulerOS-V2.0SP5-x86_64-dvd.iso
+    #wget http://tools.mindspore.cn/productrepo/iso/euleros/EulerOS-V2.0SP5-x86_64-dvd-20190709/EulerOS-V2.0SP5-x86_64-dvd.iso
     wget https://euleros2019.obs.cn-north-1.myhuaweicloud.com/ict/site-euleros/euleros/repo/yum/2.5/os/x86_64/iso/EulerOS-V2.0SP5-x86_64-dvd.iso
 fi
 

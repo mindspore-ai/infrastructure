@@ -1,6 +1,6 @@
-# ubuntu:xenial-20200326
-# DIGEST:sha256:a4fc0c40360ff2224db3a483e5d80e9164fe3fdce2a8439d2686270643974632
-FROM ubuntu:xenial-20200326
+# bionic-20190718(ubuntu18.04.2)
+# DIGEST:sha256:d91842ef309155b85a9e5c59566719308fab816b40d376809c39cf1cf4de3c6a
+FROM ubuntu:bionic-20190718
 MAINTAINER tommylike <tommylikehu@gmail.com>
 
 ##############
@@ -12,8 +12,6 @@ ENV USER root
 ENV PATH /usr/local/bin:$PATH
 ENV JAVA_HOME /usr/lib/jvm/default-java
 ENV PATH $PATH:$JAVA_HOME/bin
-ENV PATH /usr/local/gcc/gcc730/bin:$PATH
-ENV LD_LIBRARY_PATH /usr/local/gcc/gcc730/lib64:$LD_LIBRARY_PATH
 ARG PYTHON_PATH=/usr/local/python/python375
 ENV PATH ${PYTHON_PATH}/bin:$PATH
 ENV LD_LIBRARY_PATH ${PYTHON_PATH}/lib:$LD_LIBRARY_PATH
@@ -89,35 +87,6 @@ RUN DEBIAN_FRONTEND=noninteractive apt install -y libblas-dev \
     libopenblas-dev \
     libatlas-base-dev
 
-# Install gcc
-RUN mkdir -p /tmp/gcc \
-    && cd /tmp/gcc \
-    && wget https://mirrors.ustc.edu.cn/gnu/gcc/gcc-7.3.0/gcc-7.3.0.tar.gz \
-    && wget https://gcc.gnu.org/pub/gcc/infrastructure/isl-0.16.1.tar.bz2 \
-    && wget https://mirrors.ustc.edu.cn/gnu/gmp/gmp-6.1.0.tar.bz2 \
-    && wget https://mirrors.ustc.edu.cn/gnu/mpfr/mpfr-3.1.4.tar.gz \
-    && wget https://mirrors.ustc.edu.cn/gnu/mpc/mpc-1.0.3.tar.gz \
-    && tar -zxf gcc-7.3.0.tar.gz \
-    && tar -zxf mpc-1.0.3.tar.gz \
-    && tar -zxf mpfr-3.1.4.tar.gz \
-    && tar -jxf gmp-6.1.0.tar.bz2 \
-    && tar -jxf isl-0.16.1.tar.bz2 \
-    && mv gmp-6.1.0 gcc-7.3.0/gmp \
-    && mv isl-0.16.1 gcc-7.3.0/isl \
-    && mv mpc-1.0.3 gcc-7.3.0/mpc \
-    && mv mpfr-3.1.4 gcc-7.3.0/mpfr \
-    && mkdir -p /usr/local/gcc/gcc730 \
-    && cd /tmp/gcc/gcc-7.3.0 \
-    && mkdir build \
-    && cd build \
-    && ../configure --prefix=/usr/local/gcc/gcc730 -enable-checking=release -enable-languages=c,c++ -disable-multilib \
-    && make -j8 \
-    && make install-strip \
-    && chmod 755 -R /usr/local/gcc \
-    && cd /usr/local/gcc/gcc730/bin \
-    && ln -s gcc cc \
-    && rm -rf /tmp/gcc
-
 # Install python
 RUN umask 022 \
     && cd /tmp \
@@ -189,13 +158,6 @@ RUN cd /tmp \
     && /usr/local/ccache/bin/ccache -p \
     && rm -rf /tmp/ccache-3.7.9 \
     && rm -f /tmp/ccache-3.7.9.tar.gz
-
-# Reinstall git
-# Fix problem: error: RPC failed; curl 56 GnuTLS recv error (-110): The TLS connection was non-properly terminated
-RUN cd /tmp \
-    && wget https://tools.mindspore.cn/tools/ci/git/git-huawei/git-huawei_2.18.0.25_amd64.deb \
-    && dpkg -i git-huawei_2.18.0.25_amd64.deb \
-    && rm -f /tmp/git-huawei_2.18.0.25_amd64.deb
 
 # Set timezone
 RUN rm -f /etc/localtime \
@@ -270,6 +232,10 @@ RUN pip3 install --user pytest \
     && pip3 install --user 'psutil>=5.6.1' \
     && pip3 install --user 'six>=1.12.0' \
     && pip3 install --user 'Werkzeug>=1.0.0' \
+    && pip3 install --user 'tabulate>=0.8.6' \
+    && pip3 install --user 'sklearn>=0.0' \
+    && pip3 install --user 'pandas>=1.0.2' \
+    && pip3 install --user 'grpcio>=1.29.0' \
     && pip3 list
 
 # Clear cache

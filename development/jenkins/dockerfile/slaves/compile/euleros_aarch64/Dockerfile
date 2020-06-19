@@ -27,10 +27,10 @@ RUN repo_path=/etc/yum.repos.d/euleros_aarch64.repo \
     && rm -f /etc/yum.repos.d/euleros*.repo \
     && echo "[base]" > ${repo_path} \
     && echo "name=EulerOS-2.0SP8 base" >> ${repo_path} \
-    && echo "baseurl=https://tools.mindspore.cn/productrepo/repo/euleros/aarch64/EulerOS_Server_V200R008C00SPC201B530/" >> ${repo_path} \
+    && echo "baseurl=http://tools.mindspore.cn/productrepo/repo/euleros/aarch64/EulerOS_Server_V200R008C00SPC201B530/" >> ${repo_path} \
     && echo "enabled=1" >> ${repo_path} \
     && echo "gpgcheck=1" >> ${repo_path} \
-    && echo "gpgkey=https://tools.mindspore.cn/productrepo/repo/euleros/aarch64/EulerOS_Server_V200R008C00SPC201B530/RPM-GPG-KEY-EulerOS" >> ${repo_path} \
+    && echo "gpgkey=http://tools.mindspore.cn/productrepo/repo/euleros/aarch64/EulerOS_Server_V200R008C00SPC201B530/RPM-GPG-KEY-EulerOS" >> ${repo_path} \
     && yum clean all \
     && yum makecache \
     && yum update
@@ -235,6 +235,10 @@ RUN pip3 install --user pytest \
     && pip3 install --user 'psutil>=5.6.1' \
     && pip3 install --user 'six>=1.12.0' \
     && pip3 install --user 'Werkzeug>=1.0.0' \
+    && pip3 install --user 'tabulate>=0.8.6' \
+    && pip3 install --user 'sklearn>=0.0' \
+    && pip3 install --user 'pandas>=1.0.2' \
+    && pip3 install --user 'grpcio>=1.29.0' \
     && pip3 list
 
 # Clear cache

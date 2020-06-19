@@ -230,6 +230,10 @@ RUN pip3 install --user pytest \
     && pip3 install --user 'psutil>=5.6.1' \
     && pip3 install --user 'six>=1.12.0' \
     && pip3 install --user 'Werkzeug>=1.0.0' \
+    && pip3 install --user 'tabulate>=0.8.6' \
+    && pip3 install --user 'sklearn>=0.0' \
+    && pip3 install --user 'pandas>=1.0.2' \
+    && pip3 install --user 'grpcio>=1.29.0' \
     && pip3 list
 
 # Clear cache
