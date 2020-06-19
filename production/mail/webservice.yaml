@@ -5,13 +5,8 @@ kind: Service
 metadata:
   name: mailman-web-service
   namespace: mail
-  annotations:
-    kubernetes.io/elb.class: union
-    kubernetes.io/elb.id: 8409ecd7-39d4-419a-84da-5c2a3d747915
-    kubernetes.io/elb.lb-algorithm: ROUND_ROBIN
 spec:
   externalTrafficPolicy: Cluster
-  loadBalancerIP: 49.4.27.171
   ports:
   - port: 8000
     name: website-port-uwsgi-http
@@ -20,10 +15,6 @@ spec:
   - port: 80
     name: website-port-http
     targetPort: 80
-    protocol: TCP
-  - port: 443
-    name: website-port-https
-    targetPort: 443
     protocol: TCP
   selector:
     component: mail-web-service
@@ -60,12 +51,12 @@ spec:
           volumeMounts:
             - mountPath: /opt/mailman-web-config
               name: mailman-web-configmap-volume
-            - name: mailman-cert-secrets
-              mountPath: /etc/nginx/ssl/server.crt
-              subPath: server_crt
-            - name: mailman-cert-secrets
-              mountPath: /etc/nginx/ssl/server.key
-              subPath: server_key
+            - mountPath: /etc/nginx/nginx.conf
+              name: mailman-nginx-configmap-volume
+              subPath: nginx.conf
+            - mountPath: /etc/nginx/conf.d/default.conf
+              name: mailman-nginx-configmap-volume
+              subPath: default.conf
             - mountPath: /opt/mailman-web-data
               name: mailman-web-volume
             - mountPath: /usr/lib/python3.6/site-packages/postorius/templates/postorius/lists/summary.html
@@ -159,3 +150,6 @@ spec:
         - name: mailman-webpage-hack-volume
           configMap:
             name: mailman-webpage-hack
+        - name: mailman-nginx-configmap-volume
+          configMap:
+            name: mailman-nginx-configmap
