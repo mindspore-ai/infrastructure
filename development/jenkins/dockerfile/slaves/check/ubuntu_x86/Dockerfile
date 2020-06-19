@@ -1,6 +1,6 @@
-# ubuntu:xenial-20200326
-# DIGEST:sha256:a4fc0c40360ff2224db3a483e5d80e9164fe3fdce2a8439d2686270643974632
-FROM ubuntu:xenial-20200326
+# bionic-20190718(ubuntu18.04.2)
+# DIGEST:sha256:d91842ef309155b85a9e5c59566719308fab816b40d376809c39cf1cf4de3c6a
+FROM ubuntu:bionic-20190718
 MAINTAINER tommylike <tommylikehu@gmail.com>
 
 ##############
@@ -129,13 +129,6 @@ RUN cd /tmp \
     && chmod 755 -R /usr/local/clang-format \
     && rm -rf /tmp/clang+llvm-9.0.1-x86_64-linux-gnu-ubuntu-16.04 \
     && rm -f /tmp/clang+llvm-9.0.1-x86_64-linux-gnu-ubuntu-16.04.tar.xz
-
-# Reinstall git
-# Fix problem: error: RPC failed; curl 56 GnuTLS recv error (-110): The TLS connection was non-properly terminated
-RUN cd /tmp \
-    && wget https://tools.mindspore.cn/tools/ci/git/git-huawei/git-huawei_2.18.0.25_amd64.deb \
-    && dpkg -i git-huawei_2.18.0.25_amd64.deb \
-    && rm -f /tmp/git-huawei_2.18.0.25_amd64.deb
 
 # Set timezone
 RUN rm -f /etc/localtime \

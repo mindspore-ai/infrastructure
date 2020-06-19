@@ -17,7 +17,7 @@ git checkout c60e36eb76d8a260c76d5b8e7d8b5c544e8f6d23
 echo "[INFO] Download ISO."
 cd ${WORKSPACE}
 if [ ! -f ${WORKSPACE}/EulerOS-V2.0SP8-aarch64-dvd.iso ]; then
-    wget https://tools.mindspore.cn/productrepo/iso/euleros/EulerOS_Server_V200R008C00SPC201B530/EulerOS-V2.0SP8-aarch64-dvd.iso
+    wget http://tools.mindspore.cn/productrepo/iso/euleros/EulerOS_Server_V200R008C00SPC201B530/EulerOS-V2.0SP8-aarch64-dvd.iso
 fi
 
 # Mount ISO

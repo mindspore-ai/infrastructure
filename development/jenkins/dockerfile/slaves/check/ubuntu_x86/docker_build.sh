@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Global parameter
-IMAGE_VERSION="0.0.1"
+IMAGE_VERSION="0.0.2"
 WORKSPACE=$(dirname "${BASH_SOURCE-$0}")
 WORKSPACE=$(cd -P "${WORKSPACE}"; pwd -P)
 
