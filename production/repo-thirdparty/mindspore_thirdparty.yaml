@@ -50,35 +50,6 @@ data:
                   access_log off;
         }
     }
-    server {
-
-        if ($time_iso8601 ~ "^(\d{4})-(\d{2})-(\d{2})") {
-                set $year $1;
-                set $month $2;
-                set $day $3;
-        }
-        access_log /var/log/nginx/access.log.$year$month$day main;
-
-        listen 443 ssl;
-
-        server_name *.mindspore.cn;
-        ssl on;
-        ssl_certificate /etc/nginx/conf/ssl/fullchain.pem;
-        ssl_certificate_key  /etc/nginx/conf/ssl/privkey.pem;
-
-        location / {
-            root   /repo/mindspore;
-            fancyindex on;
-            fancyindex_exact_size off;
-            fancyindex_localtime on;
-            autoindex   on;
-        }
-
-        location = /favicon.ico {
-                    log_not_found off;
-                    access_log off;
-        }
-    }
 
   nginx.conf: |-
     user  root;
@@ -169,12 +140,6 @@ spec:
           image: swr.cn-north-1.myhuaweicloud.com/mindspore/nginx-extras:1.10.3
           imagePullPolicy: "Always"
           volumeMounts:
-            - name: website-secrets-volume
-              mountPath: /etc/nginx/conf/ssl/fullchain.pem
-              subPath: server_crt
-            - name: website-secrets-volume
-              mountPath: /etc/nginx/conf/ssl/privkey.pem
-              subPath: server_key
             - mountPath: /etc/nginx/conf/nginx.conf
               name: repo-nginx-configmap-volume
               subPath: nginx.conf
@@ -256,9 +221,6 @@ spec:
   #We need set this into 'Local' since we need get the client IP of elb.
   externalTrafficPolicy: Local
   ports:
-    - port: 443
-      name: nginx-repo-https
-      targetPort: 443
     - port: 873
       name: rsync-server-port
       targetPort: 873
