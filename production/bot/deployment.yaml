@@ -26,7 +26,7 @@ spec:
         botnode: "true"
       containers:
       - name: botinfod
-        image: swr.cn-south-1.myhuaweicloud.com/openeuler/bot:v1.0.202007171358386409
+        image: swr.cn-south-1.myhuaweicloud.com/openeuler/bot:v1.0.202008062049322032
         imagePullPolicy: IfNotPresent
         env:
         - name: WEBSITE_URL

@@ -19,7 +19,7 @@ RUN apt install -y software-properties-common && add-apt-repository ppa:ubuntu-t
 RUN apt install -y software-properties-common && add-apt-repository ppa:deadsnakes/ppa && \
     apt update -y && apt install -y python3.7 python3.7-dev && \
     rm /usr/bin/python3 && ln -s /usr/bin/python3.7 /usr/bin/python3 && \
-    curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py && python3 get-pip.py && pip install -U sphinx && \
+    curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py && python3 get-pip.py && pip install -U sphinx && pip install -U bs4 &&\
     curl -o doxygen-1.8.16.tar.gz https://nchc.dl.sourceforge.net/project/doxygen/rel-1.8.16/doxygen-1.8.16.linux.bin.tar.gz &&\
     tar -xvf doxygen-1.8.16.tar.gz && \
     cp doxygen-1.8.16/bin/* /usr/bin && rm -rf doxygen-1.8.16.tar.gz && rm -rf doxygen-1.8.16 && apt clean
