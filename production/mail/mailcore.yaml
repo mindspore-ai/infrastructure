@@ -20,7 +20,7 @@ spec:
     spec:
       containers:
         - name: mailman-core
-          image: mindspore/mail-core:v0.1.1
+          image: swr.ap-southeast-1.myhuaweicloud.com/opensourceway/mail-core:v0.1.1
           imagePullPolicy: "IfNotPresent"
           volumeMounts:
             - mountPath: /opt/mailman/
