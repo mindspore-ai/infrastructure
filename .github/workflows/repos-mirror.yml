@@ -17,12 +17,11 @@ jobs:
 
     steps:
     - name: Mirror the gitee/mindspore org repos to github/mindspore-ai.
-      uses: Yikun/hub-mirror-action@v0.07
+      uses: Yikun/hub-mirror-action@paging
       with:
         src: gitee/mindspore
         dst: github/mindspore-ai
         dst_key: ${{ secrets.SYNC_MINDSPORE_PRIVATE_KEY }}
         dst_token:  ${{ secrets.SYNC_MINDSPORE_TOKEN }}
         account_type: org
-        clone_style: ssh 
-        static_list: 'mindspore,mindinsight,mindarmour,graphengine,docs,book,community,ms-operator'
+        clone_style: ssh
