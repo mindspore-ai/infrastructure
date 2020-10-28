@@ -26,3 +26,4 @@ jobs:
         account_type: org
         clone_style: ssh 
         static_list: 'mindspore,mindinsight,mindarmour,graphengine,docs,book,community,ms-operator,akg,course,hub'
+        force_update: true 
