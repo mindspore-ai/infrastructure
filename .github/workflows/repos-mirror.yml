@@ -5,7 +5,7 @@ on:
     paths:
     - '.github/workflows/**'
     # Runs at every pull requests submitted in master branch 
-    branches: [ master ]
+    branches: [ master, main ]
   schedule:
     # Runs at 0,2,4,6...,22th hour every day (every 2 hours)
     - cron:  '0 */2 * * *'
@@ -17,7 +17,7 @@ jobs:
 
     steps:
     - name: Mirror the gitee/mindspore org repos to github/mindspore-ai.
-      uses: Yikun/hub-mirror-action@v0.07
+      uses: Yikun/hub-mirror-action@master
       with:
         src: gitee/mindspore
         dst: github/mindspore-ai
@@ -26,3 +26,5 @@ jobs:
         account_type: org
         clone_style: ssh 
         static_list: 'mindspore,mindinsight,mindarmour,graphengine,docs,book,community,ms-operator,akg,course,hub'
+        force_update: true
+        black_list: 'infrastructure'
