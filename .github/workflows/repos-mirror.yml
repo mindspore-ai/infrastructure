@@ -17,7 +17,7 @@ jobs:
 
     steps:
     - name: Mirror the gitee/mindspore org repos to github/mindspore-ai.
-      uses: Yikun/hub-mirror-action@master
+      uses: Yikun/hub-mirror-action@v1.0
       with:
         src: gitee/mindspore
         dst: github/mindspore-ai
@@ -28,3 +28,4 @@ jobs:
         static_list: 'mindspore,mindinsight,mindarmour,graphengine,docs,book,community,ms-operator,akg,course,hub,serving'
         force_update: true
         black_list: 'infrastructure'
+        debug: true
