@@ -25,7 +25,7 @@ jobs:
         dst_token:  ${{ secrets.SYNC_MINDSPORE_TOKEN }}
         account_type: org
         clone_style: ssh 
-        static_list: 'mindspore,mindinsight,mindarmour,graphengine,docs,book,community,ms-operator,akg,course,hub,serving,mindquantum,xai,models,mindscience,contrib'
+        static_list: 'mindspore,mindinsight,mindarmour,graphengine,docs,book,community,ms-operator,akg,course,hub,serving,mindquantum,xai,models,mindscience,contrib,reinforcement'
         force_update: true
         black_list: 'infrastructure'
         debug: true
