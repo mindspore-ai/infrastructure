@@ -26,5 +26,5 @@ jobs:
         account_type: org
         clone_style: ssh 
         force_update: true
-        black_list: 'infrastructure,mindcv'
+        black_list: 'infrastructure,mindcv,mindformers'
         debug: true
