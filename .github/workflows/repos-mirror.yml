@@ -16,6 +16,20 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+
+    - name: Mirror the gitee/mindspore repos to github/mindspore-lab.
+      uses: Yikun/hub-mirror-action@v1.0
+      with:
+        src: gitee/mindspore
+        dst: github/mindspore-lab
+        dst_key: ${{ secrets.SYNC_MINDSPORE_LAB_PRIVATE_KEY }}
+        dst_token:  ${{ secrets.SYNC_MINDSPORE_LAB_TOKEN }}
+        account_type: org
+        clone_style: ssh 
+        force_update: true
+        static_list: 'mindformers'
+        debug: true
+
     - name: Mirror the gitee/mindspore org repos to github/mindspore-ai.
       uses: Yikun/hub-mirror-action@v1.3
       with:
