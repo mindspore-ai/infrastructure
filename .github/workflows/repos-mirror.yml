@@ -27,4 +27,5 @@ jobs:
         clone_style: ssh 
         force_update: true
         black_list: 'infrastructure,mindcv,mindformers'
+        static_list: 'mindspore'
         debug: true
