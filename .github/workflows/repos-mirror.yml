@@ -29,3 +29,4 @@ jobs:
         black_list: 'infrastructure,mindcv,mindformers'
         static_list: 'mindspore'
         debug: true
+        lfs: true
