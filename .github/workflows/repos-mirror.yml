@@ -17,7 +17,7 @@ jobs:
 
     steps:
     - name: Mirror the gitee/mindspore org repos to github/mindspore-ai.
-      uses: Yikun/hub-mirror-action@v1.3
+      uses: Yikun/hub-mirror-action@v1.4
       with:
         src: gitee/mindspore
         dst: github/mindspore-ai
