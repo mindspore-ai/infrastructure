@@ -40,6 +40,5 @@ jobs:
         clone_style: ssh 
         force_update: true
         black_list: 'infrastructure,mindcv,mindformers'
-
         debug: true
         lfs: true
