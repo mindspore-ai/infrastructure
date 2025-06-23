@@ -6,9 +6,9 @@ on:
     - '.github/workflows/**'
     # Runs at every pull requests submitted in master branch 
     branches: [ master, main ]
-  schedule:
+  #schedule:
     # Runs at 0,2,4,6...,22th hour every day (every 2 hours)
-    - cron:  '0 */2 * * *'
+    #- cron:  '0 */2 * * *'
 
 jobs:
   build:
