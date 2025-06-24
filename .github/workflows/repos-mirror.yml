@@ -1,4 +1,4 @@
-name: MindSpore Gitee repos mirror periodic job
+name: MindSpore Gitee repos mirror periodic job test
 
 on:
   pull_request:
@@ -26,19 +26,6 @@ jobs:
         account_type: org
         clone_style: ssh 
         force_update: true
-        static_list: 'mindspore'
-        debug: true
-        lfs: true
-    - name: Mirror the gitee/mindspore org repos to github/mindspore-ai.
-      uses: Yikun/hub-mirror-action@v1.4
-      with:
-        src: gitee/mindspore
-        dst: github/mindspore-ai
-        dst_key: ${{ secrets.SYNC_MINDSPORE_PRIVATE_KEY }}
-        dst_token:  ${{ secrets.SYNC_MINDSPORE_TOKEN }}
-        account_type: org
-        clone_style: ssh 
-        force_update: true
-        black_list: 'infrastructure,mindcv,mindformers'
+        static_list: 'mindscience'
         debug: true
         lfs: true
