@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Mirror the mindspore.
-      uses: Yikun/hub-mirror-action@v1.4
+      uses: Yikun/hub-mirror-action@master
       with:
         src: gitcode/mindspore
         dst: github/mindspore-ai
