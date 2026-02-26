@@ -1,4 +1,4 @@
-name: MindSpore Gitee repos mirror periodic job
+name: MindSpore Gitcode repos mirror periodic job
 
 on:
   pull_request:
