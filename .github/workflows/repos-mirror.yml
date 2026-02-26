@@ -19,8 +19,8 @@ jobs:
       with:
         src: gitcode/mindspore
         dst: github/mindspore-ai
-        dst_key: ${{ secrets.SYNC_MINDSPORE_PRIVATE_KEY }}
-        dst_token:  ${{ secrets.SYNC_MINDSPORE_TOKEN }}
+        dst_key: ${{ secrets.SYNC_SSH_PRIVATE_KEY }}
+        dst_token:  ${{ secrets.SYNC_TOKEN_GITHUB }}
         account_type: org
         clone_style: ssh 
         force_update: true
