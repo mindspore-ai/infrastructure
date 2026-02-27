@@ -22,8 +22,8 @@ jobs:
         dst_key: ${{ secrets.SYNC_SSH_PRIVATE_KEY }}
         dst_token:  ${{ secrets.SYNC_TOKEN_GITHUB }}
         account_type: org
-        clone_style: https
+        clone_style: ssh
         force_update: true
-        static_list: 'hyper-parallel'
+        static_list: "hyper-parallel"
         debug: true
         lfs: true
