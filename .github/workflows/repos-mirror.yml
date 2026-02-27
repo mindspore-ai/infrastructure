@@ -1,44 +1,29 @@
-name: MindSpore Gitee repos mirror periodic job
+name: MindSpore Gitcode repos mirror periodic job
 
 on:
   pull_request:
     paths:
     - '.github/workflows/**'
     # Runs at every pull requests submitted in master branch 
-    branches: [ master, main ]
-  #schedule:
-    # Runs at 0,2,4,6...,22th hour every day (every 2 hours)
-    #- cron:  '0 */2 * * *'
+    branches: [ master ]
+  schedule:
+    # Runs every 2 hours
+    - cron:  '0 */2 * * *'
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
-
     steps:
     - name: Mirror the mindspore.
-      uses: Yikun/hub-mirror-action@v1.4
+      uses: Yikun/hub-mirror-action@master
       with:
-        src: gitee/mindspore
+        src: gitcode/mindspore
         dst: github/mindspore-ai
-        dst_key: ${{ secrets.SYNC_MINDSPORE_PRIVATE_KEY }}
-        dst_token:  ${{ secrets.SYNC_MINDSPORE_TOKEN }}
+        dst_key: ${{ secrets.SYNC_SSH_PRIVATE_KEY }}
+        dst_token:  ${{ secrets.SYNC_TOKEN_GITHUB }}
         account_type: org
-        clone_style: ssh 
+        clone_style: ssh
         force_update: true
-        static_list: 'mindspore'
-        debug: true
-        lfs: true
-    - name: Mirror the gitee/mindspore org repos to github/mindspore-ai.
-      uses: Yikun/hub-mirror-action@v1.4
-      with:
-        src: gitee/mindspore
-        dst: github/mindspore-ai
-        dst_key: ${{ secrets.SYNC_MINDSPORE_PRIVATE_KEY }}
-        dst_token:  ${{ secrets.SYNC_MINDSPORE_TOKEN }}
-        account_type: org
-        clone_style: ssh 
-        force_update: true
-        black_list: 'infrastructure,mindcv,mindformers'
+        static_list: "hyper-parallel"
         debug: true
         lfs: true
