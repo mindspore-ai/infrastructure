@@ -36,6 +36,6 @@ jobs:
         account_type: org
         clone_style: ssh
         force_update: true
-        static_list: "hyper-parallel"
+        static_list: "hyper-parallel,mindformers,vllm-mindspore,akg,mindspore-lite,ms_custom_ops,golden-stick"
         debug: true
         lfs: true
